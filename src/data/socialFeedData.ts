@@ -1,5 +1,6 @@
 import { SocialPost, SocialStory } from '../types/socialFeed';
 import type { StaticNotification } from './socialRules';
+import { createLightweightComment } from './gidiUsers';
 
 export const INITIAL_STORIES: SocialStory[] = [
   {
@@ -247,6 +248,24 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 890,
         timestamp: '1h ago',
       },
+      createLightweightComment('c_zee_tam_rep1', 'favoureze', 'Wait, Tamara is bringing a plus-one who isn’t on the official PR call sheet?', {
+        parentCommentId: 'c_zee_2',
+        replyToHandle: '@tamara_reid',
+        likes: 184,
+        timestamp: '52m ago',
+      }),
+      createLightweightComment('c_zee_tam_rep2', 'anita_nwosu', 'The Bello PR desk only cleared 200 wristbands. If someone gets in unvetted, the press team is getting questioned.', {
+        parentCommentId: 'c_zee_tam_rep1',
+        replyToHandle: '@favoureze_',
+        likes: 142,
+        timestamp: '48m ago',
+      }),
+      createLightweightComment('c_zee_tam_rep3', 'halima_bello', 'Trust me, Zainab always notices who walks into her salon, cleared or not.', {
+        parentCommentId: 'c_zee_tam_rep2',
+        replyToHandle: '@anitanwosu_',
+        likes: 215,
+        timestamp: '44m ago',
+      }),
       {
         id: 'c_zee_3',
         authorId: 'chi',
@@ -269,6 +288,66 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 180,
         timestamp: '30m ago',
       },
+      createLightweightComment('c_zee_sec_1', 'solomon_ekong', 'Security at Zone 3 gate is using biometric QR scanners tonight. Even private drivers cannot pass First Gate without wristbands.', {
+        parentCommentId: 'c_zee_4',
+        replyToHandle: '@lagos_society_wire',
+        likes: 96,
+        timestamp: '26m ago',
+      }),
+      createLightweightComment('c_zee_sec_2', 'segun_bakare', 'Unless you’re driving something that belongs on the Island. Saw two Maybachs and a matte G-Wagon cleared without stopping.', {
+        parentCommentId: 'c_zee_sec_1',
+        replyToHandle: '@solomon_ekong',
+        likes: 130,
+        timestamp: '22m ago',
+      }),
+      createLightweightComment('c_zee_sec_3', 'daniel_okafor', 'One was Kelvin Adebayo-Wright. Heard that twin-turbo V8 all the way from the bridge.', {
+        parentCommentId: 'c_zee_sec_2',
+        replyToHandle: '@segun_bakare',
+        likes: 175,
+        timestamp: '18m ago',
+      }),
+      createLightweightComment('c_zee_est_1', 'tunde_raji', 'That waterfront pavilion cost ₦85M just to landscape for this single gala. Banana Island residents know this compound well.', {
+        likes: 310,
+        timestamp: '35m ago',
+      }),
+      createLightweightComment('c_zee_est_2', 'tolu_adebayo', 'And 70% of it is sponsored by four multinational luxury brands. Check the logos behind the champagne pyramid.', {
+        parentCommentId: 'c_zee_est_1',
+        replyToHandle: '@tunde_raji',
+        likes: 198,
+        timestamp: '30m ago',
+      }),
+      createLightweightComment('c_zee_est_3', 'omowunmi_p', 'Can confirm. Brand activation decks were locked six months ago.', {
+        parentCommentId: 'c_zee_est_2',
+        replyToHandle: '@tolu_adebayo',
+        likes: 145,
+        timestamp: '25m ago',
+      }),
+      createLightweightComment('c_zee_est_4', 'tolu_adebayo', 'Actually wait, looking closer at the press backdrop—five brands. Swiss watch house just added their banner.', {
+        parentCommentId: 'c_zee_est_3',
+        replyToHandle: '@omowunmi_p',
+        likes: 112,
+        timestamp: '21m ago',
+      }),
+      createLightweightComment('c_zee_dj_1', 'kola_fashola', 'The sound rig on the waterfront deck is shaking the lagoon. Dropping the midnight Afrobeats set as soon as cake is cut!', {
+        likes: 240,
+        timestamp: '28m ago',
+      }),
+      createLightweightComment('c_zee_dj_2', 'oscar_igwe', 'The bass frequencies are bleeding into Dayo’s studio wing across the water haha! Clean acoustic setup though.', {
+        parentCommentId: 'c_zee_dj_1',
+        replyToHandle: '@kola_fashola',
+        likes: 168,
+        timestamp: '20m ago',
+      }),
+      createLightweightComment('c_zee_fash_1', 'ronke_adewale', 'Zee’s French lace corset is breathtaking. Paris haute couture standard for a 21st birthday in Lagos.', {
+        likes: 280,
+        timestamp: '24m ago',
+      }),
+      createLightweightComment('c_zee_fash_2', 'jenny_okoro', 'Literally perfection! The Parisian glam squad did not come to play! 💅✨', {
+        parentCommentId: 'c_zee_fash_1',
+        replyToHandle: '@ronke_adewale',
+        likes: 194,
+        timestamp: '17m ago',
+      }),
     ],
   },
 
@@ -320,6 +399,30 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 310,
         timestamp: '50m ago',
       },
+      createLightweightComment('c_tam_dres_1', 'blessing_alabi', 'Tamara pulled that emerald piece straight from the private vault in Victoria Island yesterday morning.', {
+        parentCommentId: 'c_tam_1',
+        replyToHandle: '@bisola_vlogs',
+        likes: 215,
+        timestamp: '46m ago',
+      }),
+      createLightweightComment('c_tam_dres_2', 'favoureze', 'Wait, is it the archive silk from Paris Fashion Week or custom Lekki couture?', {
+        parentCommentId: 'c_tam_dres_1',
+        replyToHandle: '@blessing_alabi',
+        likes: 180,
+        timestamp: '42m ago',
+      }),
+      createLightweightComment('c_tam_dres_3', 'simi_solanke', 'It’s custom Okonkwo-Reid archival silk. The bias cut and corset stitching are unmistakable.', {
+        parentCommentId: 'c_tam_dres_2',
+        replyToHandle: '@favoureze_',
+        likes: 224,
+        timestamp: '38m ago',
+      }),
+      createLightweightComment('c_tam_dres_4', 'simi_solanke', 'Wait, looking at the hemline again... she definitely had it tailored for someone taller than herself.', {
+        parentCommentId: 'c_tam_dres_3',
+        replyToHandle: '@simi_solanke',
+        likes: 167,
+        timestamp: '35m ago',
+      }),
       {
         id: 'c_tam_2',
         authorId: 'hauwa',
@@ -331,6 +434,38 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 195,
         timestamp: '40m ago',
       },
+      createLightweightComment('c_tam_traf_1', 'miriam_chukwu', 'Saw Tamara’s matte G-Wagon stuck on Admiralty Way around 4 PM. Traffic was backed up all the way to the toll plaza!', {
+        likes: 312,
+        timestamp: '36m ago',
+      }),
+      createLightweightComment('c_tam_traf_2', 'femi_ajayi', 'Was running across Lekki link bridge then. She wasn’t alone in the front seat—someone with long box braids was with her.', {
+        parentCommentId: 'c_tam_traf_1',
+        replyToHandle: '@miriam_chukwu',
+        likes: 245,
+        timestamp: '31m ago',
+      }),
+      createLightweightComment('c_tam_traf_3', 'amara_dike', 'That’s Ada! Knowing Tamara, she drove all the way to Ajegunle to pick her up in person.', {
+        parentCommentId: 'c_tam_traf_2',
+        replyToHandle: '@femi_ajayi',
+        likes: 380,
+        timestamp: '27m ago',
+      }),
+      createLightweightComment('c_tam_traf_4', 'favoureze', 'An Island billionaire going to the mainland personally? That is real friendship right there.', {
+        parentCommentId: 'c_tam_traf_3',
+        replyToHandle: '@amara_dike',
+        likes: 290,
+        timestamp: '23m ago',
+      }),
+      createLightweightComment('c_tam_glam_1', 'ifeoma_anyanwu', 'That dewy skin finish under the afternoon sun is unreal. Need the exact setting spray brand right now!', {
+        likes: 178,
+        timestamp: '33m ago',
+      }),
+      createLightweightComment('c_tam_glam_2', 'jenny_okoro', 'It’s pure hydration and French mist! Tamara never uses matte powder in this humidity.', {
+        parentCommentId: 'c_tam_glam_1',
+        replyToHandle: '@ifeoma_anyanwu',
+        likes: 142,
+        timestamp: '28m ago',
+      }),
     ],
   },
 
@@ -393,6 +528,46 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 810,
         timestamp: '30m ago',
       },
+      createLightweightComment('c_bis_nda_1', 'kene_okoli', 'Chioma is right though. Standard high-society NDAs carry heavy liquidated damages if contract folders appear in vlog b-roll.', {
+        parentCommentId: 'c_bis_2',
+        replyToHandle: '@bisola_vlogs',
+        likes: 210,
+        timestamp: '25m ago',
+      }),
+      createLightweightComment('c_bis_nda_2', 'folake_ade', 'Bisola never blurs faces properly on her vlogs anyway lol! Remember the boat party last Christmas?', {
+        parentCommentId: 'c_bis_nda_1',
+        replyToHandle: '@kene_okoli',
+        likes: 310,
+        timestamp: '22m ago',
+      }),
+      createLightweightComment('c_bis_nda_3', 'victor_osita', 'As an editor, I can tell you she edits these in 30 minutes in the back of an Uber. No time for keyframing motion blurs.', {
+        parentCommentId: 'c_bis_nda_2',
+        replyToHandle: '@folake_ade',
+        likes: 265,
+        timestamp: '18m ago',
+      }),
+      createLightweightComment('c_bis_goss_1', 'demola_shonowo', 'Word on the street is someone was uninvited because they forwarded a private voice note to a rival group chat this morning.', {
+        likes: 420,
+        timestamp: '32m ago',
+      }),
+      createLightweightComment('c_bis_goss_2', 'yemi_alabi', 'Two PR girls were whispering about that exact voice note in my cafe in VI this morning around 11!', {
+        parentCommentId: 'c_bis_goss_1',
+        replyToHandle: '@demola_shonowo',
+        likes: 345,
+        timestamp: '27m ago',
+      }),
+      createLightweightComment('c_bis_goss_3', 'demola_shonowo', 'Did they name the girl on the recording? Spill in my DMs abeg!', {
+        parentCommentId: 'c_bis_goss_2',
+        replyToHandle: '@yemi_alabi_',
+        likes: 280,
+        timestamp: '23m ago',
+      }),
+      createLightweightComment('c_bis_goss_4', 'yemi_alabi', 'They stopped talking the moment I brought the bill. Island people are super paranoid today.', {
+        parentCommentId: 'c_bis_goss_3',
+        replyToHandle: '@demola_shonowo',
+        likes: 390,
+        timestamp: '19m ago',
+      }),
     ],
   },
 
@@ -454,7 +629,49 @@ export const INITIAL_POSTS: SocialPost[] = [
         text: '@kelvin_wright I shoot what’s real. PR teams can edit whatever fantasy they like later.',
         likes: 540,
         timestamp: '20m ago',
+        parentCommentId: 'c_chi_p_1',
+        replyToHandle: '@kelvin_wright',
       },
+      createLightweightComment('c_chi_lens_1', 'ngozi_uche', 'Shooting 35mm film in low light at an Island party is brave. Flash sync at 1/60th is brutal with all those moving party strobes.', {
+        parentCommentId: 'c_chi_p_2',
+        replyToHandle: '@chidi_captures',
+        likes: 230,
+        timestamp: '17m ago',
+      }),
+      createLightweightComment('c_chi_lens_2', 'adaeze_nwosu', 'Chidi has been shooting candid film since university days. He doesn’t miss focus when the subject matters.', {
+        parentCommentId: 'c_chi_lens_1',
+        replyToHandle: '@ngozi_uche',
+        likes: 185,
+        timestamp: '14m ago',
+      }),
+      createLightweightComment('c_chi_lens_3', 'ngozi_uche', 'Yeah, but PR agencies hate grain. They want that plastic smoothed-out ring-light look.', {
+        parentCommentId: 'c_chi_lens_2',
+        replyToHandle: '@adaeze_nwosu_',
+        likes: 140,
+        timestamp: '11m ago',
+      }),
+      createLightweightComment('c_chi_lens_4', 'adaeze_nwosu', 'That’s why Chidi wins awards and they just buy sponsored likes.', {
+        parentCommentId: 'c_chi_lens_3',
+        replyToHandle: '@ngozi_uche',
+        likes: 275,
+        timestamp: '8m ago',
+      }),
+      createLightweightComment('c_chi_sam_1', 'sam_adeyemi', 'Watch how every influencer poses for five seconds, then spends twenty minutes checking if their stomach looks flat on screen.', {
+        likes: 310,
+        timestamp: '22m ago',
+      }),
+      createLightweightComment('c_chi_sam_2', 'david_obi', 'The metric isn’t reality, it’s impression velocity. Candids disrupt their calculated feed aesthetics.', {
+        parentCommentId: 'c_chi_sam_1',
+        replyToHandle: '@sam_adeyemi',
+        likes: 260,
+        timestamp: '18m ago',
+      }),
+      createLightweightComment('c_chi_sam_3', 'emmanuel_nnamdi', 'That’s why candids hurt the fake ones so much. Truth doesn’t come with a beauty filter.', {
+        parentCommentId: 'c_chi_sam_2',
+        replyToHandle: '@david_obi_',
+        likes: 340,
+        timestamp: '13m ago',
+      }),
     ],
   },
 
@@ -516,7 +733,43 @@ export const INITIAL_POSTS: SocialPost[] = [
         text: '@zeebello Just keeping the gatekeepers honest, little sister.',
         likes: 910,
         timestamp: '12m ago',
+        parentCommentId: 'c_kel_1',
+        replyToHandle: '@zeebello',
       },
+      createLightweightComment('c_kel_boat_1', 'tari_briggs', 'Saw your Riva speedboat tied at the Banana Island jetty around 7 PM. You bypassed the Lekki traffic completely.', {
+        parentCommentId: 'c_kel_2',
+        replyToHandle: '@kelvin_wright',
+        likes: 310,
+        timestamp: '10m ago',
+      }),
+      createLightweightComment('c_kel_boat_2', 'chinedu_ubah', 'Water route while everyone else is sitting on the link bridge. Old money moves.', {
+        parentCommentId: 'c_kel_boat_1',
+        replyToHandle: '@tari_briggs',
+        likes: 245,
+        timestamp: '8m ago',
+      }),
+      createLightweightComment('c_kel_boat_3', 'segun_bakare', 'His valet team also parked the GT3 by the gatehouse just in case. Prepared for any exit.', {
+        parentCommentId: 'c_kel_boat_2',
+        replyToHandle: '@chinedu_ubah',
+        likes: 198,
+        timestamp: '5m ago',
+      }),
+      createLightweightComment('c_kel_gym_1', 'uche_madu', 'Ran into Kelvin at the Ikoyi club gym this morning. Man looked like he was preparing for a takeover, not a birthday party.', {
+        likes: 280,
+        timestamp: '14m ago',
+      }),
+      createLightweightComment('c_kel_gym_2', 'daniel_okafor', 'When you have to watch your family’s empire while everyone is drinking free Dom Pérignon, it’s work, not a vacation.', {
+        parentCommentId: 'c_kel_gym_1',
+        replyToHandle: '@uche_madu',
+        likes: 215,
+        timestamp: '11m ago',
+      }),
+      createLightweightComment('c_kel_gym_3', 'uche_madu', 'Actually true. He was taking calls by the squash court about some audit records.', {
+        parentCommentId: 'c_kel_gym_2',
+        replyToHandle: '@daniel_okafor',
+        likes: 184,
+        timestamp: '7m ago',
+      }),
     ],
   },
 
@@ -631,6 +884,30 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 8420,
         timestamp: '5m ago',
       },
+      createLightweightComment('c_leak_tam_1', 'amara_dike', 'Ada works three jobs and tutors half our faculty! Leaking her tuition balance is evil, cowardly, and petty!', {
+        parentCommentId: 'c_leak_1',
+        replyToHandle: '@tamara_reid',
+        likes: 1450,
+        timestamp: '4m ago',
+      }),
+      createLightweightComment('c_leak_tam_2', 'chinwe_agwu', 'And how did @TheLagosTea get university bursary records anyway? That is an internal student portal breach!', {
+        parentCommentId: 'c_leak_tam_1',
+        replyToHandle: '@amara_dike',
+        likes: 920,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_leak_tam_3', 'kene_okoli', 'Strict violation of the Data Protection Act. Whoever extracted that screenshot from the bursary system committed a serious felony.', {
+        parentCommentId: 'c_leak_tam_2',
+        replyToHandle: '@chinwe_agwu',
+        likes: 1100,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_leak_tam_4', 'kene_okoli', 'Unless someone with authorized administrative portal login forwarded it directly. Look at the timestamp in the corner.', {
+        parentCommentId: 'c_leak_tam_3',
+        replyToHandle: '@kene_okoli',
+        likes: 840,
+        timestamp: '1m ago',
+      }),
       {
         id: 'c_leak_2',
         authorId: 'zee',
@@ -642,6 +919,30 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 6150,
         timestamp: '4m ago',
       },
+      createLightweightComment('c_leak_zee_1', 'solomon_ekong', 'Only security personnel and VIP guests had clearance for the upper mezzanine where that angle was taken.', {
+        parentCommentId: 'c_leak_2',
+        replyToHandle: '@zeebello',
+        likes: 780,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_leak_zee_2', 'cynthia_ibekwe', 'I was supervising VIP catering on that exact mezzanine! Only five people came up those private stairs all evening.', {
+        parentCommentId: 'c_leak_zee_1',
+        replyToHandle: '@solomon_ekong',
+        likes: 1250,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_leak_zee_3', 'demola_shonowo', 'WHO WERE THE FIVE CYNTHIA? We need the names right now!!', {
+        parentCommentId: 'c_leak_zee_2',
+        replyToHandle: '@cynthia_ibekwe',
+        likes: 990,
+        timestamp: '1m ago',
+      }),
+      createLightweightComment('c_leak_zee_4', 'cynthia_ibekwe', 'I’m not losing my catering license for internet gossip, Demola! But none of them were catering staff.', {
+        parentCommentId: 'c_leak_zee_3',
+        replyToHandle: '@demola_shonowo',
+        likes: 1420,
+        timestamp: 'Just now',
+      }),
       {
         id: 'c_leak_3',
         authorId: 'chidi',
@@ -675,6 +976,50 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 2100,
         timestamp: '1m ago',
       },
+      createLightweightComment('c_leak_tech_1', 'david_obi', 'Notice the compression artifacts on that uploaded receipt. This was forwarded through an encrypted channel before being posted to the Tea.', {
+        likes: 880,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_leak_tech_2', 'nnamdi_oraekwe', 'Tea’s posting latency was 6 minutes from the moment Ada stepped into the hall. The leaker was standing right there in the room.', {
+        parentCommentId: 'c_leak_tech_1',
+        replyToHandle: '@david_obi_',
+        likes: 670,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_leak_tech_3', 'david_obi', 'Exactly. This wasn’t a remote hack. It was an eyewitness with a grudge and pre-gathered receipts.', {
+        parentCommentId: 'c_leak_tech_2',
+        replyToHandle: '@nnamdi_oraekwe',
+        likes: 910,
+        timestamp: '1m ago',
+      }),
+      createLightweightComment('c_leak_cloth_em1', 'blessing_alabi', 'That emerald dress was literally on Tamara’s feed two months ago in Dubai. The leaker clocked it immediately.', {
+        requiredFlag: 'borrowed_emerald_dress',
+        hiddenIfFlag: 'vintage_style_dress',
+        likes: 450,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_leak_cloth_em2', 'favoureze', 'Tamara lent it because she loves her! Why is sharing clothes with your best friend a crime now?', {
+        parentCommentId: 'c_leak_cloth_em1',
+        replyToHandle: '@blessing_alabi',
+        requiredFlag: 'borrowed_emerald_dress',
+        hiddenIfFlag: 'vintage_style_dress',
+        likes: 620,
+        timestamp: '1m ago',
+      }),
+      createLightweightComment('c_leak_cloth_vn1', 'sam_adeyemi', 'Whoever wrote that caption was mad that someone in a thrifted black dress had more natural aura than their rented couture.', {
+        requiredFlag: 'vintage_style_dress',
+        hiddenIfFlag: 'borrowed_emerald_dress',
+        likes: 540,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_leak_cloth_vn2', 'favoureze', 'Exactly! She looked stunning and they couldn’t stand someone from the mainland looking better than them.', {
+        parentCommentId: 'c_leak_cloth_vn1',
+        replyToHandle: '@sam_adeyemi',
+        requiredFlag: 'vintage_style_dress',
+        hiddenIfFlag: 'borrowed_emerald_dress',
+        likes: 680,
+        timestamp: '1m ago',
+      }),
     ],
   },
 
@@ -726,6 +1071,24 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 3100,
         timestamp: '2h ago',
       },
+      createLightweightComment('c_zstmt_wifi_1', 'david_obi', 'Kelvin is right. Banana Island private residential networks have MAC address logging. If a device posted through the villa router, it’s recorded.', {
+        parentCommentId: 'c_zee_ep2_1',
+        replyToHandle: '@kelvin_wright',
+        likes: 890,
+        timestamp: '1h 45m ago',
+      }),
+      createLightweightComment('c_zstmt_wifi_2', 'nnamdi_oraekwe', 'Unless the leaker used cellular data with an unregistered burner SIM to bypass local IP tracking.', {
+        parentCommentId: 'c_zstmt_wifi_1',
+        replyToHandle: '@david_obi_',
+        likes: 670,
+        timestamp: '1h 30m ago',
+      }),
+      createLightweightComment('c_zstmt_wifi_3', 'david_obi', 'Which means whoever did it planned the whole operation before stepping through the door.', {
+        parentCommentId: 'c_zstmt_wifi_2',
+        replyToHandle: '@nnamdi_oraekwe',
+        likes: 920,
+        timestamp: '1h 15m ago',
+      }),
       {
         id: 'c_zee_ep2_2',
         authorId: 'hauwa',
@@ -737,6 +1100,38 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 1850,
         timestamp: '1h ago',
       },
+      createLightweightComment('c_zstmt_fam_1', 'halima_bello', 'Zainab’s team is panicking because the family board doesn’t like scandal attached to the Bello Foundation.', {
+        likes: 560,
+        timestamp: '2h ago',
+      }),
+      createLightweightComment('c_zstmt_fam_2', 'tolu_adebayo', 'The political campaign starts next quarter. Negative press about leaked bursary records looks terrible for their education philanthropy.', {
+        parentCommentId: 'c_zstmt_fam_1',
+        replyToHandle: '@halima_bello_',
+        likes: 480,
+        timestamp: '1h 40m ago',
+      }),
+      createLightweightComment('c_zstmt_fam_3', 'halima_bello', 'Exactly. This isn’t just influencer noise; it’s touching real family business.', {
+        parentCommentId: 'c_zstmt_fam_2',
+        replyToHandle: '@tolu_adebayo',
+        likes: 510,
+        timestamp: '1h 20m ago',
+      }),
+      createLightweightComment('c_zstmt_mor_1', 'grace_okeke', 'All this noise over vanity. May God protect innocent children trying to study from high society traps.', {
+        likes: 620,
+        timestamp: '2h 10m ago',
+      }),
+      createLightweightComment('c_zstmt_mor_2', 'prisca_nwa', 'Amen Mommy. When you invite students from honest homes into these circles without protection, wolves eat them.', {
+        parentCommentId: 'c_zstmt_mor_1',
+        replyToHandle: '@grace_okeke',
+        likes: 490,
+        timestamp: '1h 50m ago',
+      }),
+      createLightweightComment('c_zstmt_mor_3', 'amara_dike', 'Ada is stronger than all of them, Mommy. She won’t let them break her spirit.', {
+        parentCommentId: 'c_zstmt_mor_2',
+        replyToHandle: '@prisca_nwa',
+        likes: 710,
+        timestamp: '1h 30m ago',
+      }),
     ],
   },
 
@@ -839,6 +1234,30 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 4210,
         timestamp: '40m ago',
       },
+      createLightweightComment('c_tea_ph_1', 'folake_ade', 'Bisola wait, YOU have two phones! One for vlogging and one for personal DMs!', {
+        parentCommentId: 'c_tea2_1',
+        replyToHandle: '@bisola_vlogs',
+        likes: 680,
+        timestamp: '35m ago',
+      }),
+      createLightweightComment('c_tea_ph_2', 'folake_ade', 'Wait, actually wait. Bisola’s vlog phone is an Android. Tea said TWO iPhones.', {
+        parentCommentId: 'c_tea_ph_1',
+        replyToHandle: '@folake_ade',
+        likes: 920,
+        timestamp: '32m ago',
+      }),
+      createLightweightComment('c_tea_ph_3', 'demola_shonowo', 'Chioma carries two iPhones too—one corporate and one personal! And what about Hauwa?', {
+        parentCommentId: 'c_tea_ph_2',
+        replyToHandle: '@folake_ade',
+        likes: 840,
+        timestamp: '28m ago',
+      }),
+      createLightweightComment('c_tea_ph_4', 'zainab_danladi', 'Hauwa does NOT use burner phones, leave her out of your podcast theories!', {
+        parentCommentId: 'c_tea_ph_3',
+        replyToHandle: '@demola_shonowo',
+        likes: 510,
+        timestamp: '25m ago',
+      }),
       {
         id: 'c_tea2_2',
         authorId: 'tamara',
@@ -850,6 +1269,27 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 2940,
         timestamp: '30m ago',
       },
+      createLightweightComment('c_tea_tow_1', 'solomon_ekong', 'That cell tower near Osborne Road covers the entire corridor between Ikoyi and the bridge. Thousands of phones ping it daily.', {
+        likes: 540,
+        timestamp: '27m ago',
+      }),
+      createLightweightComment('c_tea_tow_2', 'nnamdi_oraekwe', 'Yes, but how many pinged it between 1:00 AM and 1:30 AM while uploading 15MB of image payloads to an offshore proxy?', {
+        parentCommentId: 'c_tea_tow_1',
+        replyToHandle: '@solomon_ekong',
+        likes: 730,
+        timestamp: '23m ago',
+      }),
+      createLightweightComment('c_tea_tow_3', 'david_obi', 'Only someone routing through an offshore relay. The leaker understands basic operational security.', {
+        parentCommentId: 'c_tea_tow_2',
+        replyToHandle: '@nnamdi_oraekwe',
+        likes: 890,
+        timestamp: '19m ago',
+      }),
+      createLightweightComment('c_tea_burn_1', 'amara_dike', 'Whoever owns that second phone knows someone was close enough to see it. The panic is setting in.', {
+        requiredFlag: 'inspected_burner_phone',
+        likes: 460,
+        timestamp: '15m ago',
+      }),
     ],
   },
 
@@ -901,6 +1341,24 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 1980,
         timestamp: '1h ago',
       },
+      createLightweightComment('c_ch_omo_1', 'omowunmi_p', 'Six brand sponsor decks already signed. The ROI on housing all five creators under one roof is massive.', {
+        parentCommentId: 'c_ch_1',
+        replyToHandle: '@chi_corporate_glam',
+        likes: 540,
+        timestamp: '52m ago',
+      }),
+      createLightweightComment('c_ch_omo_2', 'anita_nwosu', 'And bringing Ada on as the creative associate was strategic. Puts the victim on the payroll so she can’t sue.', {
+        parentCommentId: 'c_ch_omo_1',
+        replyToHandle: '@omowunmi_p',
+        likes: 670,
+        timestamp: '47m ago',
+      }),
+      createLightweightComment('c_ch_omo_3', 'amara_dike', 'Or Ada put herself in the belly of the beast to find out who leaked her life.', {
+        parentCommentId: 'c_ch_omo_2',
+        replyToHandle: '@anitanwosu_',
+        likes: 980,
+        timestamp: '42m ago',
+      }),
       {
         id: 'c_ch_2',
         authorId: 'hauwa',
@@ -912,6 +1370,38 @@ export const INITIAL_POSTS: SocialPost[] = [
         likes: 2400,
         timestamp: '45m ago',
       },
+      createLightweightComment('c_ch_kej_1', 'keji_balogun', 'As a resident of this Banana Island cul-de-sac, please keep your loud generator and drone filming to daylight hours!', {
+        likes: 430,
+        timestamp: '40m ago',
+      }),
+      createLightweightComment('c_ch_kej_2', 'tunde_raji', 'Good luck Keji, the estate lease agreement explicitly allows 24-hour creative production.', {
+        parentCommentId: 'c_ch_kej_1',
+        replyToHandle: '@keji_balogun',
+        likes: 510,
+        timestamp: '34m ago',
+      }),
+      createLightweightComment('c_ch_kej_3', 'keji_balogun', 'I’m calling the residents’ association chairman tomorrow morning. Unacceptable noise.', {
+        parentCommentId: 'c_ch_kej_2',
+        replyToHandle: '@tunde_raji',
+        likes: 380,
+        timestamp: '29m ago',
+      }),
+      createLightweightComment('c_ch_fav_1', 'favoureze', 'They brought Ada into the Content House?? With ring lights and bedrooms side by side?', {
+        likes: 610,
+        timestamp: '38m ago',
+      }),
+      createLightweightComment('c_ch_fav_2', 'miriam_chukwu', 'Someone is either getting exposed this week or someone is getting pushed into the pool!', {
+        parentCommentId: 'c_ch_fav_1',
+        replyToHandle: '@favoureze_',
+        likes: 740,
+        timestamp: '31m ago',
+      }),
+      createLightweightComment('c_ch_fav_3', 'demola_shonowo', 'My podcast studio is ready. Season 3 is going to be pure chaos.', {
+        parentCommentId: 'c_ch_fav_2',
+        replyToHandle: '@miriam_chukwu',
+        likes: 820,
+        timestamp: '26m ago',
+      }),
     ],
   },
 
@@ -951,6 +1441,57 @@ export const INITIAL_POSTS: SocialPost[] = [
     comments: [
       { id: 'c_ttag_1', authorId: 'hauwa', authorName: 'Hauwa Musa', authorHandle: '@hauwa_mindbody', isVerified: true, avatarType: 'hauwa', text: 'Radiant. Green suits your spirit, Ada 🌿', likes: 410, timestamp: '8m ago' },
       { id: 'c_ttag_2', authorId: 'chi', authorName: 'Chioma Eze', authorHandle: '@chi_corporate_glam', isVerified: true, avatarType: 'chi', text: 'Lovely. Is it on loan or a gift? Asking for the brand team 🙂', likes: 230, timestamp: '6m ago' },
+      {
+        id: 'c_ttag_tam_rep',
+        authorId: 'tamara',
+        authorName: 'Tamara Okonkwo-Reid',
+        authorHandle: '@tamara_reid',
+        isVerified: true,
+        avatarType: 'tamara',
+        text: '@chi_corporate_glam It’s a gift to someone who actually has a heart, Chioma. Don’t worry your spreadsheets about it.',
+        likes: 890,
+        timestamp: '5m ago',
+        parentCommentId: 'c_ttag_2',
+        replyToHandle: '@chi_corporate_glam',
+      },
+      createLightweightComment('c_ttag_rep1', 'anita_nwosu', 'Tamara just shut that down in public. The tension between the Reid camp and Chioma’s firm is heating up.', {
+        parentCommentId: 'c_ttag_tam_rep',
+        replyToHandle: '@tamara_reid',
+        likes: 310,
+        timestamp: '4m ago',
+      }),
+      createLightweightComment('c_ttag_rep2', 'favoureze', 'Good! Chioma always tries to act like she’s auditing everyone’s life.', {
+        parentCommentId: 'c_ttag_rep1',
+        replyToHandle: '@anitanwosu_',
+        likes: 420,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_ttag_sim_1', 'simi_solanke', 'The way that emerald silk falls on Ada is actually perfection. Better drape than the original runway model honestly.', {
+        likes: 540,
+        timestamp: '7m ago',
+      }),
+      createLightweightComment('c_ttag_sim_2', 'blessing_alabi', 'Agreed. Skin tone contrast is doing ten times the work of heavy jewelry.', {
+        parentCommentId: 'c_ttag_sim_1',
+        replyToHandle: '@simi_solanke',
+        likes: 390,
+        timestamp: '5m ago',
+      }),
+      createLightweightComment('c_ttag_sim_3', 'amara_dike', 'Mainland beauty with Island styling! That’s how you enter a room with heads turning!', {
+        parentCommentId: 'c_ttag_sim_2',
+        replyToHandle: '@blessing_alabi',
+        likes: 670,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_ttag_mir_1', 'miriam_chukwu', 'I thought someone said Tamara was lending that piece to a brand ambassador tonight?', {
+        likes: 280,
+        timestamp: '6m ago',
+      }),
+      createLightweightComment('c_ttag_mir_2', 'miriam_chukwu', 'Oh wait, my mistake! That was the bronze gown. The emerald was always reserved for Ada.', {
+        parentCommentId: 'c_ttag_mir_1',
+        replyToHandle: '@miriam_chukwu',
+        likes: 350,
+        timestamp: '4m ago',
+      }),
     ],
   },
 
@@ -1023,6 +1564,40 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 2600,
     comments: [
       { id: 'c_thrift_1', authorId: 'tamara', authorName: 'Tamara Reid', authorHandle: '@tamara_reid', isVerified: true, avatarType: 'tamara', text: 'BOLD. Next question. 💚', likes: 1900, timestamp: '7m ago' },
+      createLightweightComment('c_th_sam_1', 'sam_adeyemi', 'People who spend ₦3M on a dress just to stand awkwardly by a pillar could never understand vintage confidence.', {
+        parentCommentId: 'c_thrift_1',
+        replyToHandle: '@tamara_reid',
+        likes: 620,
+        timestamp: '6m ago',
+      }),
+      createLightweightComment('c_th_sam_2', 'chuka_enemuo', 'Half the guys in that room are wearing rented tuxedos from Victoria Island and want to talk about thrift lol.', {
+        parentCommentId: 'c_th_sam_1',
+        replyToHandle: '@sam_adeyemi',
+        likes: 780,
+        timestamp: '5m ago',
+      }),
+      createLightweightComment('c_th_sam_3', 'segun_bakare', 'I saw the rental tags inside three jackets at the VIP coat check, not gonna lie.', {
+        parentCommentId: 'c_th_sam_2',
+        replyToHandle: '@chuka_enemuo',
+        likes: 540,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_th_fav_1', 'favoureze', 'Thrift styling takes actual talent. Anyone with Daddy’s card can swipe for fast-fashion couture.', {
+        likes: 810,
+        timestamp: '6m ago',
+      }),
+      createLightweightComment('c_th_fav_2', 'blessing_alabi', 'As a stylist, vintage black silk with the right accessories is timeless. She read the room better than the clowns in neon.', {
+        parentCommentId: 'c_th_fav_1',
+        replyToHandle: '@favoureze_',
+        likes: 670,
+        timestamp: '4m ago',
+      }),
+      createLightweightComment('c_th_fav_3', 'favoureze', 'Exactly. Less is more, especially when you don’t need to prove anything to insecure billionaires.', {
+        parentCommentId: 'c_th_fav_2',
+        replyToHandle: '@blessing_alabi',
+        likes: 590,
+        timestamp: '2m ago',
+      }),
     ],
   },
 
@@ -1055,6 +1630,34 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 380,
     comments: [
       { id: 'c_chisub_1', authorId: 'bisola', authorName: 'Bisola Adeyemi', authorHandle: '@bisola_vlogs', isVerified: true, avatarType: 'bisola', text: 'Who is this about 😭🍿 I need names', likes: 980, timestamp: '5m ago' },
+      createLightweightComment('c_chi_sub_ani_1', 'anita_nwosu', 'Everybody in the VIP gazebo heard Ada tell Chioma to check her tone before giving unsolicited advice.', {
+        parentCommentId: 'c_chisub_1',
+        replyToHandle: '@bisola_vlogs',
+        likes: 420,
+        timestamp: '4m ago',
+      }),
+      createLightweightComment('c_chi_sub_ani_2', 'amara_dike', 'Good for Ada! Chioma thinks having a corporate sponsor means she can talk down to scholarship students.', {
+        parentCommentId: 'c_chi_sub_ani_1',
+        replyToHandle: '@anitanwosu_',
+        likes: 630,
+        timestamp: '3m ago',
+      }),
+      createLightweightComment('c_chi_sub_ani_3', 'kene_okoli', 'Chioma’s haughty tone has cost her deals before. Corporate arrogance doesn’t play well when cameras are rolling.', {
+        parentCommentId: 'c_chi_sub_ani_2',
+        replyToHandle: '@amara_dike',
+        likes: 380,
+        timestamp: '2m ago',
+      }),
+      createLightweightComment('c_chi_sub_dav_1', 'david_obi', 'Subtweeting on main is an interesting PR choice for a partner at a commercial law firm.', {
+        likes: 510,
+        timestamp: '4m ago',
+      }),
+      createLightweightComment('c_chi_sub_dav_2', 'omowunmi_p', 'Client relations team probably drafting a cleanup memo as we speak.', {
+        parentCommentId: 'c_chi_sub_dav_1',
+        replyToHandle: '@david_obi_',
+        likes: 460,
+        timestamp: '2m ago',
+      }),
     ],
   },
 
@@ -1088,7 +1691,60 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 5100,
     comments: [
       { id: 'c_porsche_1', authorId: 'zee', authorName: 'Zainab Bello', authorHandle: '@zeebello', isVerified: true, avatarType: 'zee', text: 'Kelvin. Call me. Now.', likes: 6200, timestamp: '20m ago' },
+      {
+        id: 'c_pors_kel_rep',
+        authorId: 'kelvin',
+        authorName: 'Kelvin Adebayo-Wright',
+        authorHandle: '@kelvin_wright',
+        isVerified: true,
+        avatarType: 'kelvin',
+        text: '@zeebello I’m having lunch, Zee. Calm down.',
+        likes: 3800,
+        timestamp: '17m ago',
+        parentCommentId: 'c_porsche_1',
+        replyToHandle: '@zeebello',
+      },
+      createLightweightComment('c_pors_hal_1', 'halima_bello', 'Kelvin never answers family calls when he’s making a point. Classic Adebayo-Wright defiance.', {
+        parentCommentId: 'c_pors_kel_rep',
+        replyToHandle: '@kelvin_wright',
+        likes: 720,
+        timestamp: '14m ago',
+      }),
+      createLightweightComment('c_pors_hal_2', 'miriam_chukwu', 'Ada went from Ajegunle bus stops to passenger seat in a GT3 in 48 hours. I have to respect the trajectory!', {
+        parentCommentId: 'c_pors_hal_1',
+        replyToHandle: '@halima_bello_',
+        likes: 940,
+        timestamp: '11m ago',
+      }),
       { id: 'c_porsche_2', authorId: 'chidi', authorName: 'Chidi Nwosu', authorHandle: '@chidi_captures', isVerified: true, avatarType: 'chidi', text: 'Bad angle. Worse lighting.', likes: 3100, timestamp: '18m ago' },
+      createLightweightComment('c_pors_dan_1', 'daniel_okafor', 'Chidi is definitely salty haha! He wanted her in front of his 35mm lens, not in Kelvin’s bucket seats.', {
+        parentCommentId: 'c_porsche_2',
+        replyToHandle: '@chidi_captures',
+        likes: 670,
+        timestamp: '15m ago',
+      }),
+      createLightweightComment('c_pors_dan_2', 'chinedu_ubah', 'That 992 GT3 does 0-100 in 3.4 seconds. No campus camera can catch that anyway.', {
+        parentCommentId: 'c_pors_dan_1',
+        replyToHandle: '@daniel_okafor',
+        likes: 580,
+        timestamp: '12m ago',
+      }),
+      createLightweightComment('c_pors_dan_3', 'adaeze_nwosu', 'Chidi doesn’t care about cars, he cares about people who aren’t using Ada as an accessory.', {
+        parentCommentId: 'c_pors_dan_2',
+        replyToHandle: '@chinedu_ubah',
+        likes: 830,
+        timestamp: '9m ago',
+      }),
+      createLightweightComment('c_pors_fav_1', 'favoureze', 'Was that Kelvin’s car outside the faculty?', {
+        likes: 490,
+        timestamp: '18m ago',
+      }),
+      createLightweightComment('c_pors_fav_2', 'favoureze', 'Wait, I saw them turning towards the coastal expressway. He actually opened the passenger door for her.', {
+        parentCommentId: 'c_pors_fav_1',
+        replyToHandle: '@favoureze_',
+        likes: 620,
+        timestamp: '13m ago',
+      }),
     ],
   },
 
@@ -1155,6 +1811,34 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 900,
     comments: [
       { id: 'c_kwing_1', authorId: 'zee', authorName: 'Zainab Bello', authorHandle: '@zeebello', isVerified: true, avatarType: 'zee', text: 'Since when do you post captions 🙄', likes: 2100, timestamp: '30m ago' },
+      createLightweightComment('c_kw_uch_1', 'uche_madu', 'Kelvin hasn’t posted a personal caption on GidiGram in eight months. Whoever this is about shook him up.', {
+        parentCommentId: 'c_kwing_1',
+        replyToHandle: '@zeebello',
+        likes: 540,
+        timestamp: '26m ago',
+      }),
+      createLightweightComment('c_kw_uch_2', 'tari_briggs', 'He brought her to the private penthouse lounge on the 14th floor where he usually only takes offshore partners.', {
+        parentCommentId: 'c_kw_uch_1',
+        replyToHandle: '@uche_madu',
+        likes: 670,
+        timestamp: '22m ago',
+      }),
+      createLightweightComment('c_kw_uch_3', 'anita_nwosu', 'The Adebayo-Wright protection is heavy armor on the Island. Nobody can touch her bursary fees now without answering to him.', {
+        parentCommentId: 'c_kw_uch_2',
+        replyToHandle: '@tari_briggs',
+        likes: 820,
+        timestamp: '18m ago',
+      }),
+      createLightweightComment('c_kw_sam_1', 'sam_adeyemi', '‘Under my wing’ sounds poetic until you remember whose wing it is. Island billionaires always want return on investment.', {
+        likes: 490,
+        timestamp: '25m ago',
+      }),
+      createLightweightComment('c_kw_sam_2', 'amara_dike', 'Ada knows how to handle herself. She doesn’t owe anybody anything.', {
+        parentCommentId: 'c_kw_sam_1',
+        replyToHandle: '@sam_adeyemi',
+        likes: 730,
+        timestamp: '20m ago',
+      }),
     ],
   },
 
@@ -1187,6 +1871,47 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 210,
     comments: [
       { id: 'c_ctruth_1', authorId: 'tamara', authorName: 'Tamara Reid', authorHandle: '@tamara_reid', isVerified: true, avatarType: 'tamara', text: 'Ok poet 👀💚', likes: 640, timestamp: '20m ago' },
+      {
+        id: 'c_ct_chi_rep',
+        authorId: 'chidi',
+        authorName: 'Chidi Nwosu',
+        authorHandle: '@chidi_captures',
+        isVerified: true,
+        avatarType: 'chidi',
+        text: '@tamara_reid Some of us develop negatives, others just accumulate them.',
+        likes: 1200,
+        timestamp: '17m ago',
+        parentCommentId: 'c_ctruth_1',
+        replyToHandle: '@tamara_reid',
+      },
+      createLightweightComment('c_ct_ngo_1', 'ngozi_uche', 'Tri-X pushed two stops in Rodinal developer? You’re pulling out shadow detail from the mezzanine!', {
+        parentCommentId: 'c_ct_chi_rep',
+        replyToHandle: '@chidi_captures',
+        likes: 380,
+        timestamp: '14m ago',
+      }),
+      createLightweightComment('c_ct_ngo_2', 'nnamdi_oraekwe', 'Wait... does Chidi’s film roll have an unreleased shot of the leaker holding up their phone?', {
+        parentCommentId: 'c_ct_ngo_1',
+        replyToHandle: '@ngozi_uche',
+        likes: 610,
+        timestamp: '11m ago',
+      }),
+      createLightweightComment('c_ct_ngo_3', 'adaeze_nwosu', 'If anyone has the negative that solves this, it’s my cousin Chidi.', {
+        parentCommentId: 'c_ct_ngo_2',
+        replyToHandle: '@nnamdi_oraekwe',
+        likes: 740,
+        timestamp: '8m ago',
+      }),
+      createLightweightComment('c_ct_emm_1', 'emmanuel_nnamdi', 'Real craft takes patience. Let the loud ones flex on rooftops; the darkroom tells the truth.', {
+        likes: 420,
+        timestamp: '16m ago',
+      }),
+      createLightweightComment('c_ct_emm_2', 'amara_dike', 'Ada was in the photo lab with him earlier today. They are working together to find the truth.', {
+        parentCommentId: 'c_ct_emm_1',
+        replyToHandle: '@emmanuel_nnamdi',
+        likes: 690,
+        timestamp: '12m ago',
+      }),
     ],
   },
 
@@ -1218,7 +1943,47 @@ export const INITIAL_POSTS: SocialPost[] = [
     likesCount: 26700,
     commentsCount: 880,
     sharesCount: 640,
-    comments: [],
+    comments: [
+      createLightweightComment('c_bshout_omo_1', 'omowunmi_p', 'The engagement rate on this beverage post jumped 34% compared to Bisola’s usual captions. The copy is crisp, witty, and actually converts.', {
+        likes: 480,
+        timestamp: '50m ago',
+      }),
+      createLightweightComment('c_bshout_omo_2', 'folake_ade', 'We noticed!! Usually Bisola writes in all caps with 40 laughing emojis 😂 Ada made it sound like an actual luxury brand.', {
+        parentCommentId: 'c_bshout_omo_1',
+        replyToHandle: '@omowunmi_p',
+        likes: 620,
+        timestamp: '44m ago',
+      }),
+      {
+        id: 'c_bshout_bis_rep',
+        authorId: 'bisola',
+        authorName: 'Bisola Adeyemi',
+        authorHandle: '@bisola_vlogs',
+        isVerified: true,
+        avatarType: 'bisola',
+        text: '@folake_ade HEY! My all caps captions are iconic!! But yes Ada is a genius 😭💖',
+        likes: 1100,
+        timestamp: '38m ago',
+        parentCommentId: 'c_bshout_omo_2',
+        replyToHandle: '@folake_ade',
+      },
+      createLightweightComment('c_bshout_ama_1', 'amara_dike', 'Ada is top of our Media & Communications class for a reason. Pay her the full consulting fee, Bisola!', {
+        likes: 710,
+        timestamp: '46m ago',
+      }),
+      createLightweightComment('c_bshout_ama_2', 'kene_okoli', 'Make sure there’s a signed freelance retainer in place. Don’t let Island creators pay in ‘exposure’.', {
+        parentCommentId: 'c_bshout_ama_1',
+        replyToHandle: '@amara_dike',
+        likes: 540,
+        timestamp: '41m ago',
+      }),
+      createLightweightComment('c_bshout_ama_3', 'sam_adeyemi', 'Say it louder! ‘Exposure’ doesn’t pay bursary fees!', {
+        parentCommentId: 'c_bshout_ama_2',
+        replyToHandle: '@kene_okoli',
+        likes: 830,
+        timestamp: '35m ago',
+      }),
+    ],
   },
 
   // Ep3: the tender moment with Chidi at Ilashe
