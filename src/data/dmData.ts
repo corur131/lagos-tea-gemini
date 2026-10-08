@@ -377,6 +377,54 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'chidi_flirt_memory',
+        unlockEpisode: 1,
+        unlockSceneIndex: 5,
+        requiredFlag: 'flirted_with_chidi',
+        messages: [
+          { from: 'chidi', text: 'Still thinking about what you said on the terrace earlier about liking a man who knows his angles 😏' },
+          { from: 'chidi', text: 'Most people in this town spend their lives hiding behind poses. You didn’t pose for a second.' },
+        ],
+        replies: [
+          {
+            id: 'tease_angles',
+            text: 'Just giving credit where credit is due, photographer ✨',
+            effect: { meterChanges: { romanceChidi: 2 } },
+            responses: [{ from: 'chidi', text: 'I’ll make sure my next roll lives up to your standard then 📸' }],
+          },
+          {
+            id: 'honest_terrace',
+            text: 'You made it easy to be myself out there, Chidi.',
+            effect: { meterChanges: { romanceChidi: 3, loyalty: 1 } },
+            responses: [{ from: 'chidi', text: 'That goes both ways, {name}. More than you know.' }],
+          },
+        ],
+      },
+      {
+        id: 'chidi_confide_memory',
+        unlockEpisode: 1,
+        unlockSceneIndex: 5,
+        requiredFlag: 'confided_chidi_incognito',
+        messages: [
+          { from: 'chidi', text: 'Hey... wanted to say thank you for trusting me earlier about the scholarship and feeling like you didn’t belong.' },
+          { from: 'chidi', text: 'I know how loud this crowd gets. If you ever need an escape from the champagne circus, my darkroom door is always open.' },
+        ],
+        replies: [
+          {
+            id: 'appreciate_chidi',
+            text: 'It meant a lot having someone real to talk to tonight, Chidi 🙏',
+            effect: { meterChanges: { loyalty: 2, romanceChidi: 2 } },
+            responses: [{ from: 'chidi', text: 'Anytime. I mean that.' }],
+          },
+          {
+            id: 'hold_to_it',
+            text: 'I might take you up on that darkroom offer sooner than you think.',
+            effect: { meterChanges: { romanceChidi: 3 } },
+            responses: [{ from: 'chidi', text: 'I’ll keep a spare stool ready for you 🎞️' }],
+          },
+        ],
+      },
+      {
         id: 'chidi_2',
         unlockEpisode: 2,
         unlockSceneIndex: 0,
@@ -396,6 +444,63 @@ export const DM_THREADS: DmThread[] = [
             text: 'Call me the second you find something.',
             effect: { meterChanges: { suspicion: 2 }, flagToSet: 'chidi_dm_investigate' },
             responses: [{ from: 'chidi', text: 'Deal. Studio, after your 12pm class?' }],
+          },
+        ],
+      },
+      {
+        id: 'chidi_alliance_intel',
+        unlockEpisode: 2,
+        unlockSceneIndex: 1,
+        requiredFlag: 'chidi_archive_alliance',
+        messages: [
+          { from: 'chidi', text: 'Hey partner. Remembering what we agreed on at the party about teaming up to expose the leaker.' },
+          { from: 'chidi', text: 'I blew up the mezzanine RAW frames at 400%. The camera that took the leak was mounted on a monopod—someone planned that shot in advance, Ada. It wasn’t an impulse snap.' },
+        ],
+        replies: [
+          {
+            id: 'narrow_suspects',
+            text: 'A monopod? That means whoever set it up had access to the mezzanine before the dress change.',
+            effect: { meterChanges: { suspicion: 2, loyalty: 1 } },
+            responses: [
+              { from: 'chidi', text: 'Exactly. Which narrows our suspect list down to people with staff or VIP access.' },
+              { from: 'chidi', text: 'I’m pulling building pass logs next. We’re going to nail them.' },
+            ],
+          },
+          {
+            id: 'backup_ssds',
+            text: 'Keep those RAW files backed up on an external drive, Chidi. Don’t let anyone delete them.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [
+              { from: 'chidi', text: 'Already cloned onto two encrypted SSDs. Nobody touches our evidence.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'chidi_trust_deepened_dm',
+        unlockEpisode: 2,
+        unlockSceneIndex: 4,
+        requiredFlag: 'chidi_trust_deepened',
+        messages: [
+          { from: 'chidi', text: 'Still thinking about what you told me in the darkroom about feeling like an imposter on this island.' },
+          { from: 'chidi', text: 'Ada, you navigated that party with more grace and spine than people whose families own three banks. Don’t ever let these trust-fund kids make you feel small.' },
+        ],
+        replies: [
+          {
+            id: 'chidi_warm_anchor',
+            text: 'Having you believe in me makes this whole circus easier to carry, Chidi 💚',
+            effect: { meterChanges: { romanceChidi: 4, loyalty: 2 } },
+            responses: [
+              { from: 'chidi', text: 'I don’t just believe in you. I’m inspired by you. Keep your head up.' },
+            ],
+          },
+          {
+            id: 'ada_confident_fire',
+            text: 'Small? Never. I’m just getting started in this city 😉',
+            effect: { meterChanges: { reputation: 2, romanceChidi: 2 } },
+            responses: [
+              { from: 'chidi', text: 'Now that’s the Ada I know. Keep that fire burning.' },
+            ],
           },
         ],
       },
@@ -572,6 +677,54 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'kelvin_challenged_memory',
+        unlockEpisode: 1,
+        unlockSceneIndex: 6,
+        requiredFlag: 'challenged_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'By the way... telling an Adebayo-Wright that you didn’t need saving on our first meeting?' },
+          { from: 'kelvin', text: 'Most people in Lagos spend their lives trying to flatter me. You threw my champagne back in my face. I haven’t stopped thinking about it. 🥃' },
+        ],
+        replies: [
+          {
+            id: 'flattery_boring',
+            text: 'Flattery is boring, Kelvin. You should get used to hearing the truth.',
+            effect: { meterChanges: { reputation: 2, romanceKelvin: 2 } },
+            responses: [{ from: 'kelvin', text: 'Maybe I like boring people less than I thought. See you around campus.' }],
+          },
+          {
+            id: 'careful_challenge',
+            text: 'Careful, Kelvin. People might think you actually like a girl who puts you in your place 😏',
+            effect: { meterChanges: { romanceKelvin: 3 } },
+            responses: [{ from: 'kelvin', text: 'Careful yourself, Adaeze. A challenge is only fun until you get burned.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_distance_memory',
+        unlockEpisode: 1,
+        unlockSceneIndex: 6,
+        requiredFlag: 'kept_kelvin_at_bay',
+        messages: [
+          { from: 'kelvin', text: 'You made sure to keep your distance by the bar earlier.' },
+          { from: 'kelvin', text: 'I respect a girl with walls. But out here on the Island... walls don’t stop people from aiming at your back.' },
+        ],
+        replies: [
+          {
+            id: 'walls_safe',
+            text: 'My walls keep me safe from players with too much family money.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'kelvin', text: 'Fair enough. But when you’re ready to see who I actually am, you know where to find me.' }],
+          },
+          {
+            id: 'need_space',
+            text: 'I don’t need your protection, Kelvin. Just your space.',
+            effect: { meterChanges: { loyalty: 1 } },
+            responses: [{ from: 'kelvin', text: 'Space granted. For now.' }],
+          },
+        ],
+      },
+      {
         id: 'kelvin_2',
         unlockEpisode: 2,
         unlockSceneIndex: 1,
@@ -588,6 +741,102 @@ export const DM_THREADS: DmThread[] = [
             text: 'Make it dinner 😏',
             effect: { meterChanges: { romanceKelvin: 4, jealousy: 2 } },
             responses: [{ from: 'kelvin', text: 'Dinner it is. Wear something dangerous.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_drove_memory',
+        unlockEpisode: 2,
+        unlockSceneIndex: 4,
+        requiredFlag: 'drove_with_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'Admit it, Adaeze. Taking the Ferrari down the coastal toll road beat the campus shuttle.' },
+          { from: 'kelvin', text: 'The look on your face when the turbos opened up... you’re definitely not as cautious as you pretend to be. 🏎️' },
+        ],
+        replies: [
+          {
+            id: 'playlist_critique',
+            text: 'The car was fast. Your driving playlist, on the other hand, was questionable 😉',
+            effect: { meterChanges: { romanceKelvin: 3 } },
+            responses: [{ from: 'kelvin', text: 'Next time I’ll hand you the aux cord. Deal?' }],
+          },
+          {
+            id: 'check_lagoon',
+            text: 'I was just making sure you didn’t crash us into the lagoon, Kelvin.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'kelvin', text: 'I never crash, Adaeze. Not in cars, and not in deals.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_refused_memory',
+        unlockEpisode: 2,
+        unlockSceneIndex: 4,
+        requiredFlag: 'refused_kelvin_ride',
+        messages: [
+          { from: 'kelvin', text: 'You’re officially the first girl in Lagos to leave my Ferrari idling at the curb while you walked away.' },
+          { from: 'kelvin', text: 'Most people would’ve posted ten stories from that passenger seat before I even turned the key. You didn’t even look back.' },
+        ],
+        replies: [
+          {
+            id: 'car_not_impress',
+            text: 'A sports car doesn’t impress me, Kelvin. Character does.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'kelvin', text: 'Ouch. But noted. I’ll work on the character then.' }],
+          },
+          {
+            id: 'bruise_ego',
+            text: 'Did I bruise your billionaire ego? 😏',
+            effect: { meterChanges: { romanceKelvin: 2, reputation: 1 } },
+            responses: [{ from: 'kelvin', text: 'Bruised? No. Intrigued? Absolutely 🥃' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_sided_with_kelvin_dm',
+        unlockEpisode: 2,
+        unlockSceneIndex: 6,
+        requiredFlag: 'sided_with_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'You backed me on that terrace against Chidi. I saw what you did.' },
+          { from: 'kelvin', text: 'In this family, loyalty is rare. Outside this family, it’s nonexistent. Standing with me wasn’t just smart—it proved where your head is at. 🥃' },
+        ],
+        replies: [
+          {
+            id: 'backed_smartly',
+            text: 'I made the choice that made sense, Kelvin. Don’t let it swell your ego.',
+            effect: { meterChanges: { romanceKelvin: 3, reputation: 1 } },
+            responses: [{ from: 'kelvin', text: 'Too late. But I won’t forget it.' }],
+          },
+          {
+            id: 'allies_stronger',
+            text: 'We’re stronger as allies, Kelvin. Just make sure you remember that.',
+            effect: { meterChanges: { loyalty: 2 } },
+            responses: [{ from: 'kelvin', text: 'Always. Nobody crosses my allies while I’m around.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_sided_with_chidi_dm',
+        unlockEpisode: 2,
+        unlockSceneIndex: 6,
+        requiredFlag: 'sided_with_chidi',
+        messages: [
+          { from: 'kelvin', text: 'Choosing Chidi over me on that terrace. Quite the public statement, Adaeze.' },
+          { from: 'kelvin', text: 'Most people in this town wouldn’t dream of slighting an Adebayo-Wright in front of a crowd. You really don’t care about pedigree, do you?' },
+        ],
+        replies: [
+          {
+            id: 'pedigree_truth',
+            text: 'I care about truth and integrity, Kelvin. Not last names.',
+            effect: { meterChanges: { reputation: 3 } },
+            responses: [{ from: 'kelvin', text: 'Noble. Dangerous, but noble. Just hope your integrity can pay your bail when this house turns on you.' }],
+          },
+          {
+            id: 'losing_habit',
+            text: 'Don’t take it personally, Kelvin. You’re just not used to hearing “no”.',
+            effect: { meterChanges: { romanceKelvin: 1, reputation: 2 } },
+            responses: [{ from: 'kelvin', text: 'Nobody likes losing, Adaeze. Especially not me 🥃' }],
           },
         ],
       },
@@ -802,6 +1051,30 @@ export const DM_THREADS: DmThread[] = [
     profileId: 'zee',
     beats: [
       {
+        id: 'zee_charmed_memory',
+        unlockEpisode: 1,
+        unlockSceneIndex: 3,
+        requiredFlag: 'charmed_zee',
+        messages: [
+          { from: 'zee', text: 'Tamara’s new protégé. Your composure on the red carpet earlier was noted.' },
+          { from: 'zee', text: 'Most girls from the mainland try too hard to blend in and end up looking cheap. You carried yourself like you already owned the room. Keep that standards bar high.' },
+        ],
+        replies: [
+          {
+            id: 'standards_high',
+            text: 'Thank you, Zee. Excellence doesn’t require an Island postcode 👑',
+            effect: { meterChanges: { reputation: 2, loyalty: 1 } },
+            responses: [{ from: 'zee', text: 'Well said. Let’s see if your stamina matches your mouth tonight.' }],
+          },
+          {
+            id: 'observing_power',
+            text: 'I’m just observing how the real power players operate.',
+            effect: { meterChanges: { loyalty: 2 } },
+            responses: [{ from: 'zee', text: 'Smart girl. Keep watching.' }],
+          },
+        ],
+      },
+      {
         id: 'zee_1',
         unlockEpisode: 2,
         unlockSceneIndex: 6,
@@ -821,6 +1094,103 @@ export const DM_THREADS: DmThread[] = [
             text: 'Why can’t Tamara know?',
             effect: { meterChanges: { suspicion: 3 } },
             responses: [{ from: 'zee', text: 'Because some offers are only made once. 🙂' }],
+          },
+        ],
+      },
+      {
+        id: 'zee_pa_negotiated_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 0,
+        requiredFlag: 'negotiated_pa_terms',
+        messages: [
+          { from: 'zee', text: 'Your revised contract addendum is signed. 10% talent cut and creative veto included.' },
+          { from: 'zee', text: 'Nobody has ever counter-offered me on a bridge at midnight, Ada. I respect audacity. But demanding a seat at the table means you deliver executive-level results. 💼' },
+        ],
+        replies: [
+          {
+            id: 'not_an_ornament',
+            text: 'I don’t sign deals where I’m just an ornament, Zee. You’ll get your results.',
+            effect: { meterChanges: { reputation: 3 } },
+            responses: [{ from: 'zee', text: 'See that you do. Call sheet begins at 8am sharp.' }],
+          },
+          {
+            id: 'fair_partners',
+            text: 'Fair terms make better partners. Let’s get to work.',
+            effect: { meterChanges: { loyalty: 2 } },
+            responses: [{ from: 'zee', text: 'Agreed. First brand meeting is in my study.' }],
+          },
+        ],
+      },
+      {
+        id: 'zee_pa_accepted_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 0,
+        requiredFlag: 'accepted_pa_job',
+        hiddenIfFlag: 'negotiated_pa_terms',
+        messages: [
+          { from: 'zee', text: 'Welcome to the content house, Ada. Your room key and NDA packet are downstairs.' },
+          { from: 'zee', text: 'You accepted my offer without hesitation. That shows hunger. But remember: inside this house, loyalty to me is non-negotiable.' },
+        ],
+        replies: [
+          {
+            id: 'ready_for_work',
+            text: 'I’m ready to work, Zee. Just make sure the leaker doesn’t get in our way.',
+            effect: { meterChanges: { loyalty: 2 } },
+            responses: [{ from: 'zee', text: 'I handle the threats. You handle the operations.' }],
+          },
+          {
+            id: 'eyes_open_boss',
+            text: 'Understood, Zee. My eyes and ears are open.',
+            effect: { meterChanges: { reputation: 1, loyalty: 1 } },
+            responses: [{ from: 'zee', text: 'Good. Don’t disappoint me.' }],
+          },
+        ],
+      },
+      {
+        id: 'zee_pact_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 1,
+        requiredFlag: 'pact_with_zee',
+        messages: [
+          { from: 'zee', text: 'About our conversation in my study. Executive producer credit is reserved for winners.' },
+          { from: 'zee', text: 'If you help me flush out whoever is running @TheLagosTea before the weekend launch, the credit is yours. We protect each other. Understood?' },
+        ],
+        replies: [
+          {
+            id: 'partners_protect',
+            text: 'Understood. We find the leaker, we protect the brand. Partners.',
+            effect: { meterChanges: { loyalty: 3 } },
+            responses: [{ from: 'zee', text: 'Partners. Now keep an eye on Bisola and Tamara downstairs.' }],
+          },
+          {
+            id: 'solid_word',
+            text: 'Just make sure your word is as solid as your contract, Zee.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'zee', text: 'My word is the only thing on this Island that actually clears at the bank.' }],
+          },
+        ],
+      },
+      {
+        id: 'zee_warned_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 1,
+        requiredFlag: 'warned_zee',
+        messages: [
+          { from: 'zee', text: 'Threatening me in my own study took considerable nerve, Ada.' },
+          { from: 'zee', text: 'You think because you survived one viral scandal you can intimidate the Bello family? I keep you close because I want to see every move you make.' },
+        ],
+        replies: [
+          {
+            id: 'nothing_to_hide',
+            text: 'Watch as closely as you want, Zee. I have nothing to hide.',
+            effect: { meterChanges: { reputation: 3 } },
+            responses: [{ from: 'zee', text: 'We’ll see about that when the cameras roll.' }],
+          },
+          {
+            id: 'promise_of_truth',
+            text: 'It wasn’t a threat, Zee. It was a promise that the truth comes out.',
+            effect: { meterChanges: { suspicion: 2, reputation: 1 } },
+            responses: [{ from: 'zee', text: 'Be careful what truth you dig up. Some graves don’t stay buried.' }],
           },
         ],
       },
@@ -1233,6 +1603,54 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'bisola_helped_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 2,
+        requiredFlag: 'helped_bisola',
+        messages: [
+          { from: 'bisola', text: 'Adaaa!! 🥹 Seriously thank you so much for helping me fix that gimbal and calming me down earlier!' },
+          { from: 'bisola', text: 'Everyone else in this house just laughs when I panic about brand deliverables, but you actually helped. If you ever need me to check who’s lurking backstage or need raw footage, I got you 100%! 💕🎥' },
+        ],
+        replies: [
+          {
+            id: 'support_each_other',
+            text: 'We have to support each other, Bisola. This house is stressful enough without turning on each other.',
+            effect: { meterChanges: { loyalty: 3 } },
+            responses: [{ from: 'bisola', text: 'Bestie for real!! You’re a lifesaver! ✨' }],
+          },
+          {
+            id: 'eyes_open_vlog',
+            text: 'Just keep your eyes open for anyone acting suspicious around here.',
+            effect: { meterChanges: { suspicion: 1, loyalty: 2 } },
+            responses: [{ from: 'bisola', text: 'Say no more. My vlogger radar is permanently on high alert! 🕵️‍♀️' }],
+          },
+        ],
+      },
+      {
+        id: 'bisola_motive_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 2,
+        requiredFlag: 'noted_bisola_motive',
+        messages: [
+          { from: 'bisola', text: 'Hey Ada... earlier when I was stressing over my brand contract, you had this super sharp look in your eyes 👀' },
+          { from: 'bisola', text: 'I know people think I’m just a silly TikTok girl who chats too much, but I’m not clueless. You were analyzing me like I was a suspect, weren’t you?' },
+        ],
+        replies: [
+          {
+            id: 'observant_house',
+            text: 'In a house where secrets get leaked daily, everyone has to stay observant, Bisola.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'bisola', text: 'Fair point! But I swear I’m not the enemy here. I just want my brand deals!' }],
+          },
+          {
+            id: 'desperate_creators',
+            text: 'Desperate creators do crazy things for clout. Can you blame me for watching?',
+            effect: { meterChanges: { suspicion: 2 } },
+            responses: [{ from: 'bisola', text: 'Ouch! Harsh, but... yeah, Lagos is wild. Just don’t write me off so quickly 😉' }],
+          },
+        ],
+      },
+      {
         id: 'bisola_2',
         unlockEpisode: 3,
         unlockSceneIndex: 3,
@@ -1302,6 +1720,30 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'hauwa_questioned_memory',
+        unlockEpisode: 2,
+        unlockSceneIndex: 5,
+        requiredFlag: 'hauwa_calm_questioned',
+        messages: [
+          { from: 'hauwa', text: 'You asked earlier if my serene aura was merely “brand armor”, Ada 🌿' },
+          { from: 'hauwa', text: 'In Lagos, armor is survival. But true peace is a deliberate choice. Do not confuse quietness with blindness—I see the tension coiling inside you just as clearly.' },
+        ],
+        replies: [
+          {
+            id: 'armor_reasons',
+            text: 'Maybe we both wear armor for different reasons, Hauwa.',
+            effect: { meterChanges: { loyalty: 2 } },
+            responses: [{ from: 'hauwa', text: 'Indeed. Just ensure yours does not become a cage.' }],
+          },
+          {
+            id: 'shield_leaks',
+            text: 'My armor is built to withstand whoever is leaking our lives to the blogs.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [{ from: 'hauwa', text: 'Then keep your shield polished. The shadows are deepening.' }],
+          },
+        ],
+      },
+      {
         id: 'hauwa_2',
         unlockEpisode: 3,
         unlockSceneIndex: 4,
@@ -1325,6 +1767,54 @@ export const DM_THREADS: DmThread[] = [
             responses: [
               { from: 'hauwa', text: 'Truth has its own light, Ada. It will find its way out.' },
             ],
+          },
+        ],
+      },
+      {
+        id: 'hauwa_stepped_out_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 5,
+        requiredFlag: 'stepped_out_hauwa',
+        messages: [
+          { from: 'hauwa', text: 'You chose to step into the patio light and drink tea with me tonight, Ada.' },
+          { from: 'hauwa', text: 'Directness is rare in Banana Island. Most people lurk behind curtains. I respect someone who looks into the lantern without flinching. 🍵' },
+        ],
+        replies: [
+          {
+            id: 'deal_in_light',
+            text: 'I prefer seeing who I’m dealing with in the light, Hauwa.',
+            effect: { meterChanges: { loyalty: 3 } },
+            responses: [{ from: 'hauwa', text: 'A wise discipline. Peace be upon your steps tonight.' }],
+          },
+          {
+            id: 'phone_call_inquire',
+            text: 'Did that whispered phone call have anything to do with Zee’s launch?',
+            effect: { meterChanges: { suspicion: 2 } },
+            responses: [{ from: 'hauwa', text: 'All things are connected in this house. Sleep with discernment.' }],
+          },
+        ],
+      },
+      {
+        id: 'hauwa_retreated_memory',
+        unlockEpisode: 3,
+        unlockSceneIndex: 5,
+        requiredFlag: 'retreated_silent_intel',
+        messages: [
+          { from: 'hauwa', text: 'I heard the faint whisper of footsteps retreating down the utility corridor while I was on my call.' },
+          { from: 'hauwa', text: 'You move like mist, Ada. Like someone gathering receipts in the dark. Be cautious—the floorboards in this house remember every step.' },
+        ],
+        replies: [
+          {
+            id: 'nothing_to_hide_hauwa',
+            text: 'If you have nothing to hide, Hauwa, you shouldn’t worry about footsteps.',
+            effect: { meterChanges: { reputation: 2, suspicion: 1 } },
+            responses: [{ from: 'hauwa', text: 'I fear nothing. But the night is watchful. Take care.' }],
+          },
+          {
+            id: 'back_to_room_quiet',
+            text: 'I was just finding my way back to my room.',
+            effect: { meterChanges: { loyalty: 1 } },
+            responses: [{ from: 'hauwa', text: 'Of course. May your dreams bring clarity 🌿' }],
           },
         ],
       },
