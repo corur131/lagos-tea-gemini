@@ -1259,7 +1259,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     ],
     twistMoment: {
       title: 'The Burner Phone Uncovered',
-      description: 'Ada discovers the active burner phone logged into @TheLagosTea inside a locked room in the Banana Island mansion. The leaker is definitely inside the house.',
+      description: 'Ada discovers the active burner phone logged into @TheLagosTea inside a locked room in the Banana Island mansion. Whoever is behind @TheLagosTea has access to the house.',
       type: 'revelation',
     },
   },
@@ -1294,7 +1294,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
       },
       {
         speaker: 'heroine',
-        text: 'End of Season 1, Episode 3. The trap has snapped shut.',
+        text: 'End of Episode 3. The trap has snapped shut.',
       },
     ],
     choices: [
