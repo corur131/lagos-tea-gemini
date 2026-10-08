@@ -24,6 +24,8 @@ import { EndingScreen } from './components/vn/EndingScreen';
 import { SocialFeedOverlay } from './components/social/SocialFeedOverlay';
 import { CANONICAL_STORY, EPISODE_METAS } from './data/storyScript';
 import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
+import { DM_THREADS } from './data/dmData';
+import { countUnreadDms } from './components/social/DmInbox';
 import { playSound } from './utils/audio';
 import {
   Sparkles,
@@ -42,6 +44,7 @@ import {
   Camera,
   Coffee,
   CheckCircle2,
+  MessageSquare,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'lagos_tea_vn_save_v1';
@@ -190,6 +193,19 @@ export default function App() {
   const [showRecapModal, setShowRecapModal] = useState<boolean>(() => {
     return gameState.currentEpisode >= 2 && gameState.currentSceneIndex === 0;
   });
+
+  // Target tab when opening GidiGram (e.g. 'for_you' vs 'dms')
+  const [socialFeedInitialTab, setSocialFeedInitialTab] = useState<'for_you' | 'dms' | 'trending' | 'tea_leaks' | 'cast' | 'profile'>('for_you');
+
+  // Total unread DMs count
+  const unreadDmCount = useMemo(() => {
+    return countUnreadDms(DM_THREADS, {
+      episode: gameState.currentEpisode,
+      sceneIndex: gameState.currentSceneIndex,
+      flags: gameState.flags,
+      social: gameState.social,
+    });
+  }, [gameState.currentEpisode, gameState.currentSceneIndex, gameState.flags, gameState.social]);
 
   // Helper for speaker display name
   const getSpeakerDisplayName = useCallback(
@@ -668,6 +684,7 @@ export default function App() {
           {/* Social Feed (GidiGram) */}
           <button
             onClick={() => {
+              setSocialFeedInitialTab('for_you');
               setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
               if (gameState.soundEnabled) playSound.click();
             }}
@@ -679,6 +696,25 @@ export default function App() {
             {/* Live notification badge for viral leaks / updates */}
             {(gameState.currentSceneIndex >= 6 || gameState.currentEpisode > 1) && (
               <span className="w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+            )}
+          </button>
+
+          {/* Direct Messages Quick Button */}
+          <button
+            onClick={() => {
+              setSocialFeedInitialTab('dms');
+              setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
+              if (gameState.soundEnabled) playSound.click();
+            }}
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1 transition-all relative"
+            title="Direct Messages"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-pink-400" />
+            <span className="hidden sm:inline">DMs</span>
+            {unreadDmCount > 0 && (
+              <span className="min-w-[16px] h-4 px-1 rounded-full bg-pink-500 text-[10px] font-bold text-white flex items-center justify-center absolute -top-1 -right-1 animate-pulse">
+                {unreadDmCount}
+              </span>
             )}
           </button>
 
@@ -1022,6 +1058,7 @@ export default function App() {
           flags={gameState.flags}
           soundEnabled={gameState.soundEnabled}
           social={gameState.social}
+          initialTab={socialFeedInitialTab}
           onUpdateSocial={(updater) =>
             setGameState((prev) => ({
               ...prev,
@@ -1038,6 +1075,14 @@ export default function App() {
             setGameState((prev) => ({
               ...prev,
               flags: { ...prev.flags, [flag]: true },
+            }))
+          }
+          onAddClue={(clue) =>
+            setGameState((prev) => ({
+              ...prev,
+              inventory: prev.inventory.some((i) => i.id === clue.id)
+                ? prev.inventory
+                : [...prev.inventory, clue],
             }))
           }
           onClose={() => setGameState((prev) => ({ ...prev, isSocialFeedOpen: false }))}

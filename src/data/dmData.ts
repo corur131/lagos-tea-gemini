@@ -94,6 +94,33 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'mum_ep2',
+        unlockEpisode: 2,
+        unlockSceneIndex: 3,
+        messages: [
+          { from: 'mum', text: 'Pastor Matthew asked after you at church today.' },
+          { from: 'mum', text: 'I told him my daughter is busy studying. But people are whispering about some high society magazine cover. {name}, don’t let those Lagos Island people turn your head.' },
+        ],
+        replies: [
+          {
+            id: 'grounded',
+            text: 'I haven’t forgotten where I come from, Mummy. I’m just trying to make you proud.',
+            effect: { meterChanges: { loyalty: 3, reputation: 1 } },
+            responses: [
+              { from: 'mum', text: 'I am already proud of you. Just come home to the mainland for Sunday jollof when you can.' },
+            ],
+          },
+          {
+            id: 'opportunities',
+            text: 'Mummy, this circle opens doors that hard work alone never could in Lagos.',
+            effect: { meterChanges: { popularity: 2, loyalty: -1 }, flagToSet: 'ada_ambitious_to_mum' },
+            responses: [
+              { from: 'mum', text: 'Doors can open and slam on your fingers, {name}. Be wise.' },
+            ],
+          },
+        ],
+      },
+      {
         id: 'mum_4',
         unlockEpisode: 3,
         unlockSceneIndex: 0,
@@ -274,6 +301,35 @@ export const DM_THREADS: DmThread[] = [
           },
         ],
       },
+      {
+        id: 'tam_react_burner_phone',
+        unlockEpisode: 3,
+        unlockSceneIndex: 6,
+        requiredAnyFlags: ['inspected_burner_phone', 'photographed_tea_phone'],
+        messages: [
+          { from: 'tamara', text: 'Ada... did you find something in the archive room just now? 🤫' },
+          { from: 'tamara', text: 'I saw someone slipping out of that hallway looking pale as a ghost.' },
+        ],
+        replies: [
+          {
+            id: 'confide_tamara',
+            text: 'I found an active burner phone logged into @TheLagosTea.',
+            effect: { meterChanges: { loyalty: 5, suspicion: -2 }, flagToSet: 'tamara_knows_burner' },
+            responses: [
+              { from: 'tamara', text: 'WHAT?! In Zee’s house?! 😱' },
+              { from: 'tamara', text: 'Keep that photo safe, Ada. Whoever owns that phone will do anything to keep it quiet.' },
+            ],
+          },
+          {
+            id: 'play_dumb',
+            text: 'Just grabbing fresh printer toner for Zee’s schedule. Nothing dramatic.',
+            effect: { meterChanges: { suspicion: 2, reputation: 1 } },
+            responses: [
+              { from: 'tamara', text: 'You’re a terrible liar, Adaeze. But okay... stay safe. 💚' },
+            ],
+          },
+        ],
+      },
     ],
   },
 
@@ -414,6 +470,67 @@ export const DM_THREADS: DmThread[] = [
           },
         ],
       },
+      {
+        id: 'chidi_romance_darkroom',
+        unlockEpisode: 3,
+        unlockSceneIndex: 4,
+        requiredFlag: 'chidi_romantic_moment',
+        messages: [
+          { from: 'chidi', text: 'Still thinking about earlier on the veranda... when the lights flickered.' },
+          { from: 'chidi', text: 'You looked straight into the lens, Ada. No shield, no fake smile. Just you.' },
+        ],
+        replies: [
+          {
+            id: 'honest_feeling',
+            text: 'I didn’t feel like hiding from you, Chidi.',
+            effect: { meterChanges: { romanceChidi: 5, loyalty: 2 }, flagToSet: 'chidi_special_darkroom_date' },
+            responses: [
+              { from: 'chidi', text: 'That means more to me than any award or headline.' },
+              { from: 'chidi', text: 'When this storm blows over... let me take you somewhere real. No influencers allowed. 📸' },
+            ],
+          },
+          {
+            id: 'keep_focus',
+            text: 'Don’t lose focus, photographer. We still have a mystery to solve.',
+            effect: { meterChanges: { romanceChidi: 2, reputation: 2 } },
+            responses: [
+              { from: 'chidi', text: 'Aye aye, captain. Eyes on the target. Always.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'chidi_react_burner',
+        unlockEpisode: 3,
+        unlockSceneIndex: 6,
+        requiredAnyFlags: ['inspected_burner_phone', 'photographed_tea_phone'],
+        messages: [
+          { from: 'chidi', text: 'Ada! I’m outside the estate gates right now. Did you find anything in the archive room?' },
+        ],
+        replies: [
+          {
+            id: 'send_clue',
+            text: 'Found a burner phone charging inside. It was logged right into @TheLagosTea.',
+            effect: { meterChanges: { romanceChidi: 4, suspicion: -2 }, flagToSet: 'shared_burner_with_chidi' },
+            addsClue: {
+              name: 'Chidi’s Telephoto Log: Gate Surveillance',
+              description: 'Chidi cross-referenced timestamps from outside the Banana Island villa when the burner phone pinged.',
+            },
+            responses: [
+              { from: 'chidi', text: 'God. That proves the connection to the villa 100%.' },
+              { from: 'chidi', text: 'I’ve got my long lens trained on the side balconies. Whoever tries to ditch that phone is on camera.' },
+            ],
+          },
+          {
+            id: 'wait_morning',
+            text: 'Stay back for now. I don’t want security grabbing you.',
+            effect: { meterChanges: { romanceChidi: 3, loyalty: 2 } },
+            responses: [
+              { from: 'chidi', text: 'I’m not leaving you alone in a den of wolves. Call me the minute you’re in your room.' },
+            ],
+          },
+        ],
+      },
     ],
   },
 
@@ -517,6 +634,35 @@ export const DM_THREADS: DmThread[] = [
             text: 'Goodnight, Kelvin.',
             effect: { meterChanges: { reputation: 2 } },
             responses: [{ from: 'kelvin', text: 'Goodnight, Adaeze. Lock your door.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_romance_balcony',
+        unlockEpisode: 3,
+        unlockSceneIndex: 5,
+        requiredFlag: 'midnight_balcony_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'You left your earring on the table outside.' },
+          { from: 'kelvin', text: 'Consider it my excuse to see you again before the morning brand shoots begin.' },
+        ],
+        replies: [
+          {
+            id: 'keep_it',
+            text: 'Keep it safe for me, Kelvin. Don’t let anyone else claim it.',
+            effect: { meterChanges: { romanceKelvin: 5, jealousy: 2 }, flagToSet: 'kelvin_private_penthouse_access' },
+            responses: [
+              { from: 'kelvin', text: 'Nobody touches what’s yours while I’m around. That’s a promise.' },
+              { from: 'kelvin', text: 'When this house gets too loud, my penthouse in Victoria Island has a private elevator. The keycard is yours whenever you want it.' },
+            ],
+          },
+          {
+            id: 'strictly_business',
+            text: 'Give it back tomorrow. I need to keep my focus sharp.',
+            effect: { meterChanges: { reputation: 3, romanceKelvin: 1 } },
+            responses: [
+              { from: 'kelvin', text: 'Unforgiving as ever. I respect that. See you at sunrise.' },
+            ],
           },
         ],
       },
@@ -701,6 +847,33 @@ export const DM_THREADS: DmThread[] = [
           },
         ],
       },
+      {
+        id: 'zee_ep3_warning',
+        unlockEpisode: 3,
+        unlockSceneIndex: 6,
+        messages: [
+          { from: 'zee', text: 'I saw security logs from the archive corridor.' },
+          { from: 'zee', text: 'If you’re digging into my past or my family’s foundation, Ada… stop. Some doors in Lagos are locked for your own protection.' },
+        ],
+        replies: [
+          {
+            id: 'zee_confront',
+            text: 'If you have nothing to hide from @TheLagosTea, why are you so afraid of what’s in that room?',
+            effect: { meterChanges: { reputation: 3, loyalty: -2 }, flagToSet: 'defied_zee_archive' },
+            responses: [
+              { from: 'zee', text: 'I am not afraid of anything. I am warning you because I actually respect your intelligence. Don’t waste it.' },
+            ],
+          },
+          {
+            id: 'zee_diplomatic',
+            text: 'I’m trying to clear your name as much as mine, Zee.',
+            effect: { meterChanges: { loyalty: 3, suspicion: -1 }, flagToSet: 'pledged_loyalty_to_zee' },
+            responses: [
+              { from: 'zee', text: 'Then prove it tomorrow at the press reveal.' },
+            ],
+          },
+        ],
+      },
     ],
   },
 
@@ -770,6 +943,37 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'tea_ep2_cipher',
+        unlockEpisode: 2,
+        unlockSceneIndex: 6,
+        messages: [
+          { from: 'lagos_tea', text: 'Midnight bridge rendezvous? How cinematic 🎬🫖' },
+          { from: 'lagos_tea', text: 'Ask Zee about the 2023 charity gala ledger. Ask her where the ten million Naira went.' },
+        ],
+        replies: [
+          {
+            id: 'tea_receipts_demand',
+            text: 'Send receipts or stop sending riddles.',
+            effect: { meterChanges: { reputation: 3 } },
+            responses: [
+              { from: 'lagos_tea', text: 'Receipts drop when the audience is biggest, darling. Stay glued to your screen 🫖' },
+            ],
+          },
+          {
+            id: 'tea_clue_trap',
+            label: '📸 Trace the ping location',
+            effect: { meterChanges: { suspicion: 3 }, flagToSet: 'tea_ip_traced' },
+            addsClue: {
+              name: 'Tea’s Ping Location: Victoria Island Subnet',
+              description: 'The DM timestamp originated from a private high-speed fiber router registered in the Banana Island / VI diplomatic corridor.',
+            },
+            responses: [
+              { from: 'lagos_tea', text: 'Cute attempt at tracking. You’re getting warmer 😉' },
+            ],
+          },
+        ],
+      },
+      {
         id: 'tea_3',
         unlockEpisode: 3,
         unlockSceneIndex: 5,
@@ -789,6 +993,338 @@ export const DM_THREADS: DmThread[] = [
             text: 'How do you know where I am?',
             effect: { meterChanges: { suspicion: 4 }, flagToSet: 'tea_knows_location' },
             responses: [{ from: 'lagos_tea', text: 'I always know where you are. 🫖' }],
+          },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------ DAYO */
+  {
+    id: 'dm_dayo',
+    title: 'Dayo Martins 🎧',
+    handle: '@dayomartins_sound',
+    avatarType: 'dayo',
+    profileId: 'dayo',
+    beats: [
+      {
+        id: 'dayo_1',
+        unlockEpisode: 1,
+        unlockSceneIndex: 6,
+        messages: [
+          { from: 'dayo', text: 'Peace, {name}. Tamara passed me your handle after the party.' },
+          { from: 'dayo', text: 'Saw that chaotic blog post about your address. Lagos high society gets loud when people feel threatened. Hope you got home safe.' },
+        ],
+        replies: [
+          {
+            id: 'dayo_safe',
+            text: 'Made it back in one piece, Dayo. Thank you for asking. 🙏',
+            effect: { meterChanges: { romanceDayo: 4, loyalty: 2 } },
+            responses: [
+              { from: 'dayo', text: 'Good. The city has too much noise; don’t let the static drown your rhythm.' },
+              { from: 'dayo', text: 'If you ever need a quiet corner while the comments cool down, studio monitors don’t care about viral blogs.' },
+            ],
+          },
+          {
+            id: 'dayo_tough',
+            text: 'It takes a lot more than anonymous keyboard cowards to shake me.',
+            effect: { meterChanges: { reputation: 3, romanceDayo: 2 } },
+            responses: [
+              { from: 'dayo', text: 'I like that. Steady hands make the best records. Stay grounded.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'dayo_2_music_post',
+        unlockEpisode: 2,
+        unlockSceneIndex: 2,
+        messages: [
+          { from: 'dayo', text: 'Heard you on campus earlier discussing sound design for the media lab.' },
+          { from: 'dayo', text: 'Most people in Zee’s orbit only listen to what’s trending on the charts. You actually listen to the bassline.' },
+        ],
+        replies: [
+          {
+            id: 'ear_for_truth',
+            text: 'When you grow up on the mainland, you learn which beats are real and which ones are manufactured.',
+            effect: { meterChanges: { romanceDayo: 4, reputation: 2 }, flagToSet: 'connected_with_dayo_sound' },
+            responses: [
+              { from: 'dayo', text: 'Exactly that. 🎧 Authentic groove can’t be bought with oil money.' },
+              { from: 'dayo', text: 'I’m laying down acoustic stems tomorrow night at the sound studio. If you have time between classes, drop by.' },
+            ],
+          },
+          {
+            id: 'busy_grind',
+            text: 'Trying to balance classes, bills, and this anonymous leaker leaves little time for playlist curation.',
+            effect: { meterChanges: { loyalty: 2, romanceDayo: 1 } },
+            responses: [
+              { from: 'dayo', text: 'Understood. Protect your peace first. The studio door is open whenever you’re ready.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'dayo_3_romance',
+        unlockEpisode: 3,
+        unlockSceneIndex: 3,
+        requiredFlag: 'connected_with_dayo_sound',
+        messages: [
+          { from: 'dayo', text: 'Sent you a private SoundCloud snippet. Listen with headphones on.' },
+          { from: 'dayo', text: 'Built the chord progression around the energy you brought into the studio.' },
+        ],
+        replies: [
+          {
+            id: 'dayo_flirt',
+            text: 'You wrote a melody for me, Dayo Martins? Careful, people will start rumors. ✨',
+            effect: { meterChanges: { romanceDayo: 6, jealousy: 2 }, flagToSet: 'dayo_private_soundtrack' },
+            responses: [
+              { from: 'dayo', text: 'Let them talk. Great art needs real inspiration, {name}.' },
+              { from: 'dayo', text: 'When you’re ready to hear the full mix, come up to the rooftop terrace.' },
+            ],
+          },
+          {
+            id: 'dayo_friend',
+            text: 'The chords are gorgeous, Dayo. It feels peaceful after all this chaos.',
+            effect: { meterChanges: { romanceDayo: 3, loyalty: 3 } },
+            responses: [
+              { from: 'dayo', text: 'Peace is rare in Lagos. Glad it could bring you some quiet.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'dayo_4_story_stealth',
+        unlockEpisode: 3,
+        unlockSceneIndex: 6,
+        requiredAnyFlags: ['held_breath_stealth', 'confronted_intruder'],
+        messages: [
+          { from: 'dayo', text: 'Heard footsteps rushing down the fire stairs behind the recording wing.' },
+          { from: 'dayo', text: 'Whoever ran past left a dropped magnetic keycard near the mixing console. Are you alright?' },
+        ],
+        replies: [
+          {
+            id: 'dayo_share_intel',
+            text: 'Dayo, keep that keycard! It belongs to the locked archive room upstairs.',
+            effect: { meterChanges: { romanceDayo: 4, suspicion: -2 }, flagToSet: 'dayo_holds_keycard_intel' },
+            addsClue: {
+              name: 'Dayo’s Studio Keycard Log',
+              description: 'Dayo recovered a dropped magnetic access pass near the mixing console right after the intruder fled the archive hallway.',
+            },
+            responses: [
+              { from: 'dayo', text: 'Locked in my safe box right now. No one touches it.' },
+              { from: 'dayo', text: 'Watch your back, Ada. Whoever dropped this knows their time is running out.' },
+            ],
+          },
+          {
+            id: 'dayo_reassure',
+            text: 'I’m safe in my room now, Dayo. Thank you for watching out for me.',
+            effect: { meterChanges: { romanceDayo: 3, loyalty: 2 } },
+            responses: [
+              { from: 'dayo', text: 'Always. Sleep with your door locked tonight. 🎧' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------- CHIOMA */
+  {
+    id: 'dm_chi',
+    title: 'Chioma Eze ⚖️',
+    handle: '@chi_corporate_glam',
+    avatarType: 'chi',
+    profileId: 'chi',
+    beats: [
+      {
+        id: 'chi_1',
+        unlockEpisode: 2,
+        unlockSceneIndex: 3,
+        messages: [
+          { from: 'chi', text: 'Ada. A quick professional word regarding this @TheLagosTea situation.' },
+          { from: 'chi', text: 'Defamation cases in Nigeria are tedious, but publishing private addresses violates data protection statutes. Keep copies of every timestamp.' },
+        ],
+        replies: [
+          {
+            id: 'chi_thanks',
+            text: 'Thank you, Chioma. I have screenshots saved in a dedicated drive.',
+            effect: { meterChanges: { reputation: 3, loyalty: 2 }, flagToSet: 'chioma_legal_alliance' },
+            responses: [
+              { from: 'chi', text: 'Smart girl. Evidence is the only currency that doesn’t depreciate.' },
+            ],
+          },
+          {
+            id: 'chi_suspect',
+            text: 'Are you offering legal advice, or assessing whether I’m going to sue someone in this circle?',
+            effect: { meterChanges: { suspicion: 2, reputation: 2 } },
+            responses: [
+              { from: 'chi', text: 'Both. Prudence is never accidental, Ada. Keep your eyes sharp.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'chi_2',
+        unlockEpisode: 3,
+        unlockSceneIndex: 2,
+        messages: [
+          { from: 'chi', text: 'Ada, look closely at section 4 of the influencer agreement Zee distributed.' },
+          { from: 'chi', text: 'There is a unilateral indemnity clause. If Tea leaks inside info from this mansion, Zee can legally hold the signees financially liable.' },
+        ],
+        replies: [
+          {
+            id: 'chi_grateful_legal',
+            text: 'Thank you for spotting that, Chioma. Did the other girls sign it?',
+            effect: { meterChanges: { loyalty: 2, reputation: 2 }, flagToSet: 'chioma_legal_protection' },
+            addsClue: {
+              name: 'Section 4 Indemnity Trap',
+              description: 'Chioma uncovered a clause in Zee’s house contract designed to scapegoat assistants or newcomers for leaked private data.',
+            },
+            responses: [
+              { from: 'chi', text: 'Bisola signed without reading. Tamara refused. Protect yourself.' },
+            ],
+          },
+          {
+            id: 'chi_wary',
+            text: 'Why are you telling me this, Chioma? What’s your stake here?',
+            effect: { meterChanges: { suspicion: 2 } },
+            responses: [
+              { from: 'chi', text: 'I believe in clean contracts and fair play. Unfair leverage offends my professional dignity.' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  /* ------------------------------------------------------------------- BISOLA */
+  {
+    id: 'dm_bisola',
+    title: 'Bisola Adeyemi 🎥',
+    handle: '@bisola_vlogs',
+    avatarType: 'bisola',
+    profileId: 'bisola',
+    beats: [
+      {
+        id: 'bisola_1',
+        unlockEpisode: 2,
+        unlockSceneIndex: 4,
+        messages: [
+          { from: 'bisola', text: 'ADAAAA!! OMG!! 😭🍿 Did you see the comment section on Tea’s latest post?!' },
+          { from: 'bisola', text: 'People are debating whether your shoes were thrifted or vintage archival couture! You’re trending on TikTok!!' },
+        ],
+        replies: [
+          {
+            id: 'bisola_laugh',
+            text: 'Lagos social media can debate anything 😂 As long as they spell my name right!',
+            effect: { meterChanges: { popularity: 3, loyalty: 1 } },
+            responses: [
+              { from: 'bisola', text: 'ICONIC RESPONSE!! Can I quote that on my daily vlog story?? Pleeeease! 📸✨' },
+            ],
+          },
+          {
+            id: 'bisola_cautious',
+            text: 'I’d rather people focus on the truth than frivolous gossip, Bisola.',
+            effect: { meterChanges: { reputation: 2, suspicion: 1 } },
+            responses: [
+              { from: 'bisola', text: 'Fair enough sis! But hey, viral clout is viral clout 😉' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'bisola_2',
+        unlockEpisode: 3,
+        unlockSceneIndex: 3,
+        messages: [
+          { from: 'bisola', text: 'Girl!! I was doing a TikTok live in the secondary hallway and saw someone slip through the archive door with a charger!!' },
+          { from: 'bisola', text: 'I thought Zee said the key was lost?! 😱👀' },
+        ],
+        replies: [
+          {
+            id: 'bisola_press_details',
+            text: 'Bisola! Who was it?? Did you catch their clothes on camera?',
+            effect: { meterChanges: { suspicion: 3, loyalty: 2 }, flagToSet: 'bisola_witnessed_intruder' },
+            addsClue: {
+              name: 'Bisola’s Live Stream Background Silhouette',
+              description: 'Bisola’s TikTok Live caught a brief shadow entering the archive room with a charger while the rest of the house was at the pool.',
+            },
+            responses: [
+              { from: 'bisola', text: 'Too blurry! But they were wearing dark silk, and they moved super fast!' },
+            ],
+          },
+          {
+            id: 'bisola_shush',
+            text: 'Delete that TikTok live immediately before whoever it was sees it!',
+            effect: { meterChanges: { reputation: 2, loyalty: 3 } },
+            responses: [
+              { from: 'bisola', text: 'Archived to private already! My heart is pounding omg 😭' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  /* -------------------------------------------------------------------- HAUWA */
+  {
+    id: 'dm_hauwa',
+    title: 'Hauwa Musa 🌿',
+    handle: '@hauwa_mindbody',
+    avatarType: 'hauwa',
+    profileId: 'hauwa',
+    beats: [
+      {
+        id: 'hauwa_1',
+        unlockEpisode: 2,
+        unlockSceneIndex: 2,
+        messages: [
+          { from: 'hauwa', text: 'Peace to your spirit, Ada 🌿' },
+          { from: 'hauwa', text: 'This house creates whirlpools of toxic ego. Don’t internalize their envy. Drink water and remember who you were before the flashbulbs.' },
+        ],
+        replies: [
+          {
+            id: 'hauwa_grateful',
+            text: 'Thank you Hauwa. It feels like everyone else here is playing a ruthless game.',
+            effect: { meterChanges: { loyalty: 3, suspicion: -1 }, flagToSet: 'hauwa_calm_anchor' },
+            responses: [
+              { from: 'hauwa', text: 'They are playing games because they are terrified of being forgotten. Stay centered. 🕊️' },
+            ],
+          },
+          {
+            id: 'hauwa_resilient',
+            text: 'I’m focused on the facts, Hauwa. I won’t let anyone push me out.',
+            effect: { meterChanges: { reputation: 2 } },
+            responses: [
+              { from: 'hauwa', text: 'Strength is noble, provided it does not harden into bitterness. Walk gently.' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'hauwa_2',
+        unlockEpisode: 3,
+        unlockSceneIndex: 4,
+        messages: [
+          { from: 'hauwa', text: 'Ada, the energy around dinner was fractured. Someone at that table was vibrating with guilt.' },
+          { from: 'hauwa', text: 'I found an incense burner extinguished with spilled candle wax outside the utility hall. Watch where you step tonight.' },
+        ],
+        replies: [
+          {
+            id: 'hauwa_ask_who',
+            text: 'Who seemed the most nervous to you, Hauwa?',
+            effect: { meterChanges: { loyalty: 2, suspicion: 2 }, flagToSet: 'hauwa_aura_consulted' },
+            responses: [
+              { from: 'hauwa', text: 'The one who laughed the loudest. Guilt always wears an oversized smile.' },
+            ],
+          },
+          {
+            id: 'hauwa_peace_reply',
+            text: 'I will be careful, Hauwa. Thank you for always sensing what others ignore.',
+            effect: { meterChanges: { loyalty: 3, suspicion: -1 } },
+            responses: [
+              { from: 'hauwa', text: 'Truth has its own light, Ada. It will find its way out.' },
+            ],
           },
         ],
       },

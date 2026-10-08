@@ -374,7 +374,9 @@ export function calculateRelationship(
     else if (romance >= 20) statusSummary = 'He is actively fascinated by your poise and takes every chance to test your limits.';
     else statusSummary = 'Kelvin keeps tabs on you with cool curiosity, waiting to see what moves you make next.';
   } else if (charId === 'dayo') {
-    statusSummary = 'Dayo watches the emerging drama quietly, waiting for the right moment to step in.';
+    if (romance >= 40) statusSummary = 'Dayo shares his private melodies and studio sanctuary with you; he sees through the Lagos noise directly into your soul.';
+    else if (romance >= 20) statusSummary = 'There is an effortless rhythm and playful creative connection brewing whenever you talk.';
+    else statusSummary = 'Dayo watches the emerging drama quietly, offering grounded perspective and studio refuge when the city gets too loud.';
   } else if (charId === 'tamara') {
     if (trust >= 75) statusSummary = 'Tamara would take a bullet for you. She is your staunchest defender in Lekki high society.';
     else statusSummary = 'Tamara loves having you around and wants to share her luxurious lifestyle with you.';

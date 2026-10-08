@@ -33,6 +33,7 @@ import {
   computeFollowers,
   DEFAULT_SOCIAL_STATE,
   isUnlocked,
+  describeEffect,
 } from '../../data/socialRules';
 import {
   X,
@@ -51,8 +52,13 @@ import {
   TrendingUp,
   AlertCircle,
   Camera,
+  MessageCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { playSound } from '../../utils/audio';
+import { DmInbox, countUnreadDms } from './DmInbox';
+import { DM_THREADS } from '../../data/dmData';
+import { DmThread, DmBeat, DmReplyOption } from '../../types/socialFeed';
 
 interface SocialFeedOverlayProps {
   currentEpisode: number;
@@ -63,10 +69,13 @@ interface SocialFeedOverlayProps {
   flags?: Record<string, boolean>;
   soundEnabled: boolean;
   initialProfileUserId?: CharacterId | 'lagos_tea' | 'heroine' | null;
+  initialTab?: FeedFilterTab;
+  initialThreadId?: string | null;
   social?: SocialState;
   onUpdateSocial?: (updater: (prev: SocialState) => SocialState) => void;
   onUpdateMeters?: (changes: Partial<Meters>) => void;
   onUpdateFlags?: (flag: string) => void;
+  onAddClue?: (clue: InventoryItem) => void;
   onClose: () => void;
   onOpenWardrobe: () => void;
   onOpenClues: () => void;
@@ -184,21 +193,105 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   flags = {},
   soundEnabled,
   initialProfileUserId = null,
+  initialTab,
+  initialThreadId = null,
   social,
   onUpdateSocial,
   onUpdateMeters,
   onUpdateFlags,
+  onAddClue,
   onClose,
   onOpenWardrobe,
   onOpenClues,
   onOpenBioModal,
 }) => {
-  const [activeTab, setActiveTab] = useState<FeedFilterTab>('for_you');
+  const [activeTab, setActiveTab] = useState<FeedFilterTab>(initialTab || 'for_you');
+  const [openDmThreadId, setOpenDmThreadId] = useState<string | null>(initialThreadId);
   const [viewingProfileUserId, setViewingProfileUserId] = useState<
     CharacterId | 'lagos_tea' | 'heroine' | null
   >(initialProfileUserId);
   const [activeHashtag, setActiveHashtag] = useState<string | null>(null);
   const [selectedCastMember, setSelectedCastMember] = useState<CharacterId | 'all'>('all');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Toast trigger helper
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  }, []);
+
+  // Total unread DMs count across unlocked conversations
+  const totalUnreadDms = useMemo(() => {
+    return countUnreadDms(DM_THREADS, {
+      episode: currentEpisode,
+      sceneIndex: currentSceneIndex,
+      flags,
+      social: social || DEFAULT_SOCIAL_STATE,
+    });
+  }, [currentEpisode, currentSceneIndex, flags, social]);
+
+  // Handler for replying in DM threads with reactive consequences
+  const handleDmReply = useCallback(
+    (thread: DmThread, beat: DmBeat, option: DmReplyOption) => {
+      // 1. Record reply in social.dmReplies
+      onUpdateSocial?.((prev) => ({
+        ...prev,
+        dmReplies: {
+          ...prev.dmReplies,
+          [beat.id]: option.id,
+        },
+        appliedEffects: {
+          ...prev.appliedEffects,
+          [`dm_${beat.id}_${option.id}`]: true,
+        },
+      }));
+
+      // 2. Apply effect (meter changes, flagToSet)
+      if (option.effect) {
+        if (option.effect.meterChanges && onUpdateMeters) {
+          onUpdateMeters(option.effect.meterChanges);
+        }
+        if (option.effect.flagToSet && onUpdateFlags) {
+          onUpdateFlags(option.effect.flagToSet);
+        }
+        const effectDesc = describeEffect(option.effect);
+        if (effectDesc) {
+          showToast(effectDesc);
+        }
+      }
+
+      // 3. Clue added if addsClue present
+      if (option.addsClue && onAddClue) {
+        onAddClue({
+          id: `clue_dm_${option.id}`,
+          name: option.addsClue.name,
+          description: option.addsClue.description,
+          episodeAcquired: currentEpisode,
+          tag: 'Chat',
+        });
+        showToast(`New Clue Unlocked: ${option.addsClue.name} 🔍`);
+      }
+    },
+    [onUpdateSocial, onUpdateMeters, onUpdateFlags, onAddClue, currentEpisode, showToast]
+  );
+
+  // Handler for marking seen DM beats
+  const handleMarkDmSeen = useCallback(
+    (beatIds: string[]) => {
+      onUpdateSocial?.((prev) => {
+        const nextSeen = { ...prev.seenDmBeats };
+        let changed = false;
+        beatIds.forEach((id) => {
+          if (!nextSeen[id]) {
+            nextSeen[id] = true;
+            changed = true;
+          }
+        });
+        return changed ? { ...prev, seenDmBeats: nextSeen } : prev;
+      });
+    },
+    [onUpdateSocial]
+  );
 
   // Track follow status of NPCs: true = unfollowed, false/undefined = followed
   const [unfollowed, setUnfollowed] = useState<Record<string, boolean>>(() => {
@@ -246,18 +339,11 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
   const [stories, setStories] = useState<SocialStory[]>(INITIAL_STORIES);
   const [activeStoryIdx, setActiveStoryIdx] = useState<number | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAddStoryModal, setShowAddStoryModal] = useState(false);
   const [adaStoryCaption, setAdaStoryCaption] = useState('');
   const [showPostComposerModal, setShowPostComposerModal] = useState(false);
   const [isPostingAda, setIsPostingAda] = useState(false);
-
-  // Toast trigger helper
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   // Follow / Unfollow Toggle Handler
   const handleToggleFollow = useCallback(
@@ -562,6 +648,28 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
+              {/* Direct Messages Quick Button with Unread Badge */}
+              <button
+                onClick={() => {
+                  setActiveTab('dms');
+                  setViewingProfileUserId(null);
+                  if (soundEnabled) playSound.click();
+                }}
+                className={`relative p-2 rounded-xl transition-all border ${
+                  activeTab === 'dms'
+                    ? 'bg-gradient-to-r from-pink-600/30 to-purple-600/30 text-pink-300 border-pink-500/50'
+                    : 'bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border-neutral-800'
+                }`}
+                title="Direct Messages"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-pink-400" />
+                {totalUnreadDms > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-pink-500 text-[10px] font-bold text-white flex items-center justify-center animate-pulse">
+                    {totalUnreadDms}
+                  </span>
+                )}
+              </button>
+
               {/* New Post Button */}
               <button
                 onClick={() => {
@@ -670,6 +778,27 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
             <button
               onClick={() => {
+                setActiveTab('dms');
+                setActiveHashtag(null);
+                if (soundEnabled) playSound.click();
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                activeTab === 'dms'
+                  ? 'bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white shadow-md shadow-pink-500/20'
+                  : 'bg-neutral-900/80 text-neutral-400 hover:text-neutral-200 border border-neutral-800'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-pink-400" />
+              <span>Messages</span>
+              {totalUnreadDms > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-pink-500 text-[10px] font-bold text-white">
+                  {totalUnreadDms}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
                 setActiveTab('profile');
                 if (soundEnabled) playSound.click();
               }}
@@ -738,7 +867,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
           </div>
         )}
 
-        {/* 6. Content Section: Profile View OR Feed Stream */}
+        {/* 6. Content Section: Profile View OR Direct Messages OR Feed Stream */}
         {viewingProfileUserId ? (
           <InstagramProfileView
             userId={viewingProfileUserId}
@@ -751,7 +880,16 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             onBack={() => setViewingProfileUserId(null)}
             onToggleFollow={() => handleToggleFollow(viewingProfileUserId)}
             onMessage={() => {
-              showToast(`DMs with @${viewingProfileUserId} active in phone inbox 📲`);
+              const matchThread = DM_THREADS.find(
+                (t) => t.profileId === viewingProfileUserId || t.id === `dm_${viewingProfileUserId}`
+              );
+              setViewingProfileUserId(null);
+              setActiveTab('dms');
+              if (matchThread) {
+                setOpenDmThreadId(matchThread.id);
+              } else {
+                setOpenDmThreadId(null);
+              }
             }}
             renderPostCard={(post) => (
               <SocialPostCard
@@ -772,6 +910,25 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             onOpenClues={onOpenClues}
             onOpenBioModal={onOpenBioModal}
           />
+        ) : activeTab === 'dms' ? (
+          <div className="flex-1 flex flex-col min-h-0 bg-neutral-950 overflow-hidden">
+            <DmInbox
+              threads={DM_THREADS}
+              heroine={heroineCustomization}
+              soundEnabled={soundEnabled}
+              openThreadId={openDmThreadId}
+              onOpenThread={setOpenDmThreadId}
+              onReply={handleDmReply}
+              onMarkSeen={handleMarkDmSeen}
+              onViewProfile={(profileId) => {
+                setViewingProfileUserId(profileId as any);
+              }}
+              episode={currentEpisode}
+              sceneIndex={currentSceneIndex}
+              flags={flags}
+              social={social || DEFAULT_SOCIAL_STATE}
+            />
+          </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 space-y-4 scrollbar-thin scrollbar-thumb-neutral-800">
             
