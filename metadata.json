@@ -1,0 +1,6 @@
+{
+  "name": "Lagos Tea",
+  "description": "A glossy, fun, dramatic Lagos influencer romance-mystery visual novel. Navigate viral drama, luxe parties, and unravel who runs @TheLagosTea.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

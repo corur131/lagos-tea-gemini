@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        function isExtensionNoise(str) {
+          if (!str) return false;
+          var s = String(str).toLowerCase();
+          return (
+            (s.indexOf('sender') !== -1 && (s.indexOf('wallet') !== -1 || s.indexOf('initial state') !== -1 || s.indexOf('provider') !== -1 || s.indexOf('account') !== -1 || s.indexOf('bug') !== -1)) ||
+            s.indexOf('sender-wallet') !== -1 ||
+            s.indexOf('sender_getproviderstate') !== -1 ||
+            s.indexOf('failed to get initial state') !== -1 ||
+            s.indexOf('please report this bug') !== -1 ||
+            s.indexOf('no account exist') !== -1 ||
+            s.indexOf('chrome-extension://') !== -1 ||
+            s.indexOf('moz-extension://') !== -1 ||
+            s.indexOf('safari-extension://') !== -1
+          );
+        }
+
+        // Initialize dummy sender to satisfy wallet initialization checks
+        try {
+          if (!window.sender) {
+            var dummySender = {
+              isSender: true,
+              getAccountId: function() { return ''; },
+              isSignedIn: function() { return false; },
+              on: function() {},
+              off: function() {},
+              request: function() { return Promise.resolve({}); }
+            };
+            try {
+              Object.defineProperty(window, 'sender', {
+                value: dummySender,
+                writable: true,
+                configurable: true
+              });
+            } catch(e) {
+              window.sender = dummySender;
+            }
+          }
+        } catch(e) {}
+
+        // 1. Intercept EventTarget message listeners
+        try {
+          var origAddEventListener = EventTarget.prototype.addEventListener;
+          EventTarget.prototype.addEventListener = function(type, listener, options) {
+            if (type === 'message' && typeof listener === 'function') {
+              var wrapped = function(event) {
+                try {
+                  var raw = typeof event.data === 'string' ? event.data : JSON.stringify(event.data);
+                  if (isExtensionNoise(raw)) {
+                    if (event.data && event.data.response && event.data.response.error) {
+                      return;
+                    }
+                  }
+                } catch(e) {}
+                return listener.apply(this, arguments);
+              };
+              return origAddEventListener.call(this, type, wrapped, options);
+            }
+            return origAddEventListener.apply(this, arguments);
+          };
+        } catch(e) {}
+
+        // 2. Capture and stop propagation for extension message events
+        window.addEventListener('message', function(event) {
+          try {
+            var raw = typeof event.data === 'string' ? event.data : JSON.stringify(event.data);
+            if (isExtensionNoise(raw)) {
+              event.stopImmediatePropagation();
+              if (typeof event.stopPropagation === 'function') event.stopPropagation();
+              if (typeof event.preventDefault === 'function') event.preventDefault();
+            }
+          } catch(e) {}
+        }, true);
+
+        // 3. Filter console error / warn / info
+        ['error', 'warn', 'info'].forEach(function(method) {
+          var orig = console[method] || console.log;
+          console[method] = function() {
+            for (var i = 0; i < arguments.length; i++) {
+              var arg = arguments[i];
+              var str = '';
+              try {
+                if (typeof arg === 'string') {
+                  str = arg;
+                } else if (arg instanceof Error) {
+                  str = arg.message + ' ' + (arg.stack || '');
+                } else if (typeof arg === 'object' && arg !== null) {
+                  str = JSON.stringify(arg);
+                } else {
+                  str = String(arg);
+                }
+              } catch(e) {
+                str = String(arg);
+              }
+              if (isExtensionNoise(str)) {
+                return;
+              }
+            }
+            return orig.apply(console, arguments);
+          };
+        });
+
+        // 4. Filter unhandledrejection
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var str = reason ? (reason.message || String(reason)) + ' ' + (reason.stack || '') : '';
+          if (isExtensionNoise(str)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        // 5. Filter global errors
+        window.addEventListener('error', function(event) {
+          var str = (event.message || '') + ' ' + (event.error ? (event.error.message || '') + ' ' + (event.error.stack || '') : '');
+          if (isExtensionNoise(str)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        var origOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, error) {
+          var str = (String(msg || '') + ' ' + String(url || '') + ' ' + (error ? (error.message || '') + ' ' + (error.stack || '') : ''));
+          if (isExtensionNoise(str)) {
+            return true;
+          }
+          if (typeof origOnError === 'function') {
+            return origOnError.apply(this, arguments);
+          }
+        };
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Lagos Tea</title>
+    <meta name="description" content="A glossy, fun, dramatic Lagos influencer romance-mystery visual novel. Navigate viral drama, luxe parties, and unravel who runs @TheLagosTea." />
+    <meta property="og:title" content="Lagos Tea" />
+    <meta property="og:description" content="A glossy, fun, dramatic Lagos influencer romance-mystery visual novel. Navigate viral drama, luxe parties, and unravel who runs @TheLagosTea." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-neutral-950 text-neutral-100 antialiased overflow-x-hidden selection:bg-amber-500/30 selection:text-amber-200">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
