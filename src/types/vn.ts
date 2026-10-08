@@ -168,12 +168,31 @@ export type LocationType =
 
 export type TimeModifier = 'day' | 'night' | 'blackout_generator';
 
+export type MusicMood =
+  | 'campus_lifestyle'
+  | 'romance_flirting'
+  | 'party_gala'
+  | 'gossip_drama'
+  | 'suspicion_investigation'
+  | 'deceit_hiding'
+  | 'argument_confrontation'
+  | 'major_reveal'
+  | 'danger_threat'
+  | 'heartbreak_melancholy'
+  | 'victory_confidence'
+  | 'viral_tea_leak'
+  | 'mystery_climax'
+  | 'ending_romance'
+  | 'ending_triumph'
+  | 'ending_bad';
+
 export interface DialogueLine {
   speaker: CharacterId | string;
   speakerDisplayName?: string;
   expression?: Expression;
   text: string;
   sfx?: 'tap' | 'suspense' | 'suspenseSting' | 'shock' | 'gasp' | 'heartbeat' | 'thunder' | 'chime';
+  musicMood?: MusicMood;
 }
 
 export interface Meters {
@@ -194,6 +213,7 @@ export interface ChoiceOption {
   meterChanges?: Partial<Meters>;
   flagToSet?: string;
   conditionFlag?: string;
+  musicMood?: MusicMood;
 }
 
 export interface SceneData {
@@ -204,6 +224,7 @@ export interface SceneData {
   timeModifier: TimeModifier;
   charactersOnStage: CharacterId[];
   activeSpeaker?: CharacterId | string;
+  musicMood?: MusicMood;
   lines: DialogueLine[];
   choices: ChoiceOption[];
   twistMoment?: {

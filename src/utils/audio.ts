@@ -5,7 +5,7 @@
 
 let audioCtx: AudioContext | null = null;
 
-function getAudioContext(): AudioContext | null {
+export function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -217,3 +217,6 @@ export const playSound = {
     } catch {}
   },
 };
+
+export { bgmManager, MOOD_PROFILES } from './musicEngine';
+export type { MoodProfile } from './musicEngine';

@@ -40,6 +40,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'ajegunle_apartment',
     timeModifier: 'day',
     charactersOnStage: ['heroine'],
+    musicMood: 'heartbreak_melancholy',
     lines: [
       {
         speaker: 'narrator',
@@ -99,6 +100,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'ajegunle_apartment',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'tamara'],
+    musicMood: 'gossip_drama',
     lines: [
       {
         speaker: 'narrator',
@@ -165,6 +167,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'ajegunle_apartment',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'tamara'],
+    musicMood: 'campus_lifestyle',
     lines: [
       {
         speaker: 'tamara',
@@ -232,6 +235,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'zee', 'tamara', 'chi', 'bisola', 'hauwa'],
+    musicMood: 'party_gala',
     lines: [
       {
         speaker: 'narrator',
@@ -304,6 +308,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'chidi'],
+    musicMood: 'romance_flirting',
     lines: [
       {
         speaker: 'narrator',
@@ -374,6 +379,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'kelvin'],
+    musicMood: 'argument_confrontation',
     lines: [
       {
         speaker: 'narrator',
@@ -443,11 +449,13 @@ export const EPISODE_1_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'zee', 'tamara', 'chi', 'bisola', 'hauwa', 'chidi', 'kelvin'],
+    musicMood: 'viral_tea_leak',
     lines: [
       {
         speaker: 'narrator',
         text: 'Suddenly, a chorus of sharp notification alerts rang simultaneously across sixty smartphones in the living room.',
         sfx: 'shock',
+        musicMood: 'viral_tea_leak',
       },
       {
         speaker: 'bisola',
@@ -472,6 +480,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
       {
         speaker: 'narrator',
         text: 'The caption burned into my eyes: “Who invited Ajegunle Cinderella? Flaunting in a borrowed dress while owing ₦1.2M at 14 Awolowo Road, Ajegunle. Who leaked her address to us? XOXO, Lagos Tea ☕️”',
+        musicMood: 'major_reveal',
       },
       {
         speaker: 'zee',
@@ -522,6 +531,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'university_campus',
     timeModifier: 'day',
     charactersOnStage: ['heroine'],
+    musicMood: 'gossip_drama',
     lines: [
       {
         speaker: 'narrator',
@@ -568,6 +578,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'university_campus',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'tamara', 'chi'],
+    musicMood: 'argument_confrontation',
     lines: [
       {
         speaker: 'tamara',
@@ -626,6 +637,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'photoshoot_studio',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'chidi'],
+    musicMood: 'suspicion_investigation',
     lines: [
       {
         speaker: 'narrator',
@@ -682,6 +694,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'mall',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'kelvin'],
+    musicMood: 'victory_confidence',
     lines: [
       {
         speaker: 'narrator',
@@ -738,6 +751,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'mall',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'bisola', 'hauwa'],
+    musicMood: 'deceit_hiding',
     lines: [
       {
         speaker: 'narrator',
@@ -796,6 +810,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'rooftop_party',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'chidi', 'kelvin'],
+    musicMood: 'party_gala',
     lines: [
       {
         speaker: 'narrator',
@@ -854,6 +869,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
     location: 'night_street',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'zee'],
+    musicMood: 'mystery_climax',
     lines: [
       {
         speaker: 'narrator',
@@ -937,6 +953,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'zee'],
+    musicMood: 'campus_lifestyle',
     lines: [
       {
         speaker: 'narrator',
@@ -993,6 +1010,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'photoshoot_studio',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'tamara', 'bisola'],
+    musicMood: 'victory_confidence',
     lines: [
       {
         speaker: 'tamara',
@@ -1047,6 +1065,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'beach_house',
     timeModifier: 'day',
     charactersOnStage: ['heroine', 'chidi'],
+    musicMood: 'party_gala',
     lines: [
       {
         speaker: 'narrator',
@@ -1103,6 +1122,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'kelvin'],
+    musicMood: 'suspicion_investigation',
     lines: [
       {
         speaker: 'narrator',
@@ -1159,6 +1179,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine', 'chi', 'hauwa'],
+    musicMood: 'deceit_hiding',
     lines: [
       {
         speaker: 'narrator',
@@ -1213,6 +1234,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine'],
+    musicMood: 'mystery_climax',
     lines: [
       {
         speaker: 'narrator',
@@ -1235,6 +1257,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
         speaker: 'narrator',
         text: 'Suddenly, the screen illuminated in the dark room with a buzzing vibration.',
         sfx: 'shock',
+        musicMood: 'major_reveal',
       },
       {
         speaker: 'heroine',
@@ -1270,6 +1293,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
     location: 'banana_island_mansion',
     timeModifier: 'night',
     charactersOnStage: ['heroine'],
+    musicMood: 'danger_threat',
     lines: [
       {
         speaker: 'narrator',

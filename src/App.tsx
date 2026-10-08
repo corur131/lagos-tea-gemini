@@ -21,17 +21,19 @@ import { HeroineCustomizer } from './components/vn/HeroineCustomizer';
 import { ClueBoard } from './components/vn/ClueBoard';
 import { HistoryLog } from './components/vn/HistoryLog';
 import { EndingScreen } from './components/vn/EndingScreen';
+import { MusicPlayerModal } from './components/vn/MusicPlayerModal';
 import { SocialFeedOverlay } from './components/social/SocialFeedOverlay';
 import { CANONICAL_STORY, EPISODE_METAS } from './data/storyScript';
 import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
 import { countUnreadDms } from './components/social/DmInbox';
-import { playSound } from './utils/audio';
+import { playSound, bgmManager } from './utils/audio';
 import {
   Sparkles,
   BookOpen,
   Volume2,
   VolumeX,
+  Music,
   Shirt,
   ShieldAlert,
   Flame,
@@ -207,6 +209,28 @@ export default function App() {
     });
   }, [gameState.currentEpisode, gameState.currentSceneIndex, gameState.flags, gameState.social]);
 
+  // Dynamic Background Music state & modal
+  const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
+  const [musicState, setMusicState] = useState(() => ({
+    mood: bgmManager.getCurrentMood(),
+    title: bgmManager.getMoodProfile().title,
+    vibe: bgmManager.getMoodProfile().vibe,
+    isPlaying: false,
+    volume: 0.55,
+  }));
+
+  // Subscribe to background music manager changes
+  useEffect(() => {
+    return bgmManager.subscribe((state) => {
+      setMusicState(state);
+    });
+  }, []);
+
+  // Sync audio enabled state with BGM
+  useEffect(() => {
+    bgmManager.setEnabled(gameState.soundEnabled);
+  }, [gameState.soundEnabled]);
+
   // Helper for speaker display name
   const getSpeakerDisplayName = useCallback(
     (speakerId: CharacterId | string) => {
@@ -251,6 +275,42 @@ export default function App() {
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
+
+  // Dynamic Background Music adaptation based on scene, dialog, twists, or endings
+  useEffect(() => {
+    if (gameState.ending) {
+      if (gameState.ending === 'chidi') {
+        bgmManager.setMood('ending_romance');
+      } else if (gameState.ending === 'bad') {
+        bgmManager.setMood('ending_bad');
+      } else {
+        bgmManager.setMood('ending_triumph');
+      }
+      return;
+    }
+
+    // Mid-scene dialog line mood pivot
+    if (currentLine?.musicMood) {
+      bgmManager.setMood(currentLine.musicMood);
+      return;
+    }
+
+    // Scene baseline mood
+    if (currentScene?.musicMood) {
+      bgmManager.setMood(currentScene.musicMood);
+      return;
+    }
+
+    // Default fallback
+    bgmManager.setMood('campus_lifestyle');
+  }, [
+    gameState.currentEpisode,
+    gameState.currentSceneIndex,
+    gameState.currentLineIndex,
+    currentScene?.musicMood,
+    currentLine?.musicMood,
+    gameState.ending,
+  ]);
 
   // Typewriter effect state
   const [displayedText, setDisplayedText] = useState('');
@@ -413,13 +473,21 @@ export default function App() {
       });
     }
 
+    // Apply choice-specific music mood if defined
+    if (choice.musicMood) {
+      bgmManager.setMood(choice.musicMood);
+    }
+
     // Check if this scene has an episode twist
     if (currentScene.twistMoment) {
       setActiveTwistModal({
         title: currentScene.twistMoment.title,
         description: currentScene.twistMoment.description,
       });
-      if (gameState.soundEnabled) playSound.suspenseSting();
+      if (gameState.soundEnabled) {
+        playSound.suspenseSting();
+        bgmManager.playStingThenMood('reveal', 'mystery_climax');
+      }
     }
 
     // Progress to next scene or next episode
@@ -597,6 +665,7 @@ export default function App() {
     setGameState(freshState);
     setLastChoice(null);
     setDynamicScenes({});
+    bgmManager.setMood('heartbreak_melancholy');
     localStorage.removeItem('lagos_tea_last_choice');
     localStorage.removeItem('lagos_tea_dynamic_scenes');
     localStorage.setItem(STORAGE_KEY, JSON.stringify(freshState));
@@ -749,6 +818,23 @@ export default function App() {
           >
             <BookOpen className="w-3.5 h-3.5 text-blue-400" />
             <span className="hidden sm:inline">Log</span>
+          </button>
+
+          {/* Dynamic Music BGM Button */}
+          <button
+            onClick={() => setIsMusicModalOpen(true)}
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1.5 transition-all group"
+            title={`Soundtrack: ${musicState.title} (${musicState.vibe}) - Click for audio controls`}
+          >
+            <Music className={`w-3.5 h-3.5 ${gameState.soundEnabled && musicState.isPlaying ? 'text-amber-400' : 'text-neutral-400 group-hover:text-amber-400'}`} />
+            <span className="hidden md:inline font-medium text-[11px] max-w-[105px] truncate text-amber-200/90">
+              {musicState.title}
+            </span>
+            <div className="flex items-end gap-0.5 h-2.5">
+              <span className={`w-0.5 rounded-full ${gameState.soundEnabled && musicState.isPlaying ? 'bg-amber-400 h-2.5 animate-pulse' : 'bg-neutral-600 h-1'}`} />
+              <span className={`w-0.5 rounded-full ${gameState.soundEnabled && musicState.isPlaying ? 'bg-amber-400 h-1.5 animate-pulse' : 'bg-neutral-600 h-1'}`} />
+              <span className={`w-0.5 rounded-full ${gameState.soundEnabled && musicState.isPlaying ? 'bg-amber-400 h-2 animate-pulse' : 'bg-neutral-600 h-1'}`} />
+            </div>
           </button>
 
           {/* Sound Toggle */}
@@ -1140,6 +1226,19 @@ export default function App() {
           onRestart={handleRestart}
         />
       )}
+
+      {/* 14. DYNAMIC MUSIC PLAYER MODAL */}
+      <MusicPlayerModal
+        isOpen={isMusicModalOpen}
+        onClose={() => setIsMusicModalOpen(false)}
+        soundEnabled={gameState.soundEnabled}
+        onToggleSound={() => {
+          const next = !gameState.soundEnabled;
+          setGameState((prev) => ({ ...prev, soundEnabled: next }));
+          if (next) playSound.click();
+        }}
+        currentSceneMood={currentScene?.musicMood}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { EndingType, HeroineCustomization, Meters } from '../../types/vn';
 import { HeroineSvg } from '../svg/HeroineSvg';
-import { RotateCcw, ShieldCheck, Heart, Award, Skull, Sparkles } from 'lucide-react';
+import { RotateCcw, ShieldCheck, Heart, Award, Skull, Sparkles, Music } from 'lucide-react';
 
 interface EndingScreenProps {
   ending: EndingType;
@@ -117,6 +117,27 @@ export const EndingScreen: React.FC<EndingScreenProps> = ({
             <span className="text-[10px] text-neutral-400 uppercase font-mono block">Suspicion</span>
             <span className="text-sm font-bold text-rose-400">{meters.suspicion}%</span>
           </div>
+        </div>
+
+        {/* Dynamic Ending Soundtrack Vibe */}
+        <div className="w-full mb-6 px-3.5 py-2.5 rounded-2xl bg-neutral-900/60 border border-neutral-800 text-[11px] text-neutral-300 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Music className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-semibold text-neutral-200">
+              {ending === 'chidi'
+                ? 'Sunset Over The Lagoon'
+                : ending === 'bad'
+                ? 'The Feed Moves On'
+                : 'The Untouchable Queen'}
+            </span>
+          </div>
+          <span className="text-[10px] text-amber-300 font-mono">
+            {ending === 'chidi'
+              ? 'Romantic Alté Serenade'
+              : ending === 'bad'
+              ? 'Somber Minor Ambient'
+              : 'Royal Lagos Afrobeats'}
+          </span>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
