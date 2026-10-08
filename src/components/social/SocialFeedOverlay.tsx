@@ -324,7 +324,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
       );
     });
     const resolvedInitialPosts = INITIAL_POSTS.map((p) =>
-      resolvePost(p, flags, activeSocial)
+      resolvePost(p, flags, activeSocial, currentEpisode, currentSceneIndex)
     );
     return [...existingAdaPosts, ...resolvedInitialPosts];
   }, [social, currentEpisode, currentSceneIndex, meters.popularity, flags, heroineCustomization.name]);

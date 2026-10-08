@@ -421,8 +421,14 @@ export function formatCount(n: number): string {
 
 /* ------------------------------ Post display ------------------------------ */
 
-// Applies choice-based variants and narrative memory to a post
-export function resolvePost(post: SocialPost, flags: Record<string, boolean>, social: SocialState): SocialPost {
+// Applies choice-based variants, narrative memory, and threaded comment unlocking to a post
+export function resolvePost(
+  post: SocialPost,
+  flags: Record<string, boolean>,
+  social: SocialState,
+  episode: number = 1,
+  sceneIndex: number = 0
+): SocialPost {
   const variant = post.variants?.find((v) => flags[v.flag]);
   const liked = !!social.likedPosts[post.id];
   const playerComments = social.playerComments[post.id] || [];
@@ -618,7 +624,24 @@ export function resolvePost(post: SocialPost, flags: Record<string, boolean>, so
     isSavedByPlayer: !!social.savedPosts[post.id],
     likesCount: post.likesCount + (liked ? 1 : 0),
     commentsCount: post.commentsCount + playerComments.length + narrativeComments.length,
-    comments: [...narrativeComments, ...playerComments, ...post.comments],
+    comments: (() => {
+      const allCandidateComments = [...narrativeComments, ...playerComments, ...post.comments];
+      const visibleComments = allCandidateComments.filter((c) => {
+        if (c.unlockEpisode !== undefined) {
+          if (!hasReached(episode, sceneIndex, c.unlockEpisode, c.unlockSceneIndex ?? 0)) return false;
+        }
+        if (c.requiredFlag && !flags[c.requiredFlag]) return false;
+        if (c.requiredAnyFlags && !c.requiredAnyFlags.some((f) => flags[f])) return false;
+        if (c.hiddenIfFlag && flags[c.hiddenIfFlag]) return false;
+        if (c.hiddenIfAnyFlags && c.hiddenIfAnyFlags.some((f) => flags[f])) return false;
+        return true;
+      });
+      const visibleIds = new Set(visibleComments.map((c) => c.id));
+      return visibleComments.filter((c) => {
+        if (!c.parentCommentId) return true;
+        return visibleIds.has(c.parentCommentId);
+      });
+    })(),
   };
 }
 

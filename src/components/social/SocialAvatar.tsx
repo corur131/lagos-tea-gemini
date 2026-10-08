@@ -5,7 +5,7 @@ import { NpcSvg, FEMALE_NPC_PRESETS } from '../svg/NpcSvg';
 import { Coffee, User } from 'lucide-react';
 
 interface SocialAvatarProps {
-  avatarType: CharacterId | 'lagos_tea' | 'fan';
+  avatarType: CharacterId | 'lagos_tea' | 'fan' | string;
   heroineCustomization?: HeroineCustomization;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   hasStoryRing?: boolean;
@@ -13,6 +13,8 @@ interface SocialAvatarProps {
   isLagosTea?: boolean;
   className?: string;
   onClick?: () => void;
+  avatarColor?: string;
+  initials?: string;
 }
 
 const SIZE_CLASSES = {
@@ -30,6 +32,8 @@ export const SocialAvatar: React.FC<SocialAvatarProps> = ({
   hasStoryRing = false,
   hasUnseenStory = false,
   isLagosTea = false,
+  avatarColor,
+  initials,
   className = '',
   onClick,
 }) => {
@@ -133,10 +137,13 @@ export const SocialAvatar: React.FC<SocialAvatarProps> = ({
           </div>
         )}
 
-        {/* Fan / Default */}
-        {(avatarType === 'fan' || avatarType === 'narrator') && (
-          <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-neutral-400">
-            <User className="w-1/2 h-1/2" />
+        {/* Fan / Lightweight / Default */}
+        {(avatarType === 'fan' || avatarType === 'narrator' || !(avatarType in FEMALE_NPC_PRESETS || ['chidi', 'kelvin', 'dayo', 'heroine', 'lagos_tea'].includes(avatarType))) && (
+          <div
+            className="w-full h-full flex items-center justify-center font-bold text-white text-[11px] select-none"
+            style={{ backgroundColor: avatarColor || '#334155' }}
+          >
+            {initials ? initials.slice(0, 2).toUpperCase() : <User className="w-1/2 h-1/2 text-neutral-300" />}
           </div>
         )}
       </div>

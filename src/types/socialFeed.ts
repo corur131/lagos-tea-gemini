@@ -22,16 +22,25 @@ export interface Unlockable {
 
 export interface SocialComment {
   id: string;
-  authorId: SocialAuthorId;
+  authorId: SocialAuthorId | string;
   authorName: string;
   authorHandle: string;
   isVerified?: boolean;
-  avatarType: SocialAvatarType;
+  avatarType: SocialAvatarType | string;
+  avatarColor?: string;
   text: string;
   likes: number;
   isLiked?: boolean;
   timestamp: string;
   memoryBadge?: string;
+  parentCommentId?: string;
+  replyToHandle?: string;
+  unlockEpisode?: number;
+  unlockSceneIndex?: number;
+  requiredFlag?: string;
+  requiredAnyFlags?: string[];
+  hiddenIfFlag?: string;
+  hiddenIfAnyFlags?: string[];
 }
 
 export interface SoundTrack {

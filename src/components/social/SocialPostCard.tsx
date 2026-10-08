@@ -130,20 +130,58 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     if (soundEnabled) playSound.phoneChime();
   };
 
-  const displayedComments = showAllComments ? post.comments : post.comments.slice(0, 2);
   const war = post.commentWar;
   const pickedWarOption = war?.options.find((o) => o.id === warPick);
+  const [expandedThreads, setExpandedThreads] = useState<Record<string, boolean>>({});
 
-  const renderComment = (comment: SocialComment, highlight?: 'troll' | 'ada') => {
+  const toggleThread = (commentId: string) => {
+    setExpandedThreads((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
+    if (soundEnabled) playSound.click();
+  };
+
+  // Group comments into a parent-children map
+  const commentMap = React.useMemo(() => {
+    const map = new Map<string, SocialComment[]>();
+    post.comments.forEach((c) => {
+      if (c.parentCommentId) {
+        const list = map.get(c.parentCommentId) || [];
+        list.push(c);
+        map.set(c.parentCommentId, list);
+      }
+    });
+    return map;
+  }, [post.comments]);
+
+  // Top level comments are those without parentCommentId or whose parent is outside the post
+  const topLevelComments = React.useMemo(() => {
+    const allIds = new Set(post.comments.map((c) => c.id));
+    return post.comments.filter((c) => !c.parentCommentId || !allIds.has(c.parentCommentId));
+  }, [post.comments]);
+
+  const displayedTopLevel = showAllComments ? topLevelComments : topLevelComments.slice(0, 2);
+
+  const renderComment = (
+    comment: SocialComment,
+    highlight?: 'troll' | 'ada',
+    _isReply?: boolean,
+    level: number = 0
+  ) => {
     const isLiked = !!likedCommentIds[comment.id] || comment.isLiked;
     const likes = comment.likes + (likedCommentIds[comment.id] ? 1 : 0);
     const isAda = comment.authorId === 'heroine';
+    const initials = comment.authorName
+      ? comment.authorName
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+      : undefined;
+
     return (
       <div
         key={comment.id}
         className={`flex items-start justify-between text-xs text-neutral-300 gap-2 ${
           highlight === 'troll' ? 'p-2 rounded-xl bg-rose-950/40 border border-rose-500/30' : ''
-        }`}
+        } ${level > 0 ? 'bg-neutral-900/40 rounded-xl p-1.5' : ''}`}
       >
         <div className="flex items-start gap-2 min-w-0">
           <div onClick={() => openProfile(comment.authorId)} className="cursor-pointer shrink-0">
@@ -152,12 +190,14 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
               heroineCustomization={heroineCustomization}
               size="xs"
               isLagosTea={comment.avatarType === 'lagos_tea'}
+              avatarColor={comment.avatarColor}
+              initials={initials}
             />
           </div>
           <div className="min-w-0">
             <span
               onClick={() => openProfile(comment.authorId)}
-              className="font-bold text-neutral-100 hover:text-pink-300 transition-colors cursor-pointer mr-1.5 font-mono"
+              className="font-bold text-neutral-100 hover:text-pink-300 transition-colors cursor-pointer mr-1.5 font-mono text-[11px]"
             >
               {comment.authorHandle}
               {(comment.isVerified || (isAda && isAdaVerified)) && (
@@ -173,7 +213,12 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
                 <span>{comment.memoryBadge}</span>
               </span>
             )}
-            <span className="break-words">{comment.text}</span>
+            {comment.replyToHandle && (
+              <span className="text-[11px] font-mono text-pink-400 font-semibold mr-1.5">
+                @{comment.replyToHandle.replace(/^@/, '')}
+              </span>
+            )}
+            <span className="break-words leading-relaxed">{comment.text}</span>
             <div className="text-[10px] text-neutral-500 mt-0.5">{comment.timestamp}</div>
           </div>
         </div>
@@ -189,6 +234,67 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
           <Heart className={`w-3 h-3 ${isLiked ? 'fill-rose-500' : ''}`} />
           <span>{likes}</span>
         </button>
+      </div>
+    );
+  };
+
+  const renderCommentThread = (topComment: SocialComment) => {
+    const directReplies = commentMap.get(topComment.id) || [];
+    const hasReplies = directReplies.length > 0;
+    const countTotalDescendants = (parentId: string): number => {
+      const children = commentMap.get(parentId) || [];
+      return children.length + children.reduce((acc, c) => acc + countTotalDescendants(c.id), 0);
+    };
+    const totalReplies = countTotalDescendants(topComment.id);
+    const isExpanded = !!expandedThreads[topComment.id] || showAllComments;
+
+    return (
+      <div key={topComment.id} className="space-y-1.5">
+        {renderComment(topComment)}
+
+        {hasReplies && (
+          <div className="pl-3.5 sm:pl-4 border-l border-neutral-700/60 ml-2 mt-1.5 space-y-2">
+            {!isExpanded && totalReplies > 1 ? (
+              <>
+                {renderComment(directReplies[0], undefined, true, 1)}
+                <button
+                  onClick={() => toggleThread(topComment.id)}
+                  className="flex items-center gap-1.5 text-[11px] font-semibold text-pink-400 hover:text-pink-300 transition-colors pt-0.5"
+                >
+                  <span>↳ View {totalReplies - 1} more {totalReplies - 1 === 1 ? 'reply' : 'replies'}</span>
+                </button>
+              </>
+            ) : (
+              <>
+                {directReplies.map((reply) => {
+                  const nestedReplies = commentMap.get(reply.id) || [];
+                  return (
+                    <div key={reply.id} className="space-y-1.5">
+                      {renderComment(reply, undefined, true, 1)}
+                      {nestedReplies.length > 0 && (
+                        <div className="pl-3 sm:pl-3.5 border-l border-pink-500/30 ml-2 mt-1 space-y-1.5">
+                          {nestedReplies.map((deepReply) => (
+                            <React.Fragment key={deepReply.id}>
+                              {renderComment(deepReply, undefined, true, 2)}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {totalReplies > 1 && !showAllComments && (
+                  <button
+                    onClick={() => toggleThread(topComment.id)}
+                    className="flex items-center gap-1 text-[10px] font-semibold text-neutral-400 hover:text-neutral-200 transition-colors pt-0.5"
+                  >
+                    <span>⌃ Hide replies</span>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -508,14 +614,16 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
         {/* 6. Comments */}
         {post.comments.length > 0 && (
-          <div className="pt-2 border-t border-neutral-800/80 space-y-2">
-            {displayedComments.map((comment) => renderComment(comment))}
-            {post.comments.length > 2 && (
+          <div className="pt-2 border-t border-neutral-800/80 space-y-2.5">
+            {displayedTopLevel.map((comment) => renderCommentThread(comment))}
+            {topLevelComments.length > 2 && (
               <button
                 onClick={() => setShowAllComments((prev) => !prev)}
-                className="text-[11px] font-semibold text-neutral-400 hover:text-neutral-200 pt-1"
+                className="text-[11px] font-semibold text-neutral-400 hover:text-neutral-200 pt-1 block transition-colors"
               >
-                {showAllComments ? 'Hide extra comments' : `View all ${post.comments.length} comments`}
+                {showAllComments
+                  ? 'Hide extra comments'
+                  : `View all ${post.comments.length} comments (${topLevelComments.length} threads)`}
               </button>
             )}
           </div>
