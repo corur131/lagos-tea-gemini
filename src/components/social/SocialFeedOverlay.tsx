@@ -15,6 +15,8 @@ import { StoryViewerModal } from './StoryViewerModal';
 import { InstagramProfileView } from './InstagramProfileView';
 import { AdaProfileView } from './AdaProfileView';
 import { AdaPostComposer } from './AdaPostComposer';
+import { TrendingView } from './TrendingView';
+import { GIDIGRAM_TRENDS, GidiGramTrend } from '../../data/trendData';
 import {
   PhotoOption,
   TONE_INFO,
@@ -346,6 +348,25 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
     });
   }, [stories, currentEpisode, currentSceneIndex]);
 
+  // Visible trends based on story progression and flags
+  const visibleTrends = useMemo(() => {
+    return GIDIGRAM_TRENDS.filter((trend) => {
+      const isEpisodePast = trend.unlockEpisode < currentEpisode;
+      const isCurrentEpisodeUnlocked =
+        trend.unlockEpisode === currentEpisode &&
+        (trend.unlockSceneIndex === undefined || currentSceneIndex >= trend.unlockSceneIndex);
+
+      if (!isEpisodePast && !isCurrentEpisodeUnlocked) return false;
+
+      // Flag requirements
+      if (trend.requiredFlag && !flags[trend.requiredFlag]) return false;
+      if (trend.hiddenIfFlag && flags[trend.hiddenIfFlag]) return false;
+      if (trend.requiredAnyFlags && !trend.requiredAnyFlags.some((f) => flags[f])) return false;
+
+      return true;
+    });
+  }, [currentEpisode, currentSceneIndex, flags]);
+
   // Handle story viewed
   const handleStoryViewed = useCallback((storyId: string) => {
     setStories((prev) => {
@@ -617,6 +638,22 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             >
               <Flame className="w-3.5 h-3.5 text-amber-400" />
               <span>For You</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('trending');
+                setActiveHashtag(null);
+                if (soundEnabled) playSound.click();
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                activeTab === 'trending'
+                  ? 'bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 text-white shadow-md shadow-pink-500/20'
+                  : 'bg-neutral-900/80 text-neutral-400 hover:text-neutral-200 border border-neutral-800'
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-pink-400" />
+              <span>Trending ({visibleTrends.length})</span>
             </button>
 
             <button
@@ -922,8 +959,29 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
               />
             )}
 
-            {/* Feed Posts */}
-            {activeTab !== 'profile' && (
+            {/* Trending View Tab */}
+            {activeTab === 'trending' && (
+              <TrendingView
+                trends={visibleTrends}
+                allPosts={posts}
+                heroineCustomization={heroineCustomization}
+                soundEnabled={soundEnabled}
+                unfollowed={unfollowed}
+                onToggleFollow={handleToggleFollow}
+                onLikePost={handleLikePost}
+                onAddComment={handleAddComment}
+                onSharePost={handleSharePost}
+                onViewProfile={(authorId) => setViewingProfileUserId(authorId as any)}
+                onSelectHashtag={(tag) => {
+                  setActiveHashtag(tag);
+                  setActiveTab('for_you');
+                  showToast(`Filtered feed for ${tag} 🔎`);
+                }}
+              />
+            )}
+
+            {/* Feed Posts (For You, Tea Leaks, Cast) */}
+            {activeTab !== 'profile' && activeTab !== 'trending' && (
               <>
                 {visiblePosts.length === 0 ? (
                   <div className="py-12 text-center text-neutral-500 space-y-2">

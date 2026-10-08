@@ -154,7 +154,7 @@ export interface SocialStory extends Unlockable {
   slides: StorySlide[];
 }
 
-export type FeedFilterTab = 'for_you' | 'tea_leaks' | 'cast' | 'profile';
+export type FeedFilterTab = 'for_you' | 'trending' | 'tea_leaks' | 'cast' | 'profile';
 
 export type PhoneView = 'home' | 'notifications' | 'compose' | 'dms' | 'profile';
 
