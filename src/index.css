@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   VISUAL NOVEL STAGE ANIMATIONS & EFFECTS
+   ========================================================================= */
+
+@keyframes idleBreathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-2.5px) scale(1.004, 1.008);
+  }
+}
+
+@keyframes subtleBreathLeft {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+@keyframes subtleBreathRight {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+.anim-char-breathe-left {
+  animation: subtleBreathLeft 3.4s ease-in-out infinite;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.anim-char-breathe-right {
+  animation: subtleBreathRight 3.8s ease-in-out 1.2s infinite;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.anim-char-breathe-center {
+  animation: subtleBreathLeft 3.6s ease-in-out infinite;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+@keyframes speakerNod {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-2px) rotate(0.4deg);
+  }
+  60% {
+    transform: translateY(1px) rotate(-0.2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  15% { transform: translate(-4px, 2px); }
+  30% { transform: translate(4px, -3px); }
+  45% { transform: translate(-3px, 3px); }
+  60% { transform: translate(3px, -2px); }
+  75% { transform: translate(-1px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes dangerPulseVignette {
+  0%, 100% {
+    box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    box-shadow: inset 0 0 50px rgba(239, 68, 68, 0.55);
+  }
+}
+
+@keyframes floatUpHeart {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6) rotate(-10deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0px) scale(1.1) rotate(5deg);
+  }
+  80% {
+    opacity: 0.9;
+    transform: translateY(-35px) scale(1) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-55px) scale(0.8) rotate(12deg);
+  }
+}
+
+.anim-idle-breathe {
+  animation: idleBreathe 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.anim-speaker-emphasis {
+  animation: speakerNod 3.2s ease-in-out infinite;
+  transform-origin: bottom center;
+  will-change: transform;
+}
+
+.anim-screen-shake {
+  animation: screenShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.anim-danger-pulse {
+  animation: dangerPulseVignette 1.8s ease-in-out infinite;
+}
+
+.anim-floating-heart {
+  animation: floatUpHeart 1.8s ease-out forwards;
+}
+
+/* Reduced motion toggle support */
+.reduced-motion *,
+.reduced-motion .anim-idle-breathe,
+.reduced-motion .anim-speaker-emphasis,
+.reduced-motion .anim-screen-shake {
+  animation: none !important;
+  transition-duration: 0.01ms !important;
+}

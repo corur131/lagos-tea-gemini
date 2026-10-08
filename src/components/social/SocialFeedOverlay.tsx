@@ -134,9 +134,10 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
   // Handle player liking a post
   const handleLikePost = (post: SocialPost) => {
+    const postId = post.id;
     setPosts((prev) =>
       prev.map((p) => {
-        if (p.id === post.id) {
+        if (p.id === postId) {
           const wasLiked = p.isLikedByPlayer;
           return {
             ...p,
@@ -151,6 +152,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
   // Handle player commenting on a post
   const handleAddComment = (post: SocialPost, text: string) => {
+    const postId = post.id;
     const newComment = {
       id: `comment_ada_${Date.now()}`,
       authorId: 'heroine' as const,
@@ -166,7 +168,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
     setPosts((prev) =>
       prev.map((p) => {
-        if (p.id === post.id) {
+        if (p.id === postId) {
           return {
             ...p,
             commentsCount: p.commentsCount + 1,
@@ -478,13 +480,19 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
           {activeTab === 'profile' && (
             <AdaProfileView
               heroine={heroineCustomization}
-              meters={meters}
-              inventory={inventory}
+              followers={Math.round((meters.popularity / 100) * 150000)}
+              followingCount={184}
+              adaPosts={visiblePosts.filter((p) => p.authorId === 'heroine')}
+              taggedPosts={visiblePosts.filter((p) => p.authorId !== 'heroine')}
+              inventoryCount={inventory.length}
               soundEnabled={soundEnabled}
               onOpenWardrobe={onOpenWardrobe}
               onOpenClues={onOpenClues}
-              onSelectTagPhoto={(title: string) => {
-                showToast(`Viewing tagged photo: "${title}"`);
+              onOpenPost={(postId) => {
+                showToast(`Viewing post #${postId}`);
+              }}
+              onCompose={() => {
+                setShowAddStoryModal(true);
               }}
             />
           )}
@@ -538,8 +546,15 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
           initialStoryIndex={activeStoryIdx}
           heroineCustomization={heroineCustomization}
           soundEnabled={soundEnabled}
+          pollVotes={{}}
           onClose={() => setActiveStoryIdx(null)}
           onStoryViewed={handleStoryViewed}
+          onVote={(_story, _slide, _choice) => {
+            showToast('Vote submitted! 🗳️');
+          }}
+          onReact={(_story, emoji) => {
+            showToast(`Reacted with ${emoji}`);
+          }}
         />
       )}
 

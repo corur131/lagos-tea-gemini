@@ -139,7 +139,6 @@ export default function App() {
       inventory: INITIAL_INVENTORY,
       historyLog: [],
       mysterySecret: generateNewSecret(),
-      social: DEFAULT_SOCIAL_STATE,
       isTyping: false,
       isWardrobeOpen: false,
       isCluesOpen: false,
@@ -147,6 +146,7 @@ export default function App() {
       isSocialFeedOpen: false,
       soundEnabled: true,
       ending: null,
+      social: DEFAULT_SOCIAL_STATE,
     };
   });
 
@@ -560,7 +560,6 @@ export default function App() {
       inventory: INITIAL_INVENTORY,
       historyLog: [],
       mysterySecret: newSecret,
-      social: DEFAULT_SOCIAL_STATE,
       isTyping: false,
       isWardrobeOpen: false,
       isCluesOpen: false,
@@ -568,6 +567,7 @@ export default function App() {
       isSocialFeedOpen: false,
       soundEnabled: true,
       ending: null,
+      social: DEFAULT_SOCIAL_STATE,
     };
     setGameState(freshState);
     setLastChoice(null);

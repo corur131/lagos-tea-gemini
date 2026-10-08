@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HeroineCustomization, Meters, InventoryItem } from '../../types/vn';
+import { HeroineCustomization } from '../../types/vn';
 import { SocialPost } from '../../types/socialFeed';
 import { FOLLOWER_MILESTONES, formatCount, VERIFIED_FOLLOWERS } from '../../data/socialRules';
 import { SocialAvatar } from './SocialAvatar';
@@ -7,50 +7,33 @@ import { HeroineSvg } from '../svg/HeroineSvg';
 import { Shirt, Award, Grid, UserCheck, MapPin, CheckCircle2, Plus, Heart, Camera } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
-export interface AdaProfileViewProps {
+interface AdaProfileViewProps {
   heroine: HeroineCustomization;
-  followers?: number;
-  followingCount?: number;
-  adaPosts?: SocialPost[];
-  taggedPosts?: SocialPost[];
-  inventoryCount?: number;
-  meters?: Meters;
-  inventory?: InventoryItem[];
+  followers: number;
+  followingCount: number;
+  adaPosts: SocialPost[];
+  taggedPosts: SocialPost[];
+  inventoryCount: number;
   soundEnabled: boolean;
   onOpenWardrobe: () => void;
   onOpenClues: () => void;
-  onOpenPost?: (postId: string) => void;
-  onCompose?: () => void;
-  onSelectTagPhoto?: (title: string) => void;
+  onOpenPost: (postId: string) => void;
+  onCompose: () => void;
 }
 
 export const AdaProfileView: React.FC<AdaProfileViewProps> = ({
   heroine,
-  followers: followersProp,
-  followingCount = 42,
-  adaPosts = [],
-  taggedPosts = [],
-  inventoryCount: inventoryCountProp,
-  meters,
-  inventory,
+  followers,
+  followingCount,
+  adaPosts,
+  taggedPosts,
+  inventoryCount,
   soundEnabled,
   onOpenWardrobe,
   onOpenClues,
   onOpenPost,
   onCompose,
-  onSelectTagPhoto,
 }) => {
-  const followers =
-    followersProp ??
-    (meters ? Math.max(312, Math.round(312 + Math.max(0, meters.popularity - 35) ** 2 * 10)) : 1250);
-  const inventoryCount = inventoryCountProp ?? inventory?.length ?? 0;
-  const handleOpenPost = (id: string) => {
-    if (onOpenPost) onOpenPost(id);
-    else if (onSelectTagPhoto) onSelectTagPhoto(id);
-  };
-  const handleCompose = () => {
-    if (onCompose) onCompose();
-  };
   const [tab, setTab] = useState<'posts' | 'tagged'>('posts');
   const isVerified = followers >= VERIFIED_FOLLOWERS;
   const nextMilestone = FOLLOWER_MILESTONES.find((m) => followers < m);
@@ -163,7 +146,7 @@ export const AdaProfileView: React.FC<AdaProfileViewProps> = ({
             </p>
             {tab === 'posts' && (
               <button
-                onClick={handleCompose}
+                onClick={onCompose}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold"
               >
                 <Plus className="w-3.5 h-3.5" /> New post
@@ -175,7 +158,7 @@ export const AdaProfileView: React.FC<AdaProfileViewProps> = ({
             {grid.map((post) => (
               <button
                 key={post.id}
-                onClick={() => handleOpenPost(post.id)}
+                onClick={() => onOpenPost(post.id)}
                 className="group relative aspect-square overflow-hidden"
               >
                 <div className={`absolute inset-0 bg-gradient-to-tr ${post.graphic.bgGradient}`} />

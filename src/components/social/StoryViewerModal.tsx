@@ -5,16 +5,16 @@ import { SocialAvatar } from './SocialAvatar';
 import { X, ChevronLeft, ChevronRight, Heart, Flame, Coffee, Skull, Send, Volume2 } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
-export interface StoryViewerModalProps {
+interface StoryViewerModalProps {
   stories: SocialStory[];
   initialStoryIndex: number;
   heroineCustomization: HeroineCustomization;
   soundEnabled: boolean;
-  pollVotes?: Record<string, 'A' | 'B'>;
+  pollVotes: Record<string, 'A' | 'B'>;
   onClose: () => void;
   onStoryViewed?: (storyId: string) => void;
-  onVote?: (story: SocialStory, slide: StorySlide, choice: 'A' | 'B') => void;
-  onReact?: (story: SocialStory, emoji: string) => void;
+  onVote: (story: SocialStory, slide: StorySlide, choice: 'A' | 'B') => void;
+  onReact: (story: SocialStory, emoji: string) => void;
 }
 
 export const StoryViewerModal: React.FC<StoryViewerModalProps> = ({
@@ -22,7 +22,7 @@ export const StoryViewerModal: React.FC<StoryViewerModalProps> = ({
   initialStoryIndex,
   heroineCustomization,
   soundEnabled,
-  pollVotes = {},
+  pollVotes,
   onClose,
   onStoryViewed,
   onVote,
@@ -115,12 +115,12 @@ export const StoryViewerModal: React.FC<StoryViewerModalProps> = ({
     setTimeout(() => {
       setFloatingEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
     }, 1500);
-    onReact?.(currentStory, emoji);
+    onReact(currentStory, emoji);
   };
 
   const handleVotePoll = (choice: 'A' | 'B') => {
     if (soundEnabled) playSound.click();
-    onVote?.(currentStory, currentSlide, choice);
+    onVote(currentStory, currentSlide, choice);
   };
 
   const userVote = pollVotes[currentSlide.id];

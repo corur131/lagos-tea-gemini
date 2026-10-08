@@ -26,7 +26,7 @@ export interface DeleteState {
   secondsLeft?: number;
 }
 
-export interface SocialPostCardProps {
+interface SocialPostCardProps {
   post: SocialPost;
   heroineCustomization: HeroineCustomization;
   soundEnabled: boolean;
@@ -38,10 +38,10 @@ export interface SocialPostCardProps {
   isAdaVerified?: boolean;
   onLikePost: (post: SocialPost) => void;
   onSavePost?: (post: SocialPost) => void;
-  onAddComment?: (post: SocialPost, text: string) => void;
+  onAddComment: (post: SocialPost, text: string) => void;
   onQuickReply?: (post: SocialPost, reply: QuickReply) => void;
   onLikeComment?: (commentId: string) => void;
-  onSharePost?: (post: SocialPost) => void;
+  onSharePost: (post: SocialPost) => void;
   onScreenshot?: (post: SocialPost) => void;
   onWarPick?: (post: SocialPost, optionId: string) => void;
   onHashtagClick?: (tag: string) => void;
@@ -61,13 +61,13 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   isScreenshotted = false,
   isAdaVerified = false,
   onLikePost,
-  onSavePost,
+  onSavePost = () => {},
   onAddComment,
-  onQuickReply,
-  onLikeComment,
+  onQuickReply = () => {},
+  onLikeComment = () => {},
   onSharePost,
-  onScreenshot,
-  onWarPick,
+  onScreenshot = () => {},
+  onWarPick = () => {},
   onHashtagClick,
   onViewProfile,
 }) => {
@@ -112,13 +112,13 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     setShowFlash(true);
     if (soundEnabled) playSound.cameraShutter();
     setTimeout(() => setShowFlash(false), 250);
-    onScreenshot?.(post);
+    onScreenshot(post);
   };
 
   const handleSubmitComment = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!newCommentText.trim()) return;
-    onAddComment?.(post, newCommentText.trim());
+    onAddComment(post, newCommentText.trim());
     setNewCommentText('');
     setShowAllComments(true);
     if (soundEnabled) playSound.phoneChime();
@@ -164,7 +164,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         </div>
         <button
           onClick={() => {
-            onLikeComment?.(comment.id);
+            onLikeComment(comment.id);
             if (soundEnabled) playSound.likePop();
           }}
           className={`flex items-center gap-1 shrink-0 mt-0.5 text-[11px] ${
@@ -360,7 +360,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
             <button
               onClick={() => {
-                onSharePost?.(post);
+                onSharePost(post);
                 if (soundEnabled) playSound.click();
               }}
               className="text-neutral-300 hover:text-white transition-transform active:scale-110"
@@ -383,7 +383,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
 
           <button
             onClick={() => {
-              onSavePost?.(post);
+              onSavePost(post);
               if (soundEnabled) playSound.click();
             }}
             className={`transition-colors ${
@@ -428,7 +428,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
                   <button
                     key={option.id}
                     onClick={() => {
-                      onWarPick?.(post, option.id);
+                      onWarPick(post, option.id);
                       if (soundEnabled) playSound.phoneChime();
                     }}
                     className="px-2 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-pink-500/60 text-[11px] font-semibold text-neutral-200 transition-colors"
@@ -484,7 +484,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
                 <button
                   key={reply.tone}
                   onClick={() => {
-                    onQuickReply?.(post, reply);
+                    onQuickReply(post, reply);
                     setShowAllComments(true);
                     if (soundEnabled) playSound.phoneChime();
                   }}
