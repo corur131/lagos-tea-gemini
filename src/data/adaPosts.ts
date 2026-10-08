@@ -268,11 +268,17 @@ export function buildFallbackComments(
     add('chi', 'You cross-examined me like a prosecutor outside the library. Sharp tongue, Ada.', 'Recalls: Library Questioning');
   } else if (flags.helped_bisola && !unfollowed?.bisola) {
     add('bisola', 'Thank you again for reviewing my brand pitch the other day 💕 You’re one of the only real ones!', 'Recalls: Helped With Pitch');
+  } else if (flags.noted_bisola_motive && !unfollowed?.bisola) {
+    add('bisola', 'I saw you watching me at the studio… we all have bills to pay, Ada 😔', 'Recalls: Observed Distress');
   }
 
-  // Choice Memory H: Burner phone clue
+  // Choice Memory H: Burner phone clue & intruder finale
   if (flags.photographed_tea_phone && !unfollowed?.lagos_tea) {
     add('lagos_tea', 'Taking secret photos in the dark archive room? Careful what you capture 🫖📱', 'Recalls: Archive Recon');
+  } else if (flags.held_breath_stealth && !unfollowed?.lagos_tea) {
+    add('lagos_tea', 'Holding your breath behind the curtains won’t hide you forever, Cinderella 🫖🤫', 'Recalls: Stealth Vigil');
+  } else if (flags.confronted_intruder && !unfollowed?.lagos_tea) {
+    add('lagos_tea', 'Stepping into the dark to face shadows? Brave girl. Or foolish girl 🫖⚡', 'Recalls: Midnight Confrontation');
   }
 
   // 2. TONE-BASED AND RELATIONSHIP COMMENTS:
@@ -490,6 +496,19 @@ export function getUpdatedAdaPostForScene(
       c.memoryBadge = 'Recalls: Assistant Role';
       newComments.unshift(c);
     } else if (
+      flags.negotiated_pa_terms &&
+      !unfollowed?.zee &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Retainer Terms')
+    ) {
+      const c = castComment(
+        'zee',
+        'Nobody negotiates a retainer with me and wins, but you did. Keep that same energy this week ✨',
+        `${post.id}_mem_zee_neg_${post.episode}`,
+        480
+      );
+      c.memoryBadge = 'Recalls: Retainer Terms';
+      newComments.unshift(c);
+    } else if (
       flags.pact_with_zee &&
       !unfollowed?.zee &&
       !newComments.some((c) => c.memoryBadge === 'Recalls: Private Pact')
@@ -501,6 +520,19 @@ export function getUpdatedAdaPostForScene(
         410
       );
       c.memoryBadge = 'Recalls: Private Pact';
+      newComments.unshift(c);
+    } else if (
+      flags.warned_zee &&
+      !unfollowed?.zee &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: The Warning')
+    ) {
+      const c = castComment(
+        'zee',
+        'Your heads-up about the leak was sharp. I value people who keep their eyes open 🙂',
+        `${post.id}_mem_zee_warn_${post.episode}`,
+        430
+      );
+      c.memoryBadge = 'Recalls: The Warning';
       newComments.unshift(c);
     }
 

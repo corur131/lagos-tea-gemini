@@ -479,6 +479,19 @@ export function resolvePost(
         timestamp: '20m ago',
         memoryBadge: 'Recalls: Porsche Ride',
       });
+    } else if (flags.refused_kelvin_ride && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('shuttle'))) {
+      narrativeComments.push({
+        id: `mem_bis_${post.id}_refused_kelvin`,
+        authorId: 'bisola',
+        authorName: 'Bisola Adeyemi',
+        authorHandle: '@bisola_vlogs',
+        isVerified: true,
+        avatarType: 'bisola',
+        text: 'The entire campus is talking about Ada turning down Kelvin Adebayo-Wright’s GT3 to catch the campus shuttle 💀 iconic!',
+        likes: 360,
+        timestamp: '20m ago',
+        memoryBadge: 'Recalls: Rejected Ride',
+      });
     }
   }
 
@@ -496,6 +509,19 @@ export function resolvePost(
         likes: 290,
         timestamp: '30m ago',
         memoryBadge: 'Recalls: Balcony Confession',
+      });
+    } else if (flags.flirted_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('behind the lens'))) {
+      narrativeComments.push({
+        id: `mem_chidi_${post.id}_flirt`,
+        authorId: 'chidi',
+        authorName: 'Chidi Nwosu',
+        authorHandle: '@chidi_captures',
+        isVerified: true,
+        avatarType: 'chidi',
+        text: 'Still thinking about who captures the photographer. You have a sharp eye, Ada 📸✨',
+        likes: 320,
+        timestamp: '25m ago',
+        memoryBadge: 'Recalls: Balcony Flirt',
       });
     } else if (flags.sided_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('alliance'))) {
       narrativeComments.push({
@@ -528,6 +554,19 @@ export function resolvePost(
         timestamp: '15m ago',
         memoryBadge: 'Recalls: Assistant Role',
       });
+    } else if (flags.negotiated_pa_terms && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('editorial clause'))) {
+      narrativeComments.push({
+        id: `mem_zee_${post.id}_negotiated`,
+        authorId: 'zee',
+        authorName: 'Zainab Bello',
+        authorHandle: '@zeebello',
+        isVerified: true,
+        avatarType: 'zee',
+        text: 'Nobody negotiates an editorial clause with me and wins, but you did. Keep that same energy this week ✨',
+        likes: 560,
+        timestamp: '20m ago',
+        memoryBadge: 'Recalls: Retainer Terms',
+      });
     } else if (flags.pact_with_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('loyalty'))) {
       narrativeComments.push({
         id: `mem_zee_${post.id}_pact`,
@@ -540,6 +579,19 @@ export function resolvePost(
         likes: 540,
         timestamp: '25m ago',
         memoryBadge: 'Recalls: Private Pact',
+      });
+    } else if (flags.warned_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('eyes wide open'))) {
+      narrativeComments.push({
+        id: `mem_zee_${post.id}_warned`,
+        authorId: 'zee',
+        authorName: 'Zainab Bello',
+        authorHandle: '@zeebello',
+        isVerified: true,
+        avatarType: 'zee',
+        text: 'I respect people who look me in the eye and tell me to keep my hands clean. Keep those eyes wide open, Ada 👁️💅',
+        likes: 580,
+        timestamp: '20m ago',
+        memoryBadge: 'Recalls: The Warning',
       });
     }
   }
@@ -607,6 +659,19 @@ export function resolvePost(
         likes: 890,
         timestamp: '10m ago',
         memoryBadge: 'Recalls: Public Demand',
+      });
+    } else if (flags.photographed_tea_phone && !post.comments.some((c) => c.text.includes('camera'))) {
+      narrativeComments.push({
+        id: `mem_tea_${post.id}_photo`,
+        authorId: 'lagos_tea',
+        authorName: 'The Lagos Tea 🫖',
+        authorHandle: '@TheLagosTea',
+        isVerified: true,
+        avatarType: 'lagos_tea',
+        text: 'Taking secret photos in the dark service room? Careful what your camera captures 🫖📱',
+        likes: 820,
+        timestamp: '15m ago',
+        memoryBadge: 'Recalls: Archive Recon',
       });
     }
   }
