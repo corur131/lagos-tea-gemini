@@ -10,6 +10,7 @@ import {
   Unlockable,
   DmThread,
 } from '../types/socialFeed';
+import { createLightweightComment } from './gidiUsers';
 
 export const DEFAULT_SOCIAL_STATE: SocialState = {
   likedPosts: {},
@@ -493,6 +494,26 @@ export function resolvePost(
         memoryBadge: 'Recalls: Rejected Ride',
       });
     }
+
+    if (flags.noted_bisola_motive && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('stressed'))) {
+      const c1 = createLightweightComment(`org_bis_${post.id}_mot_1`, 'folake_ade', 'Is Bisola okay? She looked really stressed on live yesterday.', {
+        likes: 270,
+        timestamp: '25m ago',
+      });
+      const c2 = createLightweightComment(`org_bis_${post.id}_mot_2`, 'victor_osita', 'Heard she’s behind on payments and brand sponsors are stalling.', {
+        likes: 310,
+        timestamp: '21m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@folake_ade',
+      });
+      const c3 = createLightweightComment(`org_bis_${post.id}_mot_3`, 'demola_shonowo', 'Island life is expensive when sponsorships dry up.', {
+        likes: 390,
+        timestamp: '17m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@victor_osita',
+      });
+      narrativeComments.push(c1, c2, c3);
+    }
   }
 
   // 2. Chidi's posts: reflections on candid balcony moments & investigative alliance
@@ -511,7 +532,7 @@ export function resolvePost(
         memoryBadge: 'Recalls: Balcony Confession',
       });
     } else if (flags.flirted_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('behind the lens'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_chidi_${post.id}_flirt`,
         authorId: 'chidi',
         authorName: 'Chidi Nwosu',
@@ -522,7 +543,26 @@ export function resolvePost(
         likes: 320,
         timestamp: '25m ago',
         memoryBadge: 'Recalls: Balcony Flirt',
+      };
+      const c1 = createLightweightComment(`org_chi_${post.id}_flt_1`, 'miriam_chukwu', 'Nobody is going to talk about the chemistry between Ada and Chidi? 👀', {
+        likes: 280,
+        timestamp: '22m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@chidi_captures',
       });
+      const c2 = createLightweightComment(`org_chi_${post.id}_flt_2`, 'david_obi', 'You people see chemistry everywhere.', {
+        likes: 190,
+        timestamp: '19m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@miriam_chukwu',
+      });
+      const c3 = createLightweightComment(`org_chi_${post.id}_flt_3`, 'adaeze_nwosu', 'Please, even I noticed it 😂', {
+        likes: 340,
+        timestamp: '16m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@david_obi_',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     } else if (flags.sided_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('alliance'))) {
       narrativeComments.push({
         id: `mem_chidi_${post.id}_alliance`,
@@ -542,7 +582,7 @@ export function resolvePost(
   // 3. Zee's posts: comments regarding assistant role, pact, or party impression
   if (post.authorId === 'zee') {
     if (flags.accepted_pa_job && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('assistant'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_zee_${post.id}_pa`,
         authorId: 'zee',
         authorName: 'Zainab Bello',
@@ -553,9 +593,28 @@ export function resolvePost(
         likes: 620,
         timestamp: '15m ago',
         memoryBadge: 'Recalls: Assistant Role',
+      };
+      const c1 = createLightweightComment(`org_zee_${post.id}_pa_1`, 'folake_ade', 'So Ada is working with Zee now?', {
+        likes: 240,
+        timestamp: '12m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@zeebello',
       });
+      const c2 = createLightweightComment(`org_zee_${post.id}_pa_2`, 'kene_okoli', 'Looks like it.', {
+        likes: 290,
+        timestamp: '10m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@folake_ade',
+      });
+      const c3 = createLightweightComment(`org_zee_${post.id}_pa_3`, 'tari_briggs', 'That office is about to become interesting.', {
+        likes: 380,
+        timestamp: '8m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@kene_okoli_',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     } else if (flags.negotiated_pa_terms && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('editorial clause'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_zee_${post.id}_negotiated`,
         authorId: 'zee',
         authorName: 'Zainab Bello',
@@ -566,9 +625,28 @@ export function resolvePost(
         likes: 560,
         timestamp: '20m ago',
         memoryBadge: 'Recalls: Retainer Terms',
+      };
+      const c1 = createLightweightComment(`org_zee_${post.id}_neg_1`, 'kene_okoli', 'I heard Ada didn’t just accept whatever Zee offered.', {
+        likes: 310,
+        timestamp: '18m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@zeebello',
       });
+      const c2 = createLightweightComment(`org_zee_${post.id}_neg_2`, 'daniel_okafor', 'Good for her.', {
+        likes: 280,
+        timestamp: '15m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@kene_okoli_',
+      });
+      const c3 = createLightweightComment(`org_zee_${post.id}_neg_3`, 'omowunmi_p', 'Working with Zee without boundaries? Never.', {
+        likes: 420,
+        timestamp: '12m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@daniel_okafor',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     } else if (flags.pact_with_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('loyalty'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_zee_${post.id}_pact`,
         authorId: 'zee',
         authorName: 'Zainab Bello',
@@ -579,9 +657,28 @@ export function resolvePost(
         likes: 540,
         timestamp: '25m ago',
         memoryBadge: 'Recalls: Private Pact',
+      };
+      const c1 = createLightweightComment(`org_zee_${post.id}_pct_1`, 'halima_bello', 'Ada and Zee seem very close lately.', {
+        likes: 320,
+        timestamp: '22m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@zeebello',
       });
+      const c2 = createLightweightComment(`org_zee_${post.id}_pct_2`, 'miriam_chukwu', 'Close or strategic... in this circle you never know.', {
+        likes: 360,
+        timestamp: '18m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@halima_bello_',
+      });
+      const c3 = createLightweightComment(`org_zee_${post.id}_pct_3`, 'favoureze', 'Strategic is the only way to survive Banana Island.', {
+        likes: 410,
+        timestamp: '15m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@miriam_chukwu',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     } else if (flags.warned_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('eyes wide open'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_zee_${post.id}_warned`,
         authorId: 'zee',
         authorName: 'Zainab Bello',
@@ -592,7 +689,26 @@ export function resolvePost(
         likes: 580,
         timestamp: '20m ago',
         memoryBadge: 'Recalls: The Warning',
+      };
+      const c1 = createLightweightComment(`org_zee_${post.id}_wrn_1`, 'halima_bello', 'Did you see the look Zee gave Ada earlier? There is tension in that house.', {
+        likes: 330,
+        timestamp: '18m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@zeebello',
       });
+      const c2 = createLightweightComment(`org_zee_${post.id}_wrn_2`, 'tari_briggs', 'I heard Ada stood her ground and told her to keep her hands clean.', {
+        likes: 370,
+        timestamp: '15m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@halima_bello_',
+      });
+      const c3 = createLightweightComment(`org_zee_${post.id}_wrn_3`, 'keji_balogun', 'Nobody stands up to Zee without consequences.', {
+        likes: 440,
+        timestamp: '12m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@tari_briggs',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     }
   }
 
@@ -612,7 +728,7 @@ export function resolvePost(
         memoryBadge: 'Recalls: Porsche Ride',
       });
     } else if (flags.refused_kelvin_ride && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('shuttle'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_kelvin_${post.id}_bus`,
         authorId: 'kelvin',
         authorName: 'Kelvin Adebayo-Wright',
@@ -623,7 +739,26 @@ export function resolvePost(
         likes: 380,
         timestamp: '22m ago',
         memoryBadge: 'Recalls: Rejected Ride',
+      };
+      const c1 = createLightweightComment(`org_kel_${post.id}_ref_1`, 'daniel_okafor', 'Wait, Ada actually turned down Kelvin’s car? 😭', {
+        likes: 210,
+        timestamp: '20m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@kelvin_wright',
       });
+      const c2 = createLightweightComment(`org_kel_${post.id}_ref_2`, 'favoureze', 'Apparently she took the campus shuttle instead.', {
+        likes: 260,
+        timestamp: '18m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@daniel_okafor',
+      });
+      const c3 = createLightweightComment(`org_kel_${post.id}_ref_3`, 'tari_briggs', 'I respect the commitment 😂', {
+        likes: 310,
+        timestamp: '15m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@favoureze_',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
     }
   }
 
@@ -661,7 +796,7 @@ export function resolvePost(
         memoryBadge: 'Recalls: Public Demand',
       });
     } else if (flags.photographed_tea_phone && !post.comments.some((c) => c.text.includes('camera'))) {
-      narrativeComments.push({
+      const mem = {
         id: `mem_tea_${post.id}_photo`,
         authorId: 'lagos_tea',
         authorName: 'The Lagos Tea 🫖',
@@ -672,7 +807,64 @@ export function resolvePost(
         likes: 820,
         timestamp: '15m ago',
         memoryBadge: 'Recalls: Archive Recon',
+      };
+      const c1 = createLightweightComment(`org_tea_${post.id}_pho_1`, 'nnamdi_oraekwe', 'Someone said they saw a flash in the hallway late last night 👀', {
+        likes: 340,
+        timestamp: '14m ago',
+        parentCommentId: mem.id,
+        replyToHandle: '@TheLagosTea',
       });
+      const c2 = createLightweightComment(`org_tea_${post.id}_pho_2`, 'ngozi_uche', 'In the middle of the night?', {
+        likes: 290,
+        timestamp: '11m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@nnamdi_oraekwe',
+      });
+      const c3 = createLightweightComment(`org_tea_${post.id}_pho_3`, 'solomon_ekong', 'People are taking receipts. Nobody trusts anyone in that house.', {
+        likes: 410,
+        timestamp: '8m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@ngozi_uche',
+      });
+      narrativeComments.push(mem, c1, c2, c3);
+    }
+
+    if (flags.held_breath_stealth && !post.comments.some((c) => c.text.includes('creeping'))) {
+      const c1 = createLightweightComment(`org_tea_${post.id}_stl_1`, 'demola_shonowo', 'Security was moving around the house at 2 AM.', {
+        likes: 350,
+        timestamp: '14m ago',
+      });
+      const c2 = createLightweightComment(`org_tea_${post.id}_stl_2`, 'keji_balogun', 'I heard someone was creeping in the service wing in total darkness.', {
+        likes: 410,
+        timestamp: '11m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@demola_shonowo',
+      });
+      const c3 = createLightweightComment(`org_tea_${post.id}_stl_3`, 'anita_nwosu', 'And nobody made a sound? That takes serious nerve.', {
+        likes: 470,
+        timestamp: '8m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@keji_balogun',
+      });
+      narrativeComments.push(c1, c2, c3);
+    } else if (flags.confronted_intruder && !post.comments.some((c) => c.text.includes('back door'))) {
+      const c1 = createLightweightComment(`org_tea_${post.id}_int_1`, 'demola_shonowo', 'Did you hear that noise near the stairs last night?', {
+        likes: 380,
+        timestamp: '14m ago',
+      });
+      const c2 = createLightweightComment(`org_tea_${post.id}_int_2`, 'keji_balogun', 'Someone got caught trying to open the back door!', {
+        likes: 450,
+        timestamp: '11m ago',
+        parentCommentId: c1.id,
+        replyToHandle: '@demola_shonowo',
+      });
+      const c3 = createLightweightComment(`org_tea_${post.id}_int_3`, 'tari_briggs', 'Whoever confronted them has serious courage.', {
+        likes: 520,
+        timestamp: '8m ago',
+        parentCommentId: c2.id,
+        replyToHandle: '@keji_balogun',
+      });
+      narrativeComments.push(c1, c2, c3);
     }
   }
 

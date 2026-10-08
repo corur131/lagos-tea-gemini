@@ -9,6 +9,7 @@ import {
   SocialPost,
 } from '../types/socialFeed';
 import { castComment } from './socialRules';
+import { createLightweightComment } from './gidiUsers';
 
 const LOCATION_LABELS: Record<LocationType, string> = {
   ajegunle_apartment: 'my little room in Ajegunle',
@@ -281,6 +282,77 @@ export function buildFallbackComments(
     add('lagos_tea', 'Stepping into the dark to face shadows? Brave girl. Or foolish girl 🫖⚡', 'Recalls: Midnight Confrontation');
   }
 
+  // 1b. ORGANIC GIDIGRAM CONVERSATIONS (Phase 4.2 Story States):
+  if (flags.refused_kelvin_ride) {
+    const c1 = createLightweightComment(`${postId}_org_ref_1`, 'daniel_okafor', 'Wait, Ada actually turned down Kelvin’s car? 😭', { timestamp: '18m ago', likes: 210 });
+    const c2 = createLightweightComment(`${postId}_org_ref_2`, 'favoureze', 'Apparently she took the campus shuttle instead.', { parentCommentId: c1.id, replyToHandle: '@daniel_okafor', timestamp: '15m ago', likes: 260 });
+    const c3 = createLightweightComment(`${postId}_org_ref_3`, 'tari_briggs', 'I respect the commitment 😂', { parentCommentId: c2.id, replyToHandle: '@favoureze_', timestamp: '12m ago', likes: 310 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.flirted_with_chidi) {
+    const c1 = createLightweightComment(`${postId}_org_flt_1`, 'miriam_chukwu', 'Nobody is going to talk about the chemistry between Ada and Chidi? 👀', { timestamp: '20m ago', likes: 280 });
+    const c2 = createLightweightComment(`${postId}_org_flt_2`, 'david_obi', 'You people see chemistry everywhere.', { parentCommentId: c1.id, replyToHandle: '@miriam_chukwu', timestamp: '17m ago', likes: 190 });
+    const c3 = createLightweightComment(`${postId}_org_flt_3`, 'adaeze_nwosu', 'Please, even I noticed it 😂', { parentCommentId: c2.id, replyToHandle: '@david_obi_', timestamp: '14m ago', likes: 340 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.accepted_pa_job) {
+    const c1 = createLightweightComment(`${postId}_org_paj_1`, 'folake_ade', 'So Ada is working with Zee now?', { timestamp: '25m ago', likes: 240 });
+    const c2 = createLightweightComment(`${postId}_org_paj_2`, 'kene_okoli', 'Looks like it.', { parentCommentId: c1.id, replyToHandle: '@folake_ade', timestamp: '22m ago', likes: 290 });
+    const c3 = createLightweightComment(`${postId}_org_paj_3`, 'tari_briggs', 'That office is about to become interesting.', { parentCommentId: c2.id, replyToHandle: '@kene_okoli_', timestamp: '18m ago', likes: 380 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.negotiated_pa_terms) {
+    const c1 = createLightweightComment(`${postId}_org_pan_1`, 'kene_okoli', 'I heard Ada didn’t just accept whatever Zee offered.', { timestamp: '24m ago', likes: 310 });
+    const c2 = createLightweightComment(`${postId}_org_pan_2`, 'daniel_okafor', 'Good for her.', { parentCommentId: c1.id, replyToHandle: '@kene_okoli_', timestamp: '20m ago', likes: 280 });
+    const c3 = createLightweightComment(`${postId}_org_pan_3`, 'omowunmi_p', 'Working with Zee without boundaries? Never.', { parentCommentId: c2.id, replyToHandle: '@daniel_okafor', timestamp: '16m ago', likes: 420 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.pact_with_zee) {
+    const c1 = createLightweightComment(`${postId}_org_pct_1`, 'halima_bello', 'Ada and Zee seem very close lately.', { timestamp: '26m ago', likes: 320 });
+    const c2 = createLightweightComment(`${postId}_org_pct_2`, 'miriam_chukwu', 'Close or strategic... in this circle you never know.', { parentCommentId: c1.id, replyToHandle: '@halima_bello_', timestamp: '22m ago', likes: 360 });
+    const c3 = createLightweightComment(`${postId}_org_pct_3`, 'favoureze', 'Strategic is the only way to survive Banana Island.', { parentCommentId: c2.id, replyToHandle: '@miriam_chukwu', timestamp: '19m ago', likes: 410 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.warned_zee) {
+    const c1 = createLightweightComment(`${postId}_org_wrn_1`, 'halima_bello', 'Did you see the look Zee gave Ada earlier? There is tension in that house.', { timestamp: '24m ago', likes: 330 });
+    const c2 = createLightweightComment(`${postId}_org_wrn_2`, 'tari_briggs', 'I heard Ada stood her ground and told her to keep her hands clean.', { parentCommentId: c1.id, replyToHandle: '@halima_bello_', timestamp: '20m ago', likes: 370 });
+    const c3 = createLightweightComment(`${postId}_org_wrn_3`, 'keji_balogun', 'Nobody stands up to Zee without consequences.', { parentCommentId: c2.id, replyToHandle: '@tari_briggs', timestamp: '16m ago', likes: 440 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.noted_bisola_motive) {
+    const c1 = createLightweightComment(`${postId}_org_mot_1`, 'folake_ade', 'Is Bisola okay? She looked really stressed on live yesterday.', { timestamp: '28m ago', likes: 270 });
+    const c2 = createLightweightComment(`${postId}_org_mot_2`, 'victor_osita', 'Heard she’s behind on payments and brand sponsors are stalling.', { parentCommentId: c1.id, replyToHandle: '@folake_ade', timestamp: '24m ago', likes: 310 });
+    const c3 = createLightweightComment(`${postId}_org_mot_3`, 'demola_shonowo', 'Island life is expensive when sponsorships dry up.', { parentCommentId: c2.id, replyToHandle: '@victor_osita', timestamp: '20m ago', likes: 390 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.photographed_tea_phone) {
+    const c1 = createLightweightComment(`${postId}_org_pho_1`, 'nnamdi_oraekwe', 'Someone said they saw a flash in the hallway late last night 👀', { timestamp: '16m ago', likes: 340 });
+    const c2 = createLightweightComment(`${postId}_org_pho_2`, 'ngozi_uche', 'In the middle of the night?', { parentCommentId: c1.id, replyToHandle: '@nnamdi_oraekwe', timestamp: '13m ago', likes: 290 });
+    const c3 = createLightweightComment(`${postId}_org_pho_3`, 'solomon_ekong', 'People are taking receipts. Nobody trusts anyone in that house.', { parentCommentId: c2.id, replyToHandle: '@ngozi_uche', timestamp: '10m ago', likes: 410 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.held_breath_stealth) {
+    const c1 = createLightweightComment(`${postId}_org_stl_1`, 'demola_shonowo', 'Security was moving around the house at 2 AM.', { timestamp: '14m ago', likes: 350 });
+    const c2 = createLightweightComment(`${postId}_org_stl_2`, 'keji_balogun', 'I heard someone was creeping in the service wing in total darkness.', { parentCommentId: c1.id, replyToHandle: '@demola_shonowo', timestamp: '11m ago', likes: 410 });
+    const c3 = createLightweightComment(`${postId}_org_stl_3`, 'anita_nwosu', 'And nobody made a sound? That takes serious nerve.', { parentCommentId: c2.id, replyToHandle: '@keji_balogun', timestamp: '8m ago', likes: 470 });
+    comments.push(c1, c2, c3);
+  }
+
+  if (flags.confronted_intruder) {
+    const c1 = createLightweightComment(`${postId}_org_int_1`, 'demola_shonowo', 'Did you hear that noise near the stairs last night?', { timestamp: '14m ago', likes: 380 });
+    const c2 = createLightweightComment(`${postId}_org_int_2`, 'keji_balogun', 'Someone got caught trying to open the back door!', { parentCommentId: c1.id, replyToHandle: '@demola_shonowo', timestamp: '11m ago', likes: 450 });
+    const c3 = createLightweightComment(`${postId}_org_int_3`, 'tari_briggs', 'Whoever confronted them has serious courage.', { parentCommentId: c2.id, replyToHandle: '@keji_balogun', timestamp: '8m ago', likes: 520 });
+    comments.push(c1, c2, c3);
+  }
+
   // 2. TONE-BASED AND RELATIONSHIP COMMENTS:
   if (!comments.some((c) => c.authorId === 'tamara') && !unfollowed?.tamara) {
     if (flags.questioned_tamara_dm) add('tamara', '😐');
@@ -549,6 +621,68 @@ export function getUpdatedAdaPostForScene(
       );
       c.memoryBadge = 'Recalls: Head Held High';
       newComments.unshift(c);
+    }
+
+    // Organic GidiGram conversations for story states across scene progression
+    if (flags.refused_kelvin_ride && !newComments.some((c) => c.id.includes('_org_ref_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_ref_1`, 'daniel_okafor', 'Wait, Ada actually turned down Kelvin’s car? 😭', { timestamp: '18m ago', likes: 210 });
+      const c2 = createLightweightComment(`${post.id}_org_ref_2`, 'favoureze', 'Apparently she took the campus shuttle instead.', { parentCommentId: c1.id, replyToHandle: '@daniel_okafor', timestamp: '15m ago', likes: 260 });
+      const c3 = createLightweightComment(`${post.id}_org_ref_3`, 'tari_briggs', 'I respect the commitment 😂', { parentCommentId: c2.id, replyToHandle: '@favoureze_', timestamp: '12m ago', likes: 310 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.flirted_with_chidi && !newComments.some((c) => c.id.includes('_org_flt_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_flt_1`, 'miriam_chukwu', 'Nobody is going to talk about the chemistry between Ada and Chidi? 👀', { timestamp: '20m ago', likes: 280 });
+      const c2 = createLightweightComment(`${post.id}_org_flt_2`, 'david_obi', 'You people see chemistry everywhere.', { parentCommentId: c1.id, replyToHandle: '@miriam_chukwu', timestamp: '17m ago', likes: 190 });
+      const c3 = createLightweightComment(`${post.id}_org_flt_3`, 'adaeze_nwosu', 'Please, even I noticed it 😂', { parentCommentId: c2.id, replyToHandle: '@david_obi_', timestamp: '14m ago', likes: 340 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.accepted_pa_job && !newComments.some((c) => c.id.includes('_org_paj_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_paj_1`, 'folake_ade', 'So Ada is working with Zee now?', { timestamp: '25m ago', likes: 240 });
+      const c2 = createLightweightComment(`${post.id}_org_paj_2`, 'kene_okoli', 'Looks like it.', { parentCommentId: c1.id, replyToHandle: '@folake_ade', timestamp: '22m ago', likes: 290 });
+      const c3 = createLightweightComment(`${post.id}_org_paj_3`, 'tari_briggs', 'That office is about to become interesting.', { parentCommentId: c2.id, replyToHandle: '@kene_okoli_', timestamp: '18m ago', likes: 380 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.negotiated_pa_terms && !newComments.some((c) => c.id.includes('_org_pan_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_pan_1`, 'kene_okoli', 'I heard Ada didn’t just accept whatever Zee offered.', { timestamp: '24m ago', likes: 310 });
+      const c2 = createLightweightComment(`${post.id}_org_pan_2`, 'daniel_okafor', 'Good for her.', { parentCommentId: c1.id, replyToHandle: '@kene_okoli_', timestamp: '20m ago', likes: 280 });
+      const c3 = createLightweightComment(`${post.id}_org_pan_3`, 'omowunmi_p', 'Working with Zee without boundaries? Never.', { parentCommentId: c2.id, replyToHandle: '@daniel_okafor', timestamp: '16m ago', likes: 420 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.pact_with_zee && !newComments.some((c) => c.id.includes('_org_pct_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_pct_1`, 'halima_bello', 'Ada and Zee seem very close lately.', { timestamp: '26m ago', likes: 320 });
+      const c2 = createLightweightComment(`${post.id}_org_pct_2`, 'miriam_chukwu', 'Close or strategic... in this circle you never know.', { parentCommentId: c1.id, replyToHandle: '@halima_bello_', timestamp: '22m ago', likes: 360 });
+      const c3 = createLightweightComment(`${post.id}_org_pct_3`, 'favoureze', 'Strategic is the only way to survive Banana Island.', { parentCommentId: c2.id, replyToHandle: '@miriam_chukwu', timestamp: '19m ago', likes: 410 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.warned_zee && !newComments.some((c) => c.id.includes('_org_wrn_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_wrn_1`, 'halima_bello', 'Did you see the look Zee gave Ada earlier? There is tension in that house.', { timestamp: '24m ago', likes: 330 });
+      const c2 = createLightweightComment(`${post.id}_org_wrn_2`, 'tari_briggs', 'I heard Ada stood her ground and told her to keep her hands clean.', { parentCommentId: c1.id, replyToHandle: '@halima_bello_', timestamp: '20m ago', likes: 370 });
+      const c3 = createLightweightComment(`${post.id}_org_wrn_3`, 'keji_balogun', 'Nobody stands up to Zee without consequences.', { parentCommentId: c2.id, replyToHandle: '@tari_briggs', timestamp: '16m ago', likes: 440 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.noted_bisola_motive && !newComments.some((c) => c.id.includes('_org_mot_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_mot_1`, 'folake_ade', 'Is Bisola okay? She looked really stressed on live yesterday.', { timestamp: '28m ago', likes: 270 });
+      const c2 = createLightweightComment(`${post.id}_org_mot_2`, 'victor_osita', 'Heard she’s behind on payments and brand sponsors are stalling.', { parentCommentId: c1.id, replyToHandle: '@folake_ade', timestamp: '24m ago', likes: 310 });
+      const c3 = createLightweightComment(`${post.id}_org_mot_3`, 'demola_shonowo', 'Island life is expensive when sponsorships dry up.', { parentCommentId: c2.id, replyToHandle: '@victor_osita', timestamp: '20m ago', likes: 390 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.photographed_tea_phone && !newComments.some((c) => c.id.includes('_org_pho_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_pho_1`, 'nnamdi_oraekwe', 'Someone said they saw a flash in the hallway late last night 👀', { timestamp: '16m ago', likes: 340 });
+      const c2 = createLightweightComment(`${post.id}_org_pho_2`, 'ngozi_uche', 'In the middle of the night?', { parentCommentId: c1.id, replyToHandle: '@nnamdi_oraekwe', timestamp: '13m ago', likes: 290 });
+      const c3 = createLightweightComment(`${post.id}_org_pho_3`, 'solomon_ekong', 'People are taking receipts. Nobody trusts anyone in that house.', { parentCommentId: c2.id, replyToHandle: '@ngozi_uche', timestamp: '10m ago', likes: 410 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.held_breath_stealth && !newComments.some((c) => c.id.includes('_org_stl_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_stl_1`, 'demola_shonowo', 'Security was moving around the house at 2 AM.', { timestamp: '14m ago', likes: 350 });
+      const c2 = createLightweightComment(`${post.id}_org_stl_2`, 'keji_balogun', 'I heard someone was creeping in the service wing in total darkness.', { parentCommentId: c1.id, replyToHandle: '@demola_shonowo', timestamp: '11m ago', likes: 410 });
+      const c3 = createLightweightComment(`${post.id}_org_stl_3`, 'anita_nwosu', 'And nobody made a sound? That takes serious nerve.', { parentCommentId: c2.id, replyToHandle: '@keji_balogun', timestamp: '8m ago', likes: 470 });
+      newComments.push(c1, c2, c3);
+    }
+    if (flags.confronted_intruder && !newComments.some((c) => c.id.includes('_org_int_'))) {
+      const c1 = createLightweightComment(`${post.id}_org_int_1`, 'demola_shonowo', 'Did you hear that noise near the stairs last night?', { timestamp: '14m ago', likes: 380 });
+      const c2 = createLightweightComment(`${post.id}_org_int_2`, 'keji_balogun', 'Someone got caught trying to open the back door!', { parentCommentId: c1.id, replyToHandle: '@demola_shonowo', timestamp: '11m ago', likes: 450 });
+      const c3 = createLightweightComment(`${post.id}_org_int_3`, 'tari_briggs', 'Whoever confronted them has serious courage.', { parentCommentId: c2.id, replyToHandle: '@keji_balogun', timestamp: '8m ago', likes: 520 });
+      newComments.push(c1, c2, c3);
     }
   }
 
