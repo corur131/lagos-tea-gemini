@@ -101,7 +101,7 @@ export function isUnlocked(
   item: Unlockable,
   episode: number,
   sceneIndex: number,
-  flags: Record<string, boolean>
+  flags: Record<string, boolean> = {}
 ) {
   if (!hasReached(episode, sceneIndex, item.unlockEpisode, item.unlockSceneIndex ?? 0)) return false;
   if (item.requiredFlag && !flags[item.requiredFlag]) return false;

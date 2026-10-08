@@ -3,7 +3,7 @@ import { GidiGramTrend, TrendCategory } from '../../data/trendData';
 import { SocialPost } from '../../types/socialFeed';
 import { HeroineCustomization, CharacterId } from '../../types/vn';
 import { SocialPostCard } from './SocialPostCard';
-import { CAST_PROFILES } from '../../data/socialRules';
+import { CAST_PROFILES, isUnlocked } from '../../data/socialRules';
 import {
   TrendingUp,
   Flame,
@@ -24,6 +24,9 @@ interface TrendingViewProps {
   heroineCustomization: HeroineCustomization;
   soundEnabled: boolean;
   unfollowed: Record<string, boolean>;
+  currentEpisode: number;
+  currentSceneIndex: number;
+  flags?: Record<string, boolean>;
   onToggleFollow: (authorId: string) => void;
   onLikePost: (post: SocialPost) => void;
   onAddComment: (post: SocialPost, text: string) => void;
@@ -48,6 +51,9 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
   heroineCustomization,
   soundEnabled,
   unfollowed,
+  currentEpisode,
+  currentSceneIndex,
+  flags = {},
   onToggleFollow,
   onLikePost,
   onAddComment,
@@ -65,18 +71,26 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
   }, [trends, selectedCategory]);
 
   // When a trend is selected, find associated posts (by relatedPostIds or matching hashtag)
+  // Strictly filter by story unlock conditions (episode, sceneIndex, and flags)
   const relatedPosts = useMemo(() => {
     if (!selectedTrend) return [];
     return allPosts.filter((post) => {
-      // Direct post ID match
+      // 1. Strict unlock check: must be unlocked in the story
+      if (!isUnlocked(post, currentEpisode, currentSceneIndex, flags)) {
+        return false;
+      }
+
+      // 2. Direct post ID match
       if (selectedTrend.relatedPostIds?.includes(post.id)) return true;
-      // Hashtag match
+
+      // 3. Hashtag match
       if (post.hashtags?.some((h) => h.toLowerCase() === selectedTrend.hashtag.toLowerCase())) {
         return true;
       }
+
       return false;
     });
-  }, [selectedTrend, allPosts]);
+  }, [selectedTrend, allPosts, currentEpisode, currentSceneIndex, flags]);
 
   const getIntensityBadge = (intensity?: GidiGramTrend['intensity']) => {
     switch (intensity) {
@@ -224,7 +238,7 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
           </div>
 
           {/* Associated Feed Posts */}
-          {relatedPosts.length > 0 && (
+          {relatedPosts.length > 0 ? (
             <div className="pt-2 space-y-3">
               <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-400">
                 <MessageSquare className="w-3.5 h-3.5 text-pink-400" />
@@ -247,6 +261,12 @@ export const TrendingView: React.FC<TrendingViewProps> = ({
                   />
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="pt-2 text-center py-4 bg-neutral-950/40 rounded-2xl border border-neutral-800/60 text-neutral-500 text-xs">
+              <p className="font-mono text-[11px]">
+                No public posts currently unlocked for this trend on your feed.
+              </p>
             </div>
           )}
         </div>

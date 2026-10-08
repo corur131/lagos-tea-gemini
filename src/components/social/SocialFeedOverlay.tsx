@@ -32,6 +32,7 @@ import {
   resolvePost,
   computeFollowers,
   DEFAULT_SOCIAL_STATE,
+  isUnlocked,
 } from '../../data/socialRules';
 import {
   X,
@@ -308,12 +309,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   const visiblePosts = useMemo(() => {
     return posts.filter((post) => {
       // 1. Progression check: has this post unlocked in the story?
-      const isEpisodePast = post.unlockEpisode < currentEpisode;
-      const isCurrentEpisodeUnlocked =
-        post.unlockEpisode === currentEpisode &&
-        (!post.unlockSceneIndex || currentSceneIndex >= post.unlockSceneIndex);
-
-      if (!isEpisodePast && !isCurrentEpisodeUnlocked) {
+      if (!isUnlocked(post, currentEpisode, currentSceneIndex, flags)) {
         return false;
       }
 
@@ -335,36 +331,20 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
 
       return true;
     });
-  }, [posts, currentEpisode, currentSceneIndex, activeTab, selectedCastMember, activeHashtag]);
+  }, [posts, currentEpisode, currentSceneIndex, flags, activeTab, selectedCastMember, activeHashtag]);
 
   // Visible stories based on progression
   const visibleStories = useMemo(() => {
-    return stories.filter((story) => {
-      const isPast = story.unlockEpisode < currentEpisode;
-      const isCurrent =
-        story.unlockEpisode === currentEpisode &&
-        (!story.unlockSceneIndex || currentSceneIndex >= story.unlockSceneIndex);
-      return isPast || isCurrent;
-    });
-  }, [stories, currentEpisode, currentSceneIndex]);
+    return stories.filter((story) =>
+      isUnlocked(story, currentEpisode, currentSceneIndex, flags)
+    );
+  }, [stories, currentEpisode, currentSceneIndex, flags]);
 
   // Visible trends based on story progression and flags
   const visibleTrends = useMemo(() => {
-    return GIDIGRAM_TRENDS.filter((trend) => {
-      const isEpisodePast = trend.unlockEpisode < currentEpisode;
-      const isCurrentEpisodeUnlocked =
-        trend.unlockEpisode === currentEpisode &&
-        (trend.unlockSceneIndex === undefined || currentSceneIndex >= trend.unlockSceneIndex);
-
-      if (!isEpisodePast && !isCurrentEpisodeUnlocked) return false;
-
-      // Flag requirements
-      if (trend.requiredFlag && !flags[trend.requiredFlag]) return false;
-      if (trend.hiddenIfFlag && flags[trend.hiddenIfFlag]) return false;
-      if (trend.requiredAnyFlags && !trend.requiredAnyFlags.some((f) => flags[f])) return false;
-
-      return true;
-    });
+    return GIDIGRAM_TRENDS.filter((trend) =>
+      isUnlocked(trend, currentEpisode, currentSceneIndex, flags)
+    );
   }, [currentEpisode, currentSceneIndex, flags]);
 
   // Handle story viewed
@@ -967,6 +947,9 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
                 heroineCustomization={heroineCustomization}
                 soundEnabled={soundEnabled}
                 unfollowed={unfollowed}
+                currentEpisode={currentEpisode}
+                currentSceneIndex={currentSceneIndex}
+                flags={flags}
                 onToggleFollow={handleToggleFollow}
                 onLikePost={handleLikePost}
                 onAddComment={handleAddComment}
