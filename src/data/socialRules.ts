@@ -107,6 +107,7 @@ export function isUnlocked(
   if (item.requiredFlag && !flags[item.requiredFlag]) return false;
   if (item.requiredAnyFlags && !item.requiredAnyFlags.some((f) => flags[f])) return false;
   if (item.hiddenIfFlag && flags[item.hiddenIfFlag]) return false;
+  if (item.hiddenIfAnyFlags && item.hiddenIfAnyFlags.some((f) => flags[f])) return false;
   return true;
 }
 

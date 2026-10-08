@@ -17,6 +17,7 @@ export interface Unlockable {
   requiredFlag?: string;
   requiredAnyFlags?: string[];
   hiddenIfFlag?: string;
+  hiddenIfAnyFlags?: string[];
 }
 
 export interface SocialComment {

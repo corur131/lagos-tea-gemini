@@ -864,9 +864,59 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'kelvin_4_loyal',
+        unlockEpisode: 3,
+        unlockSceneIndex: 4,
+        requiredFlag: 'sided_with_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'Can’t sleep either?' },
+          { from: 'kelvin', text: 'After you backed me on that terrace against Chidi, Zee’s had security watching both of us. Balcony’s clear right now if you need a drink—or just an ally who doesn’t fold under pressure. 🥃' },
+        ],
+        replies: [
+          {
+            id: 'coming_loyal',
+            text: 'Coming down. Save me a glass 🥃',
+            effect: { meterChanges: { romanceKelvin: 5, jealousy: 3 }, flagToSet: 'midnight_balcony_kelvin' },
+            responses: [{ from: 'kelvin', text: 'Already poured. East terrace.' }],
+          },
+          {
+            id: 'sharp_loyal',
+            text: 'Goodnight, Kelvin. Tomorrow needs us sharp, not drinking.',
+            effect: { meterChanges: { reputation: 2, loyalty: 2 } },
+            responses: [{ from: 'kelvin', text: 'Fair enough, partner. Lock your door.' }],
+          },
+        ],
+      },
+      {
+        id: 'kelvin_4_chidi',
+        unlockEpisode: 3,
+        unlockSceneIndex: 4,
+        requiredFlag: 'sided_with_chidi',
+        hiddenIfFlag: 'sided_with_kelvin',
+        messages: [
+          { from: 'kelvin', text: 'Still burning the midnight oil upstairs?' },
+          { from: 'kelvin', text: 'After choosing Chidi on the terrace, I didn’t think you’d want anything to do with an Adebayo-Wright. I’m on the balcony. Not to charm you—just to see if you’re ready to hear what my sister actually has planned for tomorrow.' },
+        ],
+        replies: [
+          {
+            id: 'coming_chidi',
+            text: 'If you actually have something real to say, I’m listening. Coming down.',
+            effect: { meterChanges: { romanceKelvin: 3, suspicion: 2 }, flagToSet: 'midnight_balcony_kelvin' },
+            responses: [{ from: 'kelvin', text: 'Leave your skepticism at the top of the stairs 🥃' }],
+          },
+          {
+            id: 'brush_off_chidi',
+            text: 'I’d rather trust Chidi than whatever game you’re playing, Kelvin.',
+            effect: { meterChanges: { reputation: 3, romanceKelvin: -1 } },
+            responses: [{ from: 'kelvin', text: 'Careful, Adaeze. When this house collapses, your photographer won’t be able to catch you.' }],
+          },
+        ],
+      },
+      {
         id: 'kelvin_4',
         unlockEpisode: 3,
         unlockSceneIndex: 4,
+        hiddenIfAnyFlags: ['sided_with_kelvin', 'sided_with_chidi'],
         messages: [
           { from: 'kelvin', text: 'Can’t sleep either?' },
           { from: 'kelvin', text: 'Your light’s on. I’m on the balcony. The view’s better with company.' },
@@ -1195,9 +1245,58 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'zee_2_pact',
+        unlockEpisode: 3,
+        unlockSceneIndex: 2,
+        requiredFlag: 'pact_with_zee',
+        messages: [
+          { from: 'zee', text: 'Where are the sponsor decks? Call sheet starts in 20 mins.' },
+          { from: 'zee', text: 'Also: someone was in my private office. The lock was tampered with. Remember our agreement: if you notice anyone hovering by my wing, tell me first.' },
+        ],
+        replies: [
+          {
+            id: 'pact_on_it',
+            text: 'Decks sent. And I’m watching the corridor, Zee. We protect the launch.',
+            effect: { meterChanges: { loyalty: 3 } },
+            responses: [{ from: 'zee', text: 'Good girl. That’s why you’re earning that producer title.' }],
+          },
+          {
+            id: 'pact_tamara_suspect',
+            text: 'Bisola and Tamara were filming near that wing earlier. Want me to check Bisola’s vlog?',
+            effect: { meterChanges: { suspicion: 2, loyalty: 2 } },
+            responses: [{ from: 'zee', text: 'Quietly. Don’t alert them.' }],
+          },
+        ],
+      },
+      {
+        id: 'zee_2_warned',
+        unlockEpisode: 3,
+        unlockSceneIndex: 2,
+        requiredFlag: 'warned_zee',
+        messages: [
+          { from: 'zee', text: 'My private office drawer was forced open this morning.' },
+          { from: 'zee', text: 'After that little threat you made in my study yesterday, you’re the first name on my list, Ada. Don’t play games with me.' },
+        ],
+        replies: [
+          {
+            id: 'warned_defy',
+            text: 'If I were searching your office, Zee, I wouldn’t leave the drawer open. Check your inner circle.',
+            effect: { meterChanges: { reputation: 3 } },
+            responses: [{ from: 'zee', text: 'I check everyone. Starting with you.' }],
+          },
+          {
+            id: 'warned_innocent',
+            text: 'I was reviewing sponsor briefs with the hair team. Check the hallway logs.',
+            effect: { meterChanges: { loyalty: 1, reputation: 2 } },
+            responses: [{ from: 'zee', text: 'The hallway camera was offline for ten minutes. How convenient.' }],
+          },
+        ],
+      },
+      {
         id: 'zee_2',
         unlockEpisode: 3,
         unlockSceneIndex: 2,
+        hiddenIfAnyFlags: ['pact_with_zee', 'warned_zee'],
         messages: [
           { from: 'zee', text: 'Where are the sponsor decks? Call sheet starts in 20 mins.' },
           { from: 'zee', text: 'Also: who has been in my office? My desk drawer was open.' },
@@ -1651,9 +1750,74 @@ export const DM_THREADS: DmThread[] = [
         ],
       },
       {
+        id: 'bisola_2_helped',
+        unlockEpisode: 3,
+        unlockSceneIndex: 3,
+        requiredFlag: 'helped_bisola',
+        messages: [
+          { from: 'bisola', text: 'Adaaa!! Remember how I promised I’d have your back after you helped me earlier? 🥺💕' },
+          { from: 'bisola', text: 'You’re the ONLY person in this house I’m telling: I was doing a TikTok live in the secondary hallway and saw someone slip through the archive door with a charger! Zee said the key was lost!!' },
+        ],
+        replies: [
+          {
+            id: 'bisola_press_details',
+            text: 'Bisola! Who was it?? Did you catch their clothes on camera?',
+            effect: { meterChanges: { suspicion: 3, loyalty: 2 }, flagToSet: 'bisola_witnessed_intruder' },
+            addsClue: {
+              name: 'Bisola’s Live Stream Background Silhouette',
+              description: 'Bisola’s TikTok Live caught a brief shadow entering the archive room with a charger while the rest of the house was at the pool.',
+            },
+            responses: [
+              { from: 'bisola', text: 'Too blurry! But they were wearing dark silk, and they moved super fast!' },
+            ],
+          },
+          {
+            id: 'bisola_shush',
+            text: 'Delete that TikTok live immediately before whoever it was sees it!',
+            effect: { meterChanges: { reputation: 2, loyalty: 3 } },
+            responses: [
+              { from: 'bisola', text: 'Archived to private already! My heart is pounding omg 😭' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'bisola_2_motive',
+        unlockEpisode: 3,
+        unlockSceneIndex: 3,
+        requiredFlag: 'noted_bisola_motive',
+        messages: [
+          { from: 'bisola', text: 'Ada!! I know you were analyzing me earlier like I was a suspect because of my brand deal panic 👀' },
+          { from: 'bisola', text: 'Look what I just caught to prove I’m not the enemy: I was doing a TikTok live and saw someone slip into the archive room with a charger! I’m telling you directly so you see I’m innocent!' },
+        ],
+        replies: [
+          {
+            id: 'bisola_press_details',
+            text: 'Bisola! Who was it?? Did you catch their clothes on camera?',
+            effect: { meterChanges: { suspicion: 3, loyalty: 2 }, flagToSet: 'bisola_witnessed_intruder' },
+            addsClue: {
+              name: 'Bisola’s Live Stream Background Silhouette',
+              description: 'Bisola’s TikTok Live caught a brief shadow entering the archive room with a charger while the rest of the house was at the pool.',
+            },
+            responses: [
+              { from: 'bisola', text: 'Too blurry! But they were wearing dark silk, and they moved super fast!' },
+            ],
+          },
+          {
+            id: 'bisola_shush',
+            text: 'Delete that TikTok live immediately before whoever it was sees it!',
+            effect: { meterChanges: { reputation: 2, loyalty: 3 } },
+            responses: [
+              { from: 'bisola', text: 'Archived to private already! My heart is pounding omg 😭' },
+            ],
+          },
+        ],
+      },
+      {
         id: 'bisola_2',
         unlockEpisode: 3,
         unlockSceneIndex: 3,
+        hiddenIfAnyFlags: ['helped_bisola', 'noted_bisola_motive'],
         messages: [
           { from: 'bisola', text: 'Girl!! I was doing a TikTok live in the secondary hallway and saw someone slip through the archive door with a charger!!' },
           { from: 'bisola', text: 'I thought Zee said the key was lost?! 😱👀' },
