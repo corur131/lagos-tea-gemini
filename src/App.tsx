@@ -23,7 +23,7 @@ import { HistoryLog } from './components/vn/HistoryLog';
 import { EndingScreen } from './components/vn/EndingScreen';
 import { SocialFeedOverlay } from './components/social/SocialFeedOverlay';
 import { CANONICAL_STORY, EPISODE_METAS } from './data/storyScript';
-import { DEFAULT_SOCIAL_STATE, normalizeSocial } from './data/socialRules';
+import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
 import { playSound } from './utils/audio';
 import {
   Sparkles,
@@ -101,12 +101,20 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        // If player is at the very beginning of the story (Episode 1 Scene 0), calibrate popularity for the authentic underdog grind
+        const calibratedMeters = {
+          ...parsed.meters,
+          ...(parsed.currentEpisode === 1 && parsed.currentSceneIndex === 0 && parsed.meters?.popularity > 20
+            ? { popularity: 12, reputation: 25 }
+            : {}),
+        };
         return {
           ...parsed,
           heroine: {
             ...DEFAULT_HEROINE,
             ...parsed.heroine,
           },
+          meters: calibratedMeters,
           mysterySecret: parsed.mysterySecret || generateNewSecret(),
           social: parsed.social ? normalizeSocial(parsed.social) : DEFAULT_SOCIAL_STATE,
           isTyping: false,
@@ -126,13 +134,13 @@ export default function App() {
       currentLineIndex: 0,
       heroine: DEFAULT_HEROINE,
       meters: {
-        popularity: 35,
-        loyalty: 60,
-        suspicion: 15,
-        jealousy: 10,
-        reputation: 40,
-        romanceChidi: 20,
-        romanceKelvin: 15,
+        popularity: 12,
+        loyalty: 50,
+        suspicion: 10,
+        jealousy: 5,
+        reputation: 25,
+        romanceChidi: 15,
+        romanceKelvin: 10,
         romanceDayo: 0,
       },
       flags: {},
@@ -257,6 +265,7 @@ export default function App() {
         soundEnabled: gameState.soundEnabled,
         ending: gameState.ending,
         reachedEndOfContent: gameState.reachedEndOfContent,
+        social: gameState.social,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     } catch {
@@ -382,7 +391,7 @@ export default function App() {
       updatedInventory.push({
         id: 'burner_phone_pic',
         name: 'The Active Burner Phone',
-        description: 'Photograph of the black smartphone logged into @TheLagosTea found inside the locked archive room.',
+        description: 'Evidence of the black smartphone logged into @TheLagosTea found charging inside the locked archive room.',
         episodeAcquired: 3,
         tag: 'Chat',
       });
@@ -547,13 +556,13 @@ export default function App() {
       currentLineIndex: 0,
       heroine: resetCustomization ? DEFAULT_HEROINE : gameState.heroine,
       meters: {
-        popularity: 35,
-        loyalty: 60,
-        suspicion: 15,
-        jealousy: 10,
-        reputation: 40,
-        romanceChidi: 20,
-        romanceKelvin: 15,
+        popularity: 12,
+        loyalty: 50,
+        suspicion: 10,
+        jealousy: 5,
+        reputation: 25,
+        romanceChidi: 15,
+        romanceKelvin: 10,
         romanceDayo: 0,
       },
       flags: {},
@@ -1010,7 +1019,27 @@ export default function App() {
           heroineCustomization={gameState.heroine}
           meters={gameState.meters}
           inventory={gameState.inventory}
+          flags={gameState.flags}
           soundEnabled={gameState.soundEnabled}
+          social={gameState.social}
+          onUpdateSocial={(updater) =>
+            setGameState((prev) => ({
+              ...prev,
+              social: updater(prev.social),
+            }))
+          }
+          onUpdateMeters={(changes) =>
+            setGameState((prev) => ({
+              ...prev,
+              meters: applyMeterChanges(prev.meters, changes),
+            }))
+          }
+          onUpdateFlags={(flag) =>
+            setGameState((prev) => ({
+              ...prev,
+              flags: { ...prev.flags, [flag]: true },
+            }))
+          }
           onClose={() => setGameState((prev) => ({ ...prev, isSocialFeedOpen: false }))}
           onOpenWardrobe={() =>
             setGameState((prev) => ({

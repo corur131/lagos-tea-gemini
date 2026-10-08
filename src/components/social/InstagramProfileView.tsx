@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 import { RELATIONSHIP_CHARACTERS } from '../../data/relationshipData';
+import { calculateAdaFollowers, formatCount } from '../../data/socialRules';
 
 interface CharacterProfileMeta {
   id: string;
@@ -292,14 +293,9 @@ export const InstagramProfileView: React.FC<InstagramProfileViewProps> = ({
 
   const isAda = userId === 'heroine';
 
-  // Ada's dynamic meta
-  const calculatedFollowers = Math.round(
-    480 + meters.popularity * 85 + meters.reputation * 120
-  );
-  const formattedAdaFollowers =
-    calculatedFollowers >= 1000
-      ? `${(calculatedFollowers / 1000).toFixed(1)}K`
-      : calculatedFollowers.toString();
+  // Ada's dynamic meta - starting as an underdog scholar grinding to the top!
+  const calculatedFollowers = calculateAdaFollowers(meters.popularity, meters.reputation, 9);
+  const formattedAdaFollowers = formatCount(calculatedFollowers);
 
   const profileMeta: CharacterProfileMeta = useMemo(() => {
     if (isAda) {
@@ -307,8 +303,18 @@ export const InstagramProfileView: React.FC<InstagramProfileViewProps> = ({
         id: 'heroine',
         name: `${heroine.name} Obi`,
         handle: '@ada_obi',
-        category: `${heroine.department} Scholar • Rising Prodigy`,
-        bio: 'Holding my ground in high society. Observant, stylish, and refusing to let anonymous blogs write my destiny. 💅📚 Ajegunle to Banana Island.',
+        category:
+          calculatedFollowers < 1000
+            ? 'Underdog Student • Grinding from the Bottom'
+            : calculatedFollowers < 5000
+            ? `${heroine.department} Scholar • Rising Campus Voice`
+            : calculatedFollowers < 25000
+            ? 'High-Society Contender • Digital Prodigy'
+            : 'Verified Lagos Star • Digital Royalty 👑',
+        bio:
+          calculatedFollowers < 1000
+            ? 'Ajegunle to Lekki Atlantic. 19 | Scholarship student | Camera in hand, keeping my head down and working my way to the top 📚📸 #TheGrind'
+            : 'Holding my ground in high society. Observant, ambitious, and proving talent beats trust funds 💅📚',
         website: 'ada-obi.me/portfolio',
         followers: formattedAdaFollowers,
         following: '18',

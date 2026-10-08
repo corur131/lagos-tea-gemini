@@ -30,6 +30,7 @@ export interface SocialComment {
   likes: number;
   isLiked?: boolean;
   timestamp: string;
+  memoryBadge?: string;
 }
 
 export interface SoundTrack {

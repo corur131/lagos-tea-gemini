@@ -1,4 +1,4 @@
-import { HeroineCustomization, LocationType, Meters, OutfitId } from '../types/vn';
+import { HeroineCustomization, LocationType, Meters, OutfitId, CharacterId } from '../types/vn';
 import {
   AdaPhotoKind,
   AdaPost,
@@ -109,10 +109,48 @@ export const TONE_INFO: Record<
   },
 };
 
-export function computeReach(tone: AdaPostTone, popularity: number) {
-  const followerGain = Math.round(TONE_INFO[tone].followerBase * (0.5 + popularity / 100));
-  const likesCount = Math.round(followerGain * 1.6 + popularity * 40);
-  return { followerGain, likesCount };
+export function computeReach(
+  tone: AdaPostTone,
+  popularity: number,
+  unfollowed?: Record<string, boolean>
+) {
+  // Underdog scaling: At low popularity (12%), Ada starts small (~25-45 followers gained per post, ~18-35 likes)
+  // As she grinds her way up and expands her network, reach scales exponentially to thousands!
+  const basePotential = TONE_INFO[tone].followerBase;
+  const underdogFactor = 0.08 + Math.pow(Math.max(0, popularity) / 100, 1.8) * 0.92;
+  const baseFollowerGain = Math.round(basePotential * underdogFactor);
+
+  // High society influence calculation:
+  // Each followed NPC expands Ada's explore-feed footprint and recommendation algorithm
+  const allNpcs: Array<CharacterId | 'lagos_tea'> = [
+    'zee',
+    'tamara',
+    'kelvin',
+    'chi',
+    'bisola',
+    'hauwa',
+    'chidi',
+    'dayo',
+    'lagos_tea',
+  ];
+  const followedCount = allNpcs.filter((id) => !unfollowed?.[id]).length;
+  
+  // Influencer network multiplier:
+  const networkMultiplier = 0.4 + (followedCount / allNpcs.length) * 0.9;
+  const zeeBoost = !unfollowed?.zee ? 1.25 : 0.8;
+  const tamaraBoost = !unfollowed?.tamara ? 1.2 : 0.85;
+  const kelvinBoost = !unfollowed?.kelvin ? 1.15 : 0.9;
+  const totalMultiplier = networkMultiplier * ((zeeBoost * tamaraBoost * kelvinBoost) / (1.25 * 1.2 * 1.15));
+
+  const followerGain = Math.max(15, Math.round(baseFollowerGain * totalMultiplier));
+  // Likes start authentic to an aspiring unknown creator:
+  // At 12% Popularity: ~24-35 likes! Real humble beginnings!
+  // At 50% Popularity: ~320 likes!
+  // At 90% Popularity: ~2,400 likes!
+  const baseLikes = 15 + followerGain * 0.5 + Math.pow(popularity, 1.6) * 0.7;
+  const likesCount = Math.max(12, Math.round(baseLikes * totalMultiplier));
+
+  return { followerGain, likesCount, networkMultiplier: totalMultiplier, followedCount };
 }
 
 const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
@@ -120,16 +158,19 @@ const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
     ['@mainland_queen', 'This is so inspiring 😭🙏'],
     ['@yaba_finest', 'Mainland to the world 🌍💛'],
     ['@scholarship_sis', 'From one scholarship girl to another, I see you 💪🏾'],
+    ['@lagos_hustle', 'Real recognize real! Pure grace 🙏✨'],
   ],
   shady: [
     ['@vi_gist', 'THE SHADE 😭😭😭'],
     ['@island_tattle', 'Tea is shaking rn 🫖😂'],
     ['@lekkibabe99', 'She’s not playing with anybody this year 💀'],
+    ['@gidi_pulse', 'Direct hit! Tag the culprit already 😂🍿'],
   ],
   flex: [
     ['@ajegunle_pride', 'Ajegunle stand up!! 🔥🔥'],
     ['@glowup_gist', 'The glow up is GLOWING 😍'],
     ['@lekkibabe99', 'Island suits you sis 🌴'],
+    ['@style_gidi', 'Frame this look immediately! 👑🔥'],
   ],
 };
 
@@ -141,45 +182,349 @@ function fanComment(handle: string, text: string, id: string): SocialComment {
     authorHandle: handle,
     avatarType: 'fan',
     text,
-    likes: Math.round(20 + Math.random() * 400),
+    likes: Math.round(10 + Math.random() * 250),
     timestamp: 'Just now',
   };
 }
 
-// Pre-written comments used when Gemini isn't available
+// Pre-written comments influenced by narrative choices made in past scenes
 export function buildFallbackComments(
   tone: AdaPostTone,
   meters: Meters,
-  flags: Record<string, boolean>,
-  postId: string
+  flags: Record<string, boolean> = {},
+  postId: string,
+  unfollowed?: Record<string, boolean>,
+  lastChoiceText?: string
 ): SocialComment[] {
   const comments: SocialComment[] = [];
-  const add = (author: Parameters<typeof castComment>[0], text: string) =>
-    comments.push(castComment(author, text, `${postId}_${author}`, Math.round(100 + Math.random() * 2000)));
+  const add = (
+    author: Parameters<typeof castComment>[0],
+    text: string,
+    memoryBadge?: string
+  ) => {
+    const comment = castComment(author, text, `${postId}_${author}_${Date.now()}`, Math.round(30 + Math.random() * 400));
+    if (memoryBadge) comment.memoryBadge = memoryBadge;
+    comments.push(comment);
+  };
 
-  if (flags.questioned_tamara_dm) add('tamara', '😐');
-  else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑' }[tone]);
+  // 1. SPECIFIC MEMORIES OF NARRATIVE CHOICES:
+  
+  // Choice Memory A: The Dress at Zee's 21st Party
+  if (flags.borrowed_emerald_dress && !unfollowed?.tamara) {
+    add('tamara', 'Still obsessed with that emerald silk look we pulled from my closet 💚 You made that dress legendary, sister!', 'Recalls: Emerald Dress');
+  } else if (flags.vintage_style_dress && !unfollowed?.bisola) {
+    add('bisola', 'I will never forget you pulling up to a Banana Island billionaire party in thrifted black! Iconic nerve 💀🍿', 'Recalls: Thrift Look');
+  } else if (flags.dragged_dress && !unfollowed?.tamara) {
+    add('tamara', 'Remember that dress scramble in the taxi? So glad we made it in time 💛', 'Recalls: Entrance Panic');
+  }
 
-  if (meters.romanceChidi >= 35) {
+  // Choice Memory B: Ride with Kelvin in his Porsche
+  if (flags.drove_with_kelvin && !unfollowed?.kelvin) {
+    add('kelvin', 'Still thinking about our drive along the coastal expressway. You talk more sense than anyone on the Island 🥃', 'Recalls: Porsche Ride');
+  } else if (flags.refused_kelvin_ride && !unfollowed?.kelvin) {
+    add('kelvin', 'The only girl in Lekki to choose the student bus over my Porsche. Still hurts my pride a little, Ada 😏', 'Recalls: Rejected Ride');
+  } else if (flags.refused_kelvin_ride && !unfollowed?.chidi) {
+    add('chidi', 'Respect for taking the campus bus over the sports car. Real ones stay true to where they came from 📸✨', 'Recalls: Humble Transit');
+  }
+
+  // Choice Memory C: Balcony Romance / Intimacy with Chidi
+  if (flags.chidi_romantic_moment && !unfollowed?.chidi) {
+    add('chidi', 'That quiet moment by the balcony railing late at night... my camera didn’t lie. You’re different from the rest 📸💛', 'Recalls: Balcony Confession');
+  } else if (flags.flirted_with_chidi && !unfollowed?.chidi) {
+    add('chidi', 'You know how to get behind the lens and in front of it 😉 Looking good, Ada.', 'Recalls: Balcony Flirt');
+  } else if (flags.chidi_archive_alliance && !unfollowed?.chidi) {
+    add('chidi', 'We’re going to get to the truth behind that mezzanine shot. Nobody messes with you on my watch 🔍', 'Recalls: Mezzanine Lead');
+  }
+
+  // Choice Memory D: Working for Queen Bee Zee
+  if (flags.accepted_pa_job && !unfollowed?.zee) {
+    add('zee', 'My new communications assistant is posting content instead of updating my press schedule? Focus, darling 💅', 'Recalls: Assistant Role');
+  } else if (flags.negotiated_pa_terms && !unfollowed?.zee) {
+    add('zee', 'Nobody negotiates a retainer with me and wins, but you did. Keep that same energy this week ✨', 'Recalls: Retainer Terms');
+  } else if (flags.pact_with_zee && !unfollowed?.zee) {
+    add('zee', 'Our little agreement remains intact, Ada. Loyalty in this circle pays dividends 👑', 'Recalls: Private Pact');
+  } else if (flags.warned_zee && !unfollowed?.zee) {
+    add('zee', 'Your heads-up about the leak was sharp. I value people who keep their eyes open 🙂', 'Recalls: The Warning');
+  }
+
+  // Choice Memory E: Campus Walk After the Leak
+  if (flags.unbothered_walk && !unfollowed?.hauwa) {
+    add('hauwa', 'The peace you held walking into class after that cruel leak... pure spiritual strength 🌿🕊️', 'Recalls: Head Held High');
+  } else if (flags.demanded_leak_answers && !unfollowed?.chi) {
+    add('chi', 'Demanding accountability in front of the board was bold. Make sure your evidence is airtight ⚖️', 'Recalls: Public Demand');
+  } else if (flags.demanded_leak_answers && !unfollowed?.lagos_tea) {
+    add('lagos_tea', 'Demanding answers won’t silence the tea kettle, darling Ada 🫖👀', 'Recalls: Tea Confrontation');
+  }
+
+  // Choice Memory F: Siding with Chidi vs Kelvin
+  if (flags.sided_with_chidi && !unfollowed?.chidi) {
+    add('chidi', 'Glad you trusted my photographer’s instinct over island money. We’re close 📸', 'Recalls: Trusted Chidi');
+  } else if (flags.sided_with_kelvin && !unfollowed?.kelvin) {
+    add('kelvin', 'Trusting my family was the right move. We protect people in our circle 🥃', 'Recalls: Sided with Kelvin');
+  }
+
+  // Choice Memory G: Confronting Chioma or Bisola
+  if (flags.pressed_chioma && !unfollowed?.chi) {
+    add('chi', 'You cross-examined me like a prosecutor outside the library. Sharp tongue, Ada.', 'Recalls: Library Questioning');
+  } else if (flags.helped_bisola && !unfollowed?.bisola) {
+    add('bisola', 'Thank you again for reviewing my brand pitch the other day 💕 You’re one of the only real ones!', 'Recalls: Helped With Pitch');
+  }
+
+  // Choice Memory H: Burner phone clue
+  if (flags.photographed_tea_phone && !unfollowed?.lagos_tea) {
+    add('lagos_tea', 'Taking secret photos in the dark archive room? Careful what you capture 🫖📱', 'Recalls: Archive Recon');
+  }
+
+  // 2. TONE-BASED AND RELATIONSHIP COMMENTS:
+  if (!comments.some((c) => c.authorId === 'tamara') && !unfollowed?.tamara) {
+    if (flags.questioned_tamara_dm) add('tamara', '😐');
+    else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑' }[tone]);
+  }
+
+  if (!comments.some((c) => c.authorId === 'chidi') && !unfollowed?.chidi && meters.romanceChidi >= 25) {
     add('chidi', {
       humble: '📸👏',
       shady: 'Remind me never to get on your bad side 😅',
-      flex: 'Better than any shot I took tonight',
+      flex: 'Better than any shot I took tonight 🔥',
     }[tone]);
   }
-  if (meters.romanceKelvin >= 35) {
-    add('kelvin', { humble: 'Humble looks good on you.', shady: 'Dangerous. I like it 🥃', flex: 'Told you. Main character. 🥃' }[tone]);
-  }
-  if (tone === 'shady') add('bisola', 'OMG who is this about 😭🍿');
-  if (tone === 'flex') {
-    add('bisola', 'Ok STYLED 😍');
-    add('zee', 'Cute 🙂');
-    add('chi', 'Borrowed or bought? 🤔');
-  }
-  if (tone === 'humble') add('hauwa', 'Your aura is healing 🌿');
 
-  FAN_COMMENTS[tone].forEach(([handle, text], i) => comments.push(fanComment(handle, text, `${postId}_fan${i}`)));
+  if (!comments.some((c) => c.authorId === 'kelvin') && !unfollowed?.kelvin && meters.romanceKelvin >= 25) {
+    add('kelvin', {
+      humble: 'Humble looks good on you.',
+      shady: 'Dangerous. I like it 🥃',
+      flex: 'Told you. Main character. 🥃',
+    }[tone]);
+  }
+
+  if (!comments.some((c) => c.authorId === 'bisola') && !unfollowed?.bisola) {
+    if (tone === 'shady') add('bisola', 'OMG who is this about 😭🍿');
+    else if (tone === 'flex') add('bisola', 'Ok STYLED 😍');
+    else add('bisola', 'Love this for you boo 💕');
+  }
+
+  if (!comments.some((c) => c.authorId === 'zee')) {
+    if (!unfollowed?.zee) {
+      if (tone === 'flex') add('zee', 'Cute 🙂');
+      else if (meters.loyalty >= 45) add('zee', 'Keep that focus ✨');
+    } else {
+      add('zee', 'Unfollowing me won’t make you relevant, darling 🙂');
+    }
+  }
+
+  if (!comments.some((c) => c.authorId === 'chi') && !unfollowed?.chi) {
+    if (tone === 'flex') add('chi', 'Borrowed or bought? 🤔');
+    else add('chi', 'Networking suits you.');
+  }
+
+  if (!comments.some((c) => c.authorId === 'hauwa') && !unfollowed?.hauwa) {
+    if (tone === 'humble') add('hauwa', 'Your aura is healing 🌿');
+    else add('hauwa', 'Stay grounded in this city 🕊️');
+  }
+
+  if (!comments.some((c) => c.authorId === 'dayo') && !unfollowed?.dayo && meters.romanceDayo >= 20) {
+    add('dayo', 'Soundtrack to your glow-up coming soon 🎧');
+  }
+
+  if (!comments.some((c) => c.authorId === 'lagos_tea') && !unfollowed?.lagos_tea && meters.suspicion >= 30) {
+    add('lagos_tea', 'Pretty pictures don’t delete your receipts, Ada dear 🫖👀');
+  }
+
+  // 3. UNDERDOG FAN & COMMUNITY COMMENTS:
+  // When Popularity is low (underdog start), comments are authentic Ajegunle/Mainland supporters!
+  const mainlandFans: Array<[string, string]> = [
+    ['@ajegunle_pride', 'Ajegunle stand up! Make us proud sis 💪🏾💛'],
+    ['@mainland_queen', 'Watching you rise from our neighborhood gives me hope 😭🙏'],
+    ['@lau_scholar_24', 'Ada representing the scholarship squad! We see you 📚✨'],
+    ['@yaba_finest', 'Mainland to the Island! The hustle is real 🌍🔥'],
+  ];
+
+  const islandFans: Array<[string, string]> = [
+    ['@vi_gist', 'Wait who is this new girl in Tamara’s circle? 👀'],
+    ['@island_tattle', 'Her aesthetic is actually refreshing amongst the fake millionaires ☕'],
+    ['@style_gidi', 'Okay she has natural style, I won’t lie 🔥'],
+    ['@lekkibabe99', 'Island suits you sis 🌴✨'],
+  ];
+
+  const fanPool = meters.popularity < 35 ? mainlandFans : [...mainlandFans, ...islandFans];
+  const fanCountToShow = Math.max(1, Math.min(fanPool.length, Math.ceil((meters.popularity / 100) * fanPool.length) + 1));
+
+  fanPool.slice(0, fanCountToShow).forEach(([handle, text], i) => {
+    comments.push(fanComment(handle, text, `${postId}_fan${i}`));
+  });
+
   return comments;
+}
+
+// Adjusts existing Ada posts as story scenes advance in the visual novel
+export function getUpdatedAdaPostForScene(
+  post: AdaPost,
+  currentEpisode: number,
+  currentSceneIndex: number,
+  popularity: number,
+  unfollowed?: Record<string, boolean>,
+  flags?: Record<string, boolean>
+): AdaPost {
+  const episodesPassed = currentEpisode - post.episode;
+  const scenesPassed = episodesPassed * 7 + (currentSceneIndex - post.sceneIndex);
+
+  if (scenesPassed <= 0) return post;
+
+  const allNpcs: Array<CharacterId | 'lagos_tea'> = [
+    'zee',
+    'tamara',
+    'kelvin',
+    'chi',
+    'bisola',
+    'hauwa',
+    'chidi',
+    'dayo',
+  ];
+  const followedCount = allNpcs.filter((id) => !unfollowed?.[id]).length;
+  // If player followed everyone, post enjoys viral algorithmic ripple across future scenes!
+  const circleClout = 0.35 + (followedCount / allNpcs.length) * 1.15;
+
+  // Realistic growth based on underdog status:
+  const viralLikeGrowth = Math.round(scenesPassed * (8 + popularity * 6) * circleClout);
+  const updatedLikes = post.likesCount + viralLikeGrowth;
+
+  const newComments = [...post.comments];
+
+  // Dynamically add narrative memories of player choices made across scenes
+  if (flags) {
+    if (
+      flags.borrowed_emerald_dress &&
+      !unfollowed?.tamara &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Emerald Dress')
+    ) {
+      const c = castComment(
+        'tamara',
+        'Still obsessed with that emerald silk look we pulled from my closet 💚 You owned that party!',
+        `${post.id}_mem_emerald_${post.episode}`,
+        240
+      );
+      c.memoryBadge = 'Recalls: Emerald Dress';
+      newComments.unshift(c);
+    } else if (
+      flags.vintage_style_dress &&
+      !unfollowed?.bisola &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Thrift Look')
+    ) {
+      const c = castComment(
+        'bisola',
+        'Still shouting out Ada pulling up to the Island in thrifted black! Pure nerve 💀🔥',
+        `${post.id}_mem_thrift_${post.episode}`,
+        210
+      );
+      c.memoryBadge = 'Recalls: Thrift Look';
+      newComments.unshift(c);
+    }
+
+    if (
+      flags.drove_with_kelvin &&
+      !unfollowed?.kelvin &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Porsche Ride')
+    ) {
+      const c = castComment(
+        'kelvin',
+        'Still thinking about our drive along the coastal expressway in the GT3. You’re different from the rest 🥃',
+        `${post.id}_mem_kelvin_${post.episode}`,
+        320
+      );
+      c.memoryBadge = 'Recalls: Porsche Ride';
+      newComments.unshift(c);
+    } else if (
+      flags.refused_kelvin_ride &&
+      !unfollowed?.kelvin &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Rejected Ride')
+    ) {
+      const c = castComment(
+        'kelvin',
+        'The only girl on campus to choose the student bus over my Porsche. Still hurts my pride a little, Ada 😏',
+        `${post.id}_mem_kelvin_bus_${post.episode}`,
+        290
+      );
+      c.memoryBadge = 'Recalls: Rejected Ride';
+      newComments.unshift(c);
+    }
+
+    if (
+      flags.chidi_romantic_moment &&
+      !unfollowed?.chidi &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Balcony Confession')
+    ) {
+      const c = castComment(
+        'chidi',
+        'That quiet moment by the balcony railing late at night... my camera didn’t lie. You’re rare 📸💛',
+        `${post.id}_mem_chidi_balcony_${post.episode}`,
+        350
+      );
+      c.memoryBadge = 'Recalls: Balcony Confession';
+      newComments.unshift(c);
+    } else if (
+      flags.sided_with_chidi &&
+      !unfollowed?.chidi &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Trusted Chidi')
+    ) {
+      const c = castComment(
+        'chidi',
+        'Glad you trusted my photographer’s instinct over island money. We’re close 📸🔍',
+        `${post.id}_mem_chidi_side_${post.episode}`,
+        280
+      );
+      c.memoryBadge = 'Recalls: Trusted Chidi';
+      newComments.unshift(c);
+    }
+
+    if (
+      flags.accepted_pa_job &&
+      !unfollowed?.zee &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Assistant Role')
+    ) {
+      const c = castComment(
+        'zee',
+        'My new communications assistant is posting content instead of updating my press schedule? Focus, darling 💅',
+        `${post.id}_mem_zee_pa_${post.episode}`,
+        490
+      );
+      c.memoryBadge = 'Recalls: Assistant Role';
+      newComments.unshift(c);
+    } else if (
+      flags.pact_with_zee &&
+      !unfollowed?.zee &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Private Pact')
+    ) {
+      const c = castComment(
+        'zee',
+        'Our little agreement remains intact, Ada. Loyalty in this circle pays dividends 👑',
+        `${post.id}_mem_zee_pact_${post.episode}`,
+        410
+      );
+      c.memoryBadge = 'Recalls: Private Pact';
+      newComments.unshift(c);
+    }
+
+    if (
+      flags.unbothered_walk &&
+      !unfollowed?.hauwa &&
+      !newComments.some((c) => c.memoryBadge === 'Recalls: Head Held High')
+    ) {
+      const c = castComment(
+        'hauwa',
+        'The peace you held walking into class after that cruel leak... pure spiritual strength 🌿🕊️',
+        `${post.id}_mem_hauwa_walk_${post.episode}`,
+        230
+      );
+      c.memoryBadge = 'Recalls: Head Held High';
+      newComments.unshift(c);
+    }
+  }
+
+  return {
+    ...post,
+    likesCount: updatedLikes,
+    comments: newComments,
+  };
 }
 
 export function buildAdaTrollWar(tone: AdaPostTone, postId: string): CommentWar {

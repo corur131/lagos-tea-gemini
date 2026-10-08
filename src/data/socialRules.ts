@@ -16,7 +16,12 @@ export const DEFAULT_SOCIAL_STATE: SocialState = {
   savedPosts: {},
   likedComments: {},
   playerComments: {},
-  unfollowed: {},
+  unfollowed: {
+    zee: true,
+    kelvin: true,
+    chi: true,
+    dayo: true,
+  },
   pollVotes: {},
   seenStories: {},
   adaStorySlides: [],
@@ -166,14 +171,68 @@ export function getFollowToggleEffect(
 ): SocialEffect {
   const romance = ROMANCE_METER[authorId];
   if (!nowFollowing) {
-    if (authorId === 'lagos_tea') {
-      return { meterChanges: { reputation: 3, popularity: -2 }, flagToSet: 'unfollowed_lagos_tea' };
+    // Unfollowing Lagos high society influencers lowers Ada's circle clout and Popularity
+    if (authorId === 'zee') {
+      return { meterChanges: { popularity: -5, loyalty: -5 }, flagToSet: 'unfollowed_zee' };
     }
-    if (romance) return { meterChanges: { [romance]: -6 }, flagToSet: `unfollowed_${authorId}` };
-    return { meterChanges: { loyalty: -5, jealousy: 2 }, flagToSet: `unfollowed_${authorId}` };
+    if (authorId === 'tamara') {
+      return { meterChanges: { popularity: -4, loyalty: -5 }, flagToSet: 'unfollowed_tamara' };
+    }
+    if (authorId === 'kelvin') {
+      return { meterChanges: { popularity: -4, romanceKelvin: -6 }, flagToSet: 'unfollowed_kelvin' };
+    }
+    if (authorId === 'chi') {
+      return { meterChanges: { popularity: -3, loyalty: -3 }, flagToSet: 'unfollowed_chi' };
+    }
+    if (authorId === 'bisola') {
+      return { meterChanges: { popularity: -3, loyalty: -2 }, flagToSet: 'unfollowed_bisola' };
+    }
+    if (authorId === 'hauwa') {
+      return { meterChanges: { popularity: -2, loyalty: -2 }, flagToSet: 'unfollowed_hauwa' };
+    }
+    if (authorId === 'chidi') {
+      return { meterChanges: { popularity: -2, romanceChidi: -6 }, flagToSet: 'unfollowed_chidi' };
+    }
+    if (authorId === 'dayo') {
+      return { meterChanges: { popularity: -3, romanceDayo: -5 }, flagToSet: 'unfollowed_dayo' };
+    }
+    if (authorId === 'lagos_tea') {
+      return { meterChanges: { popularity: -2, reputation: 3 }, flagToSet: 'unfollowed_lagos_tea' };
+    }
+    if (romance) return { meterChanges: { popularity: -3, [romance]: -6 }, flagToSet: `unfollowed_${authorId}` };
+    return { meterChanges: { popularity: -3, loyalty: -4 }, flagToSet: `unfollowed_${authorId}` };
   }
-  if (romance) return { meterChanges: { [romance]: 1 }, flagToSet: `refollowed_${authorId}` };
-  return { meterChanges: { loyalty: 1 }, flagToSet: `refollowed_${authorId}` };
+
+  // Following high society icons connects Ada to their algorithm reach and boosts Popularity
+  if (authorId === 'zee') {
+    return { meterChanges: { popularity: 5, loyalty: 2 }, flagToSet: 'followed_zee' };
+  }
+  if (authorId === 'tamara') {
+    return { meterChanges: { popularity: 4, loyalty: 3 }, flagToSet: 'followed_tamara' };
+  }
+  if (authorId === 'kelvin') {
+    return { meterChanges: { popularity: 4, romanceKelvin: 4, jealousy: 2 }, flagToSet: 'followed_kelvin' };
+  }
+  if (authorId === 'chi') {
+    return { meterChanges: { popularity: 3, loyalty: 2 }, flagToSet: 'followed_chi' };
+  }
+  if (authorId === 'bisola') {
+    return { meterChanges: { popularity: 3, loyalty: 1 }, flagToSet: 'followed_bisola' };
+  }
+  if (authorId === 'hauwa') {
+    return { meterChanges: { popularity: 2, loyalty: 2 }, flagToSet: 'followed_hauwa' };
+  }
+  if (authorId === 'chidi') {
+    return { meterChanges: { popularity: 2, romanceChidi: 3 }, flagToSet: 'followed_chidi' };
+  }
+  if (authorId === 'dayo') {
+    return { meterChanges: { popularity: 3, romanceDayo: 3 }, flagToSet: 'followed_dayo' };
+  }
+  if (authorId === 'lagos_tea') {
+    return { meterChanges: { popularity: 3, reputation: -2, suspicion: 2 }, flagToSet: 'followed_lagos_tea' };
+  }
+  if (romance) return { meterChanges: { popularity: 3, [romance]: 2 }, flagToSet: `refollowed_${authorId}` };
+  return { meterChanges: { popularity: 2, loyalty: 1 }, flagToSet: `refollowed_${authorId}` };
 }
 
 /* ----------------------------- Quick replies ----------------------------- */
@@ -318,11 +377,38 @@ export function getAuthorReaction(
 export const FOLLOWER_MILESTONES = [1000, 5000, 10000, 50000];
 export const VERIFIED_FOLLOWERS = 50000;
 
-export function computeFollowers(meters: Meters, episode: number, sceneIndex: number, social: SocialState) {
-  const popularityBoost = Math.max(0, meters.popularity - 35) ** 2 * 10;
-  // Going viral for the wrong reasons still brings followers
-  const infamy = hasReached(episode, sceneIndex, 1, 6) ? 1850 : 0;
-  return Math.max(0, Math.round(312 + popularityBoost + infamy + social.followerBonus));
+// Grinding from the bottom: Ada starts with only ~280-360 followers
+// and grinds her way to 1,000, 5,000, 10,000, and 50,000+!
+export function calculateAdaFollowers(
+  popularity: number,
+  reputation: number,
+  followedNpcCount: number,
+  bonus = 0
+): number {
+  const base = 180;
+  // Non-linear growth: slow grind at start, viral inflection as popularity rises above 40%
+  const popGrowth = Math.pow(Math.max(0, popularity) / 10, 2.25) * 14;
+  const repBonus = (reputation || 0) * 3;
+  const circleBonus = (followedNpcCount || 0) * 16;
+  return Math.max(100, Math.round(base + popGrowth + repBonus + circleBonus + bonus));
+}
+
+export function computeFollowers(
+  meters: Meters,
+  episode: number,
+  sceneIndex: number,
+  social: SocialState,
+  followedCount = 9
+) {
+  const baseFollowers = calculateAdaFollowers(
+    meters.popularity,
+    meters.reputation,
+    followedCount,
+    social.followerBonus
+  );
+  // The midnight leak brings a sudden surge of curious onlookers
+  const infamy = (episode > 1 || sceneIndex >= 6) ? 220 : 0;
+  return baseFollowers + infamy;
 }
 
 export function formatCount(n: number): string {
@@ -334,11 +420,190 @@ export function formatCount(n: number): string {
 
 /* ------------------------------ Post display ------------------------------ */
 
-// Applies choice-based variants and everything the player has done to a post
+// Applies choice-based variants and narrative memory to a post
 export function resolvePost(post: SocialPost, flags: Record<string, boolean>, social: SocialState): SocialPost {
   const variant = post.variants?.find((v) => flags[v.flag]);
   const liked = !!social.likedPosts[post.id];
   const playerComments = social.playerComments[post.id] || [];
+
+  // Narrative memory comments on NPC posts reflecting the player's choices
+  const narrativeComments: SocialComment[] = [];
+
+  // 1. Bisola's posts: comments regarding outfit, party entrance, or Porsche ride
+  if (post.authorId === 'bisola') {
+    if (flags.borrowed_emerald_dress && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('emerald silk'))) {
+      narrativeComments.push({
+        id: `mem_bis_${post.id}_emerald`,
+        authorId: 'tamara',
+        authorName: 'Tamara Reid',
+        authorHandle: '@tamara_reid',
+        isVerified: true,
+        avatarType: 'tamara',
+        text: 'Tamara here! My girl @ada_obi owned that emerald silk entrance at the party 💚',
+        likes: 184,
+        timestamp: '1h ago',
+        memoryBadge: 'Recalls: Emerald Dress',
+      });
+    } else if (flags.vintage_style_dress && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('thrifted'))) {
+      narrativeComments.push({
+        id: `mem_bis_${post.id}_thrift`,
+        authorId: 'bisola',
+        authorName: 'Bisola Adeyemi',
+        authorHandle: '@bisola_vlogs',
+        isVerified: true,
+        avatarType: 'bisola',
+        text: 'Still shouting out Ada for showing up in vintage thrift! Kept it 100% real 🔥',
+        likes: 210,
+        timestamp: '45m ago',
+        memoryBadge: 'Recalls: Thrift Look',
+      });
+    }
+
+    if (flags.drove_with_kelvin && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('GT3'))) {
+      narrativeComments.push({
+        id: `mem_bis_${post.id}_kelvin_car`,
+        authorId: 'bisola',
+        authorName: 'Bisola Adeyemi',
+        authorHandle: '@bisola_vlogs',
+        isVerified: true,
+        avatarType: 'bisola',
+        text: 'Wait did anyone else catch Kelvin picking up Ada outside the faculty in his Porsche? 👀🍿',
+        likes: 340,
+        timestamp: '20m ago',
+        memoryBadge: 'Recalls: Porsche Ride',
+      });
+    }
+  }
+
+  // 2. Chidi's posts: reflections on candid balcony moments & investigative alliance
+  if (post.authorId === 'chidi') {
+    if (flags.chidi_romantic_moment && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('balcony'))) {
+      narrativeComments.push({
+        id: `mem_chidi_${post.id}_moment`,
+        authorId: 'chidi',
+        authorName: 'Chidi Nwosu',
+        authorHandle: '@chidi_captures',
+        isVerified: true,
+        avatarType: 'chidi',
+        text: 'Grateful for real conversations by the balcony railing late at night. Rare energy in this city ✨',
+        likes: 290,
+        timestamp: '30m ago',
+        memoryBadge: 'Recalls: Balcony Confession',
+      });
+    } else if (flags.sided_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('alliance'))) {
+      narrativeComments.push({
+        id: `mem_chidi_${post.id}_alliance`,
+        authorId: 'chidi',
+        authorName: 'Chidi Nwosu',
+        authorHandle: '@chidi_captures',
+        isVerified: true,
+        avatarType: 'chidi',
+        text: 'Trusting photographer instinct over Island money. We uncover the truth together 🔍📸',
+        likes: 310,
+        timestamp: '15m ago',
+        memoryBadge: 'Recalls: Trusted Chidi',
+      });
+    }
+  }
+
+  // 3. Zee's posts: comments regarding assistant role, pact, or party impression
+  if (post.authorId === 'zee') {
+    if (flags.accepted_pa_job && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('assistant'))) {
+      narrativeComments.push({
+        id: `mem_zee_${post.id}_pa`,
+        authorId: 'zee',
+        authorName: 'Zainab Bello',
+        authorHandle: '@zeebello',
+        isVerified: true,
+        avatarType: 'zee',
+        text: 'Welcoming @ada_obi to the brand communications desk. Let us see if Ajegunle grit matches Island excellence 💅',
+        likes: 620,
+        timestamp: '15m ago',
+        memoryBadge: 'Recalls: Assistant Role',
+      });
+    } else if (flags.pact_with_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('loyalty'))) {
+      narrativeComments.push({
+        id: `mem_zee_${post.id}_pact`,
+        authorId: 'zee',
+        authorName: 'Zainab Bello',
+        authorHandle: '@zeebello',
+        isVerified: true,
+        avatarType: 'zee',
+        text: 'Loyalty in this circle pays dividends. Some know how to keep their word 👑',
+        likes: 540,
+        timestamp: '25m ago',
+        memoryBadge: 'Recalls: Private Pact',
+      });
+    }
+  }
+
+  // 4. Kelvin's posts: remarks on the Porsche GT3 ride or refused ride
+  if (post.authorId === 'kelvin') {
+    if (flags.drove_with_kelvin && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('coastal'))) {
+      narrativeComments.push({
+        id: `mem_kelvin_${post.id}_ride`,
+        authorId: 'kelvin',
+        authorName: 'Kelvin Adebayo-Wright',
+        authorHandle: '@kelvin_wright',
+        isVerified: true,
+        avatarType: 'kelvin',
+        text: 'That run down the coastal expressway was unmatched. Better conversation than the entire gala 🥃',
+        likes: 420,
+        timestamp: '18m ago',
+        memoryBadge: 'Recalls: Porsche Ride',
+      });
+    } else if (flags.refused_kelvin_ride && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('shuttle'))) {
+      narrativeComments.push({
+        id: `mem_kelvin_${post.id}_bus`,
+        authorId: 'kelvin',
+        authorName: 'Kelvin Adebayo-Wright',
+        authorHandle: '@kelvin_wright',
+        isVerified: true,
+        avatarType: 'kelvin',
+        text: 'First person to turn down the passenger seat of my GT3 for a campus shuttle. Still bruised my ego, Ada 😏',
+        likes: 380,
+        timestamp: '22m ago',
+        memoryBadge: 'Recalls: Rejected Ride',
+      });
+    }
+  }
+
+  // 5. Tamara's posts: reminiscing about getting ready or the scholarship struggle
+  if (post.authorId === 'tamara') {
+    if (flags.borrowed_emerald_dress && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('fitting'))) {
+      narrativeComments.push({
+        id: `mem_tamara_${post.id}_fit`,
+        authorId: 'tamara',
+        authorName: 'Tamara Reid',
+        authorHandle: '@tamara_reid',
+        isVerified: true,
+        avatarType: 'tamara',
+        text: 'Throwback to our fitting session! Seeing @ada_obi shut down Banana Island was unforgettable 💚',
+        likes: 310,
+        timestamp: '40m ago',
+        memoryBadge: 'Recalls: Emerald Dress',
+      });
+    }
+  }
+
+  // 6. Lagos Tea leak posts: reacting to public confrontations or archive snooping
+  if (post.authorId === 'lagos_tea') {
+    if (flags.demanded_leak_answers && !post.comments.some((c) => c.text.includes('kettle'))) {
+      narrativeComments.push({
+        id: `mem_tea_${post.id}_demand`,
+        authorId: 'lagos_tea',
+        authorName: 'The Lagos Tea 🫖',
+        authorHandle: '@TheLagosTea',
+        isVerified: true,
+        avatarType: 'lagos_tea',
+        text: 'Making public demands at the party won’t silence the receipts, darling Ada 🫖👀',
+        likes: 890,
+        timestamp: '10m ago',
+        memoryBadge: 'Recalls: Public Demand',
+      });
+    }
+  }
+
   return {
     ...post,
     caption: variant?.caption ?? post.caption,
@@ -351,8 +616,8 @@ export function resolvePost(post: SocialPost, flags: Record<string, boolean>, so
     isLikedByPlayer: liked,
     isSavedByPlayer: !!social.savedPosts[post.id],
     likesCount: post.likesCount + (liked ? 1 : 0),
-    commentsCount: post.commentsCount + playerComments.length,
-    comments: [...playerComments, ...post.comments],
+    commentsCount: post.commentsCount + playerComments.length + narrativeComments.length,
+    comments: [...narrativeComments, ...playerComments, ...post.comments],
   };
 }
 

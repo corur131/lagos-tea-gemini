@@ -15,6 +15,7 @@ interface AdaPostComposerProps {
   alreadyPostedThisEpisode: boolean;
   isPosting: boolean;
   soundEnabled: boolean;
+  unfollowed?: Record<string, boolean>;
   onPost: (photo: PhotoOption, tone: AdaPostTone, caption: string) => void;
 }
 
@@ -28,6 +29,7 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
   alreadyPostedThisEpisode,
   isPosting,
   soundEnabled,
+  unfollowed = {},
   onPost,
 }) => {
   const photos = getPhotoOptions(heroine, location);
@@ -50,7 +52,7 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
   }
 
   const photo = photos[photoIdx];
-  const reach = tone ? computeReach(tone, meters.popularity) : null;
+  const reach = tone ? computeReach(tone, meters.popularity, unfollowed) : null;
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-5">
@@ -138,11 +140,21 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
       )}
 
       {tone && reach && (
-        <div className="p-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 space-y-0.5">
-          <div>
-            Expected reach: <span className="font-bold text-emerald-400">+{formatCount(reach.followerGain)} followers</span>
+        <div className="p-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-300 space-y-1">
+          <div className="flex items-center justify-between">
+            <span>Expected reach:</span>
+            <span className="font-bold text-emerald-400">+{formatCount(reach.followerGain)} followers</span>
           </div>
-          <div className="text-neutral-400">{describeEffect(TONE_INFO[tone].effect)}</div>
+          <div className="flex items-center justify-between text-neutral-400">
+            <span>Estimated likes:</span>
+            <span className="font-bold text-pink-300">~{formatCount(reach.likesCount)} likes</span>
+          </div>
+          <div className="text-[10px] text-amber-300/90 font-mono pt-0.5 border-t border-neutral-800">
+            {reach.followedCount > 0
+              ? `🔥 High-society circle boost: ${(reach.networkMultiplier).toFixed(2)}x (${reach.followedCount}/9 influencers followed)`
+              : '⚠️ No influencers followed — organic reach only (likes halved)'}
+          </div>
+          <div className="text-neutral-400 pt-0.5">{describeEffect(TONE_INFO[tone].effect)}</div>
         </div>
       )}
 

@@ -92,9 +92,21 @@ export const AdaProfileView: React.FC<AdaProfileViewProps> = ({
         </div>
 
         <div className="mt-4 text-xs text-neutral-300 leading-relaxed">
-          <p className="font-medium text-neutral-200">{heroine.department} Scholar</p>
-          <p className="text-neutral-400 mt-0.5">
-            Holding my ground in high society. Refusing to let anonymous blogs write my destiny. 💅📚
+          <p className="font-semibold text-neutral-100 flex items-center gap-1.5">
+            <span>
+              {followers < 1000
+                ? 'Underdog Student • Grinding from the Bottom'
+                : followers < 5000
+                ? `${heroine.department} Scholar • Rising Campus Voice`
+                : followers < 25000
+                ? 'High-Society Contender • Digital Prodigy'
+                : 'Verified Lagos Star • Digital Royalty 👑'}
+            </span>
+          </p>
+          <p className="text-neutral-400 mt-1">
+            {followers < 1000
+              ? 'Ajegunle to Lekki Atlantic. 19 | Scholarship student | Camera in hand, keeping my head down and grinding to the top 📚📸 #TheGrind'
+              : 'Holding my ground in high society. Observant, ambitious, and proving talent beats trust funds every time 💅✨'}
           </p>
         </div>
 

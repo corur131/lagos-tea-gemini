@@ -397,7 +397,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
       },
       {
         speaker: 'heroine',
-        text: '“Have you? I didn’t think oil heirs noticed scholarship students from Ajegunle.”',
+        text: '“Have you? I didn’t think shipping heirs noticed scholarship students from Ajegunle.”',
       },
       {
         speaker: 'kelvin',
@@ -891,6 +891,16 @@ export const EPISODE_2_SCENES: SceneData[] = [
         expression: 'neutral',
         text: '“I pay your full remaining tuition fees, give you a private ensuite bedroom, and put you at the center of everything. Do we have a deal?”',
       },
+      {
+        speaker: 'narrator',
+        text: 'Zee reached through the open window and pressed a heavy brass key into my palm.',
+      },
+      {
+        speaker: 'zee',
+        speakerDisplayName: 'Zainab “Zee” Bello',
+        expression: 'flirty',
+        text: '“That’s for my private office desk at the villa. Keep it on you at all times—you’ll need it to access my sponsor files and manage deliveries.”',
+      },
     ],
     choices: [
       {
@@ -936,7 +946,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
         speaker: 'zee',
         speakerDisplayName: 'Zainab “Zee” Bello',
         expression: 'happy',
-        text: '“Here is your room, Ada. Master suite annex. High-speed fiber internet, private bathroom, and your official influencer house pass.”',
+        text: '“Here is your room, Ada. Master suite annex. High-speed fiber internet, private bathroom, and your official influencer house pass. And keep that brass desk key handy for sorting my sponsor files and brand deliveries.”',
       },
       {
         speaker: 'heroine',
@@ -1066,7 +1076,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
         speaker: 'chidi',
         speakerDisplayName: 'Chidi Nwosu',
         expression: 'neutral',
-        text: '“I pulled the IP logs from the domain registration of @TheLagosTea’s backup website. The domain was paid with a prepaid card registered in Victoria Island.”',
+        text: '“I pulled the server logs and hosting records for @TheLagosTea’s backup website. The account was paid with a prepaid card registered in Victoria Island.”',
       },
     ],
     choices: [
@@ -1158,13 +1168,17 @@ export const EPISODE_3_SCENES: SceneData[] = [
         speaker: 'chi',
         speakerDisplayName: 'Chioma “Chi” Eze',
         expression: 'angry',
-        text: '“...She cannot have the luxury campaign, Hauwa! If Zee signs that contract, she gets voting rights on the entire influencer board!”',
+        text: '“...She cannot have the luxury campaign, Hauwa! If Zee signs that contract, she gets voting rights on the Lagos Influencer Guild board—she’ll control every major brand endorsement on the Island!”',
       },
       {
         speaker: 'hauwa',
         speakerDisplayName: 'Hauwa Musa',
         expression: 'neutral',
         text: '“Patience, Chi. Every empire overreaches before it falls. Watch your steps; the new girl has sharp eyes.”',
+      },
+      {
+        speaker: 'heroine',
+        text: 'The Influencer Board: the elite council that controlled brand allocations across West Africa. If Zee gained voting rights, Chioma’s agency leverage was finished.',
       },
       {
         speaker: 'heroine',
@@ -1206,7 +1220,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
       },
       {
         speaker: 'heroine',
-        text: 'The heavy brass key from Zee’s office desk turned in the old wooden lock with a faint click.',
+        text: 'The heavy brass key Zee gave me for her office desk turned in the old wooden lock with a faint click.',
         sfx: 'tap',
       },
       {

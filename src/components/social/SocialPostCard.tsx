@@ -18,6 +18,8 @@ import {
   Camera,
   Trash2,
   Timer,
+  UserCheck,
+  UserPlus,
 } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
@@ -36,6 +38,8 @@ interface SocialPostCardProps {
   deleteState?: DeleteState;
   isScreenshotted?: boolean;
   isAdaVerified?: boolean;
+  isFollowing?: boolean;
+  onToggleFollow?: (authorId: string) => void;
   onLikePost: (post: SocialPost) => void;
   onSavePost?: (post: SocialPost) => void;
   onAddComment: (post: SocialPost, text: string) => void;
@@ -60,6 +64,8 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
   deleteState,
   isScreenshotted = false,
   isAdaVerified = false,
+  isFollowing = true,
+  onToggleFollow,
   onLikePost,
   onSavePost = () => {},
   onAddComment,
@@ -158,6 +164,15 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
                 <CheckCircle2 className="inline w-3 h-3 ml-0.5 text-pink-400" />
               )}
             </span>
+            {comment.memoryBadge && (
+              <span
+                className="inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-purple-950/80 text-purple-300 border border-purple-600/50 mr-1.5 align-middle shadow-sm"
+                title={`Narrative memory: response to player's story choice "${comment.memoryBadge}"`}
+              >
+                <span>🧠</span>
+                <span>{comment.memoryBadge}</span>
+              </span>
+            )}
             <span className="break-words">{comment.text}</span>
             <div className="text-[10px] text-neutral-500 mt-0.5">{comment.timestamp}</div>
           </div>
@@ -230,6 +245,36 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Follow/Unfollow toggle button for NPC posts */}
+        {!post.isAdaPost && post.authorId !== 'heroine' && onToggleFollow && (
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFollow(post.authorId);
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isFollowing
+                  ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700/80 hover:text-white'
+                  : 'bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 hover:from-pink-500 hover:to-amber-400 text-white shadow-pink-500/25 shadow-md'
+              }`}
+              title={isFollowing ? `Unfollow ${post.authorHandle}` : `Follow ${post.authorHandle}`}
+            >
+              {isFollowing ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5 text-pink-400" />
+                  <span className="hidden xs:inline">Following</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-3.5 h-3.5 text-amber-200" />
+                  <span>Follow</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 2. Visual Media Stage */}
