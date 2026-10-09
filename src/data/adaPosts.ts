@@ -14,91 +14,9 @@ import { createLightweightComment } from './gidiUsers';
 export { getPhotoOptions } from './adaPhotos';
 export type { PhotoOption } from './adaPhotos';
 
-export const TONE_INFO: Record<
-  AdaPostTone,
-  { label: string; description: string; effect: SocialEffect; followerBase: number; captions: string[]; badge: string }
-> = {
-  humble: {
-    label: 'Humble 🙏',
-    description: 'Wins respect. Small follower bump.',
-    effect: { meterChanges: { reputation: 4, loyalty: 2 } },
-    followerBase: 500,
-    badge: '🙏 GRATEFUL',
-    captions: [
-      'Grateful for every room I walk into, even the ones that didn’t want me there 🙏✨',
-      'Scholarship girl. Big dreams, small room. Still here 💛📚',
-      'Not where I want to be, but so far from where I started 🙏',
-    ],
-  },
-  shady: {
-    label: 'Shady 💅',
-    description: 'Goes viral. The girls won’t love it.',
-    effect: { meterChanges: { popularity: 5, jealousy: 4, loyalty: -3, suspicion: 2 } },
-    followerBase: 1800,
-    badge: '💅 NO NAMES',
-    captions: [
-      'Some people’s “tea” is just tap water with a filter 💅🫖',
-      'Imagine leaking someone’s address and still being irrelevant 🥱',
-      'Smile for the camera, babe. I know you’re watching 👀',
-    ],
-  },
-  flex: {
-    label: 'Flex 👑',
-    description: 'Big reach. Some people will ask where the money came from.',
-    effect: { meterChanges: { popularity: 4, reputation: -2, jealousy: 2 } },
-    followerBase: 1100,
-    badge: '👑 MAIN CHARACTER',
-    captions: [
-      'Ajegunle to Banana Island. Same girl, new view 💅🌴',
-      'Main character energy. Borrowed or not 👑',
-      'They said I didn’t belong. The algorithm disagrees 📈✨',
-    ],
-  },
-};
-
-export function computeReach(
-  tone: AdaPostTone,
-  popularity: number,
-  unfollowed?: Record<string, boolean>
-) {
-  // Underdog scaling: At low popularity (12%), Ada starts small (~25-45 followers gained per post, ~18-35 likes)
-  // As she grinds her way up and expands her network, reach scales exponentially to thousands!
-  const basePotential = TONE_INFO[tone].followerBase;
-  const underdogFactor = 0.08 + Math.pow(Math.max(0, popularity) / 100, 1.8) * 0.92;
-  const baseFollowerGain = Math.round(basePotential * underdogFactor);
-
-  // High society influence calculation:
-  // Each followed NPC expands Ada's explore-feed footprint and recommendation algorithm
-  const allNpcs: Array<CharacterId | 'lagos_tea'> = [
-    'zee',
-    'tamara',
-    'kelvin',
-    'chi',
-    'bisola',
-    'hauwa',
-    'chidi',
-    'dayo',
-    'lagos_tea',
-  ];
-  const followedCount = allNpcs.filter((id) => !unfollowed?.[id]).length;
-  
-  // Influencer network multiplier:
-  const networkMultiplier = 0.4 + (followedCount / allNpcs.length) * 0.9;
-  const zeeBoost = !unfollowed?.zee ? 1.25 : 0.8;
-  const tamaraBoost = !unfollowed?.tamara ? 1.2 : 0.85;
-  const kelvinBoost = !unfollowed?.kelvin ? 1.15 : 0.9;
-  const totalMultiplier = networkMultiplier * ((zeeBoost * tamaraBoost * kelvinBoost) / (1.25 * 1.2 * 1.15));
-
-  const followerGain = Math.max(15, Math.round(baseFollowerGain * totalMultiplier));
-  // Likes start authentic to an aspiring unknown creator:
-  // At 12% Popularity: ~24-35 likes! Real humble beginnings!
-  // At 50% Popularity: ~320 likes!
-  // At 90% Popularity: ~2,400 likes!
-  const baseLikes = 15 + followerGain * 0.5 + Math.pow(popularity, 1.6) * 0.7;
-  const likesCount = Math.max(12, Math.round(baseLikes * totalMultiplier));
-
-  return { followerGain, likesCount, networkMultiplier: totalMultiplier, followedCount };
-}
+// Vibes, captions and scoring live in postEngine.ts
+export { VIBES as TONE_INFO } from './postEngine';
+import { VIBES as TONE_INFO } from './postEngine';
 
 const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
   humble: [
@@ -118,6 +36,18 @@ const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
     ['@glowup_gist', 'The glow up is GLOWING 😍'],
     ['@lekkibabe99', 'Island suits you sis 🌴'],
     ['@style_gidi', 'Frame this look immediately! 👑🔥'],
+  ],
+  flirty: [
+    ['@vi_gist', 'WHO IS HE 😭😭 drop the @ please'],
+    ['@lekkibabe99', 'The way I screamed. Soft launch season 💋'],
+    ['@island_tattle', 'Somebody’s blushing and it’s not just Ada 👀'],
+    ['@mainland_queen', 'Love wins on the mainland and the island 💕'],
+  ],
+  mysterious: [
+    ['@gidi_pulse', 'Wait what does this MEAN 😳'],
+    ['@island_tattle', 'She knows something. I can feel it 🫖'],
+    ['@vi_gist', 'Lagos Tea is sweating right now I promise you 💀'],
+    ['@yaba_finest', 'Detective Ada era unlocked 🔍'],
   ],
 };
 
@@ -662,6 +592,22 @@ export function buildAdaTrollWar(tone: AdaPostTone, postId: string): CommentWar 
       options: [
         { id: 'clapback', label: 'Clap back 💅', replyText: 'On my own two feet. My sponsor is called hard work 💅', effect: { meterChanges: { popularity: 4 } }, followerDelta: 450, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'ajegunle_pride', authorHandle: '@ajegunle_pride', avatarType: 'fan', text: 'HARD WORK 🗣️🗣️' }] },
         { id: 'classy', label: 'Stay classy 🙏', replyText: 'Every room I’m in, I earned 🙏', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
+        { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { reputation: 1 } }, followerDelta: 0, aftermath: [] },
+      ],
+    },
+    flirty: {
+      troll: { authorId: 'gidi_paparazzi', authorName: 'lekki_insider', authorHandle: '@lekki_insider', avatarType: 'fan', text: 'Two weeks on the island and she’s already soft-launching a billionaire 🙄' },
+      options: [
+        { id: 'clapback', label: 'Clap back 💅', replyText: 'Who said billionaire? Keep guessing 😘', effect: { meterChanges: { popularity: 4, jealousy: 1 } }, followerDelta: 450, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'vi_gist', authorHandle: '@vi_gist', avatarType: 'fan', text: 'KEEP GUESSING 😭 she’s toying with us' }] },
+        { id: 'classy', label: 'Stay classy 🙏', replyText: 'Some things stay offline 🤍', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
+        { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { reputation: 1 } }, followerDelta: 0, aftermath: [] },
+      ],
+    },
+    mysterious: {
+      troll: { authorId: 'gidi_paparazzi', authorName: 'gidi_paparazzi', authorHandle: '@gidi_paparazzi', avatarType: 'fan', text: 'Vague posting for clout. Either say it or delete it 🥱' },
+      options: [
+        { id: 'clapback', label: 'Clap back 💅', replyText: 'When I say it, you’ll be the first to screenshot 📸', effect: { meterChanges: { popularity: 4, suspicion: 2 } }, followerDelta: 500, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'island_tattle', authorHandle: '@island_tattle', avatarType: 'fan', text: 'She’s cooking something BIG 🍳🫖' }] },
+        { id: 'classy', label: 'Stay classy 🙏', replyText: 'Patience is a whole skill 🙂', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
         { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { reputation: 1 } }, followerDelta: 0, aftermath: [] },
       ],
     },

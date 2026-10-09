@@ -247,7 +247,7 @@ export interface SocialNotification {
 
 /* ------------------------------ Ada's posts ------------------------------ */
 
-export type AdaPostTone = 'humble' | 'shady' | 'flex';
+export type AdaPostTone = 'humble' | 'shady' | 'flex' | 'flirty' | 'mysterious';
 /** Id of the photo from Ada's camera roll (see adaPhotos.ts) */
 export type AdaPhotoKind = string;
 
@@ -265,6 +265,7 @@ export interface AdaPost {
   photoExpression?: Expression;
   tone: AdaPostTone;
   caption: string;
+  captionId?: string;
   likesCount: number;
   followerGain: number;
   comments: SocialComment[];

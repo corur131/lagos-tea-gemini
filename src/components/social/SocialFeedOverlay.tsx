@@ -19,12 +19,11 @@ import { TrendingView } from './TrendingView';
 import { GIDIGRAM_TRENDS, GidiGramTrend } from '../../data/trendData';
 import {
   PhotoOption,
-  TONE_INFO,
-  computeReach,
   buildFallbackComments,
   adaPostToSocialPost,
   getUpdatedAdaPostForScene,
 } from '../../data/adaPosts';
+import { CaptionOption, finalizePost } from '../../data/postEngine';
 import {
   CAST_PROFILES,
   getFollowToggleEffect,
@@ -575,12 +574,24 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   };
 
   // Handle posting a full Ada feed post (influenced by Popularity & followed NPCs)
-  const handlePostAda = (photo: PhotoOption, tone: AdaPostTone, caption: string) => {
+  const handlePostAda = (photo: PhotoOption, tone: AdaPostTone, caption: CaptionOption) => {
     setIsPostingAda(true);
     setTimeout(() => {
       const newPostId = `ada_post_${Date.now()}`;
-      // Reach and likes are dynamically amplified by Popularity AND followed NPCs
-      const reach = computeReach(tone, meters.popularity, unfollowed);
+      const pastPosts = (social || DEFAULT_SOCIAL_STATE).adaPosts || [];
+      // Photo + vibe + caption + story mood + freshness decide how it lands
+      const outcome = finalizePost(
+        {
+          tone,
+          photo,
+          caption,
+          meters,
+          progress: { episode: currentEpisode, sceneIndex: currentSceneIndex, flags },
+          pastPosts,
+          unfollowed,
+        },
+        newPostId
+      );
       // Comments are tailored based on who is followed vs unfollowed and player's story choices
       const comments = buildFallbackComments(tone, meters, flags, newPostId, unfollowed);
 
@@ -595,9 +606,10 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         photoExpression: photo.expression,
         bgGradient: photo.bgGradient,
         tone,
-        caption,
-        likesCount: reach.likesCount,
-        followerGain: reach.followerGain,
+        caption: caption.text,
+        captionId: caption.id,
+        likesCount: outcome.likesCount,
+        followerGain: outcome.followerGain,
         comments,
       };
 
@@ -613,19 +625,20 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         onUpdateSocial((prev) => ({
           ...prev,
           adaPosts: [newAdaPost, ...(prev.adaPosts || [])],
-          followerBonus: (prev.followerBonus || 0) + reach.followerGain,
+          followerBonus: (prev.followerBonus || 0) + outcome.followerGain,
         }));
       }
 
-      const toneEffect = TONE_INFO[tone].effect;
-      if (onUpdateMeters && toneEffect.meterChanges) {
-        onUpdateMeters(toneEffect.meterChanges);
+      if (onUpdateMeters && Object.keys(outcome.meterChanges).length > 0) {
+        onUpdateMeters(outcome.meterChanges);
       }
 
       setIsPostingAda(false);
       setShowPostComposerModal(false);
       if (soundEnabled) playSound.phoneChime();
-      showToast(`Post published! ~${formatCount(reach.likesCount)} likes & ${comments.length} comments rolling in! 📸✨`);
+      showToast(
+        `Post published! +${formatCount(outcome.followerGain)} followers · ${formatCount(outcome.likesCount)} likes · ${comments.length} comments 📸✨`
+      );
     }, 450);
   };
 
@@ -1296,7 +1309,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
                 episode={currentEpisode}
                 sceneIndex={currentSceneIndex}
                 flags={flags}
-                alreadyPostedThisEpisode={false}
+                pastPosts={(social || DEFAULT_SOCIAL_STATE).adaPosts || []}
                 isPosting={isPostingAda}
                 soundEnabled={soundEnabled}
                 unfollowed={unfollowed}

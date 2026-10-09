@@ -1,4 +1,4 @@
-import { Expression, HeroineCustomization, LocationType, OutfitId } from '../types/vn';
+import { Expression, HeroineCustomization, LocationType, Meters, OutfitId } from '../types/vn';
 import { Unlockable } from '../types/socialFeed';
 import { isUnlocked } from './socialRules';
 
@@ -24,6 +24,8 @@ export interface PhotoOption {
   outfit?: OutfitId;
   /** Object shots show this instead of Ada */
   emoji?: string;
+  /** Extra consequences of posting this exact photo (e.g. who it makes jealous) */
+  effect?: Partial<Meters>;
 }
 
 interface StoryPhoto extends Unlockable, PhotoOption {}
@@ -78,15 +80,15 @@ export const STORY_PHOTOS: StoryPhoto[] = [
   { kind: 'ep1_thrift_dress', label: '₦4,500 thrifted dress, styled like Paris 🖤', bgGradient: 'from-neutral-500 via-neutral-800 to-black', tags: ['authentic', 'glam', 'hustle'], expression: 'flirty', outfit: 'party_dress', unlockEpisode: 1, unlockSceneIndex: 2, requiredFlag: 'vintage_style_dress' },
   { kind: 'ep1_party_arrival', label: 'Arriving at Zee’s Banana Island party ✨', bgGradient: 'from-amber-400 via-rose-700 to-neutral-950', tags: ['luxury', 'glam'], expression: 'happy', outfit: 'party_dress', unlockEpisode: 1, unlockSceneIndex: 3 },
   { kind: 'ep1_lagoon_terrace', label: 'Lagoon view from the pool terrace 🌊', bgGradient: 'from-sky-600 via-indigo-800 to-neutral-950', tags: ['luxury', 'glam'], expression: 'neutral', outfit: 'party_dress', unlockEpisode: 1, unlockSceneIndex: 4 },
-  { kind: 'ep1_chidi_candid', label: 'The candid Chidi snapped of me 📸', bgGradient: 'from-blue-600 via-cyan-800 to-neutral-950', tags: ['romance', 'authentic'], expression: 'happy', outfit: 'party_dress', unlockEpisode: 1, unlockSceneIndex: 4, requiredAnyFlags: ['flirted_with_chidi', 'bantered_with_chidi'] },
-  { kind: 'ep1_champagne', label: 'Champagne flute against the lagoon lights 🥂', bgGradient: 'from-amber-500 via-pink-700 to-neutral-950', tags: ['luxury', 'romance'], emoji: '🥂', unlockEpisode: 1, unlockSceneIndex: 5, requiredAnyFlags: ['locked_eyes_kelvin', 'challenged_kelvin'] },
+  { kind: 'ep1_chidi_candid', label: 'The candid Chidi snapped of me 📸', bgGradient: 'from-blue-600 via-cyan-800 to-neutral-950', tags: ['romance', 'authentic'], effect: { romanceChidi: 3 }, expression: 'happy', outfit: 'party_dress', unlockEpisode: 1, unlockSceneIndex: 4, requiredAnyFlags: ['flirted_with_chidi', 'bantered_with_chidi'] },
+  { kind: 'ep1_champagne', label: 'Champagne flute against the lagoon lights 🥂', bgGradient: 'from-amber-500 via-pink-700 to-neutral-950', tags: ['luxury', 'romance'], effect: { romanceKelvin: 2 }, emoji: '🥂', unlockEpisode: 1, unlockSceneIndex: 5, requiredAnyFlags: ['locked_eyes_kelvin', 'challenged_kelvin'] },
 
   /* ---------------- Episode 2 ---------------- */
   { kind: 'ep2_campus_walk', label: 'Head-high walk past the palm trees 🌴', bgGradient: 'from-emerald-600 via-sky-800 to-neutral-950', tags: ['authentic', 'hustle'], expression: 'neutral', outfit: 'casual', unlockEpisode: 2, unlockSceneIndex: 0 },
   { kind: 'ep2_comment_receipts', label: 'Screenshot of the burner account’s comment 🧾', bgGradient: 'from-rose-700 via-neutral-900 to-black', tags: ['scandal', 'mystery'], emoji: '🧾', unlockEpisode: 2, unlockSceneIndex: 0, requiredFlag: 'investigated_comments' },
   { kind: 'ep2_coffee_lounge', label: 'Iced latte at the campus coffee lounge ☕', bgGradient: 'from-amber-800 via-stone-800 to-neutral-950', tags: ['authentic'], expression: 'happy', outfit: 'casual', unlockEpisode: 2, unlockSceneIndex: 1 },
-  { kind: 'ep2_studio_malt', label: 'Cold malt at Chidi’s photo studio 🎞️', bgGradient: 'from-neutral-300 via-neutral-600 to-neutral-950', tags: ['romance', 'hustle'], emoji: '🎞️', unlockEpisode: 2, unlockSceneIndex: 2 },
-  { kind: 'ep2_porsche', label: 'Selfie in Kelvin’s Porsche 🏎️', bgGradient: 'from-neutral-800 via-amber-900 to-black', tags: ['luxury', 'romance', 'scandal'], expression: 'flirty', outfit: 'casual', unlockEpisode: 2, unlockSceneIndex: 3, requiredFlag: 'drove_with_kelvin' },
+  { kind: 'ep2_studio_malt', label: 'Cold malt at Chidi’s photo studio 🎞️', bgGradient: 'from-neutral-300 via-neutral-600 to-neutral-950', tags: ['romance', 'hustle'], effect: { romanceChidi: 2 }, emoji: '🎞️', unlockEpisode: 2, unlockSceneIndex: 2 },
+  { kind: 'ep2_porsche', label: 'Selfie in Kelvin’s Porsche 🏎️', bgGradient: 'from-neutral-800 via-amber-900 to-black', tags: ['luxury', 'romance', 'scandal'], effect: { romanceKelvin: 3, romanceChidi: -2 }, expression: 'flirty', outfit: 'casual', unlockEpisode: 2, unlockSceneIndex: 3, requiredFlag: 'drove_with_kelvin' },
   { kind: 'ep2_shuttle', label: 'Campus shuttle. Still that girl 🚌', bgGradient: 'from-yellow-500 via-emerald-800 to-neutral-950', tags: ['authentic', 'roots'], expression: 'happy', outfit: 'casual', unlockEpisode: 2, unlockSceneIndex: 3, requiredFlag: 'refused_kelvin_ride' },
   { kind: 'ep2_palms', label: 'Window shopping at The Palms 🛍️', bgGradient: 'from-sky-500 via-indigo-700 to-neutral-950', tags: ['luxury', 'glam'], expression: 'happy', unlockEpisode: 2, unlockSceneIndex: 4 },
   { kind: 'ep2_vi_rooftop', label: 'VI skyline from the rooftop lounge 🌃', bgGradient: 'from-indigo-700 via-fuchsia-800 to-neutral-950', tags: ['glam', 'luxury'], expression: 'neutral', outfit: 'party_dress', unlockEpisode: 2, unlockSceneIndex: 5 },
@@ -96,8 +98,8 @@ export const STORY_PHOTOS: StoryPhoto[] = [
   { kind: 'ep3_new_suite', label: 'My new suite in the Content House 🏡', bgGradient: 'from-rose-400 via-amber-700 to-neutral-950', tags: ['luxury', 'glam'], expression: 'happy', unlockEpisode: 3, unlockSceneIndex: 0 },
   { kind: 'ep3_ring_lights', label: 'Behind the ring lights with the girls 💡', bgGradient: 'from-pink-400 via-purple-700 to-neutral-950', tags: ['glam', 'hustle'], expression: 'flirty', unlockEpisode: 3, unlockSceneIndex: 1 },
   { kind: 'ep3_beach_shoot', label: 'Ilashe beach shoot, golden hour 🏖️', bgGradient: 'from-cyan-400 via-teal-700 to-neutral-950', tags: ['glam', 'luxury'], expression: 'happy', unlockEpisode: 3, unlockSceneIndex: 2 },
-  { kind: 'ep3_cabana_hands', label: 'Two hands on the cabana railing 🤍', bgGradient: 'from-sky-300 via-blue-700 to-neutral-950', tags: ['romance', 'scandal'], emoji: '🤍', unlockEpisode: 3, unlockSceneIndex: 2, requiredFlag: 'chidi_romantic_moment' },
-  { kind: 'ep3_villa_study', label: 'Late night in the villa study 🥃', bgGradient: 'from-amber-900 via-stone-900 to-black', tags: ['mystery', 'luxury'], emoji: '🥃', unlockEpisode: 3, unlockSceneIndex: 3 },
+  { kind: 'ep3_cabana_hands', label: 'Two hands on the cabana railing 🤍', bgGradient: 'from-sky-300 via-blue-700 to-neutral-950', tags: ['romance', 'scandal'], effect: { romanceChidi: 4, romanceKelvin: -2 }, emoji: '🤍', unlockEpisode: 3, unlockSceneIndex: 2, requiredFlag: 'chidi_romantic_moment' },
+  { kind: 'ep3_villa_study', label: 'Late night in the villa study 🥃', bgGradient: 'from-amber-900 via-stone-900 to-black', tags: ['mystery', 'luxury'], effect: { romanceKelvin: 2 }, emoji: '🥃', unlockEpisode: 3, unlockSceneIndex: 3 },
   { kind: 'ep3_pantry_tea', label: 'Midnight peppermint tea ☕', bgGradient: 'from-emerald-800 via-stone-900 to-black', tags: ['mystery', 'authentic'], emoji: '🍵', unlockEpisode: 3, unlockSceneIndex: 4, requiredFlag: 'stepped_out_hauwa' },
   { kind: 'ep3_archive_door', label: 'Blurry shot of a locked archive room 👀', bgGradient: 'from-neutral-800 via-rose-950 to-black', tags: ['scandal', 'mystery'], emoji: '🚪', unlockEpisode: 3, unlockSceneIndex: 5, requiredFlag: 'photographed_tea_phone' },
 ];
@@ -134,7 +136,7 @@ export function getPhotoOptions(
         STORY_PHOTOS.indexOf(a) - STORY_PHOTOS.indexOf(b)
     )
     .slice(0, MAX_STORY_PHOTOS)
-    .map(({ kind, label, bgGradient, tags, expression, outfit, emoji }) => ({ kind, label, bgGradient, tags, expression, outfit, emoji }));
+    .map(({ kind, label, bgGradient, tags, expression, outfit, emoji, effect }) => ({ kind, label, bgGradient, tags, expression, outfit, emoji, effect }));
 
   const everyday: PhotoOption[] = [
     {
