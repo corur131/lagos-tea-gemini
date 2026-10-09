@@ -103,6 +103,12 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
     { id: 'party_dress', label: 'Banana Island VIP', desc: 'Emerald couture evening dress' },
     { id: 'hoodie', label: 'Late Night Hoodie', desc: 'Street hoodie & cozy fit' },
     { id: 'native_lace', label: 'Rich Aunty Cord Lace', desc: 'Opulent regal cord lace' },
+    { id: 'bubu_kaftan', label: 'Owambe Bubu', desc: 'Flowing damask bubu, gold embroidery' },
+    { id: 'adire_shirt', label: 'Adire Camp Shirt', desc: 'Hand-dyed indigo adire, open collar' },
+    { id: 'aso_oke', label: 'Aso-Oke Off-Shoulder', desc: 'Hand-woven wine and gold stripes' },
+    { id: 'denim_jacket', label: 'Denim & Tank', desc: 'Washed denim jacket over a white tank' },
+    { id: 'corset_top', label: 'Satin Corset', desc: 'Wine satin sweetheart corset' },
+    { id: 'athleisure', label: 'Track Half-Zip', desc: 'Sporty half-zip with stripes' },
   ];
 
   const earringsList: { id: EarringsId; label: string }[] = [

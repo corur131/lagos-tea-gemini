@@ -93,14 +93,14 @@ export function getNpcLook(id: GirlId, moment: StoryMoment = {}): { look: Heroin
     look.outfit = id === 'hauwa' ? 'native_lace' : 'party_dress';
     look.necklace = id === 'chi' ? 'pendant' : look.necklace;
   } else if (loc === 'university_campus') {
-    look.outfit = ({ zee: 'corporate', tamara: 'casual', chi: 'corporate', bisola: 'hoodie', hauwa: 'native_lace' } as const)[id];
+    look.outfit = ({ zee: 'corporate', tamara: 'adire_shirt', chi: 'corporate', bisola: 'athleisure', hauwa: 'bubu_kaftan' } as const)[id];
   } else if (loc === 'mall') {
-    look.outfit = ({ zee: 'party_dress', tamara: 'ankara', chi: 'corporate', bisola: 'casual', hauwa: 'native_lace' } as const)[id];
+    look.outfit = ({ zee: 'corset_top', tamara: 'ankara', chi: 'denim_jacket', bisola: 'casual', hauwa: 'native_lace' } as const)[id];
   } else if (loc === 'beach_house') {
-    look.outfit = ({ zee: 'party_dress', tamara: 'ankara', chi: 'casual', bisola: 'party_dress', hauwa: 'native_lace' } as const)[id];
+    look.outfit = ({ zee: 'party_dress', tamara: 'aso_oke', chi: 'casual', bisola: 'party_dress', hauwa: 'bubu_kaftan' } as const)[id];
   } else if (loc === 'banana_island_mansion' && episode >= 3) {
     // Content House at home
-    look.outfit = ({ zee: 'corporate', tamara: 'ankara', chi: 'casual', bisola: 'hoodie', hauwa: 'native_lace' } as const)[id];
+    look.outfit = ({ zee: 'corporate', tamara: 'ankara', chi: 'adire_shirt', bisola: 'hoodie', hauwa: 'bubu_kaftan' } as const)[id];
   } else if (loc === 'night_street') {
     look.outfit = id === 'hauwa' ? 'native_lace' : 'hoodie';
   }

@@ -12,6 +12,8 @@ import {
   BLUSH_COLORS,
 } from './palettes';
 import type { FaceProfile, HeadShape } from './npcLooks';
+import { HairBack, HairFront, makeInk } from './art/HairArt';
+import { OutfitArt } from './art/OutfitArt';
 
 interface HeroineSvgProps {
   customization: HeroineCustomization;
@@ -104,6 +106,8 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
   }, [isTalking, reduceMotion]);
 
   const uniqueId = `heroine_${customization.skinTone}_${customization.hairColor}_${customization.lipColor}`;
+  const hairId = `${uniqueId}_${customization.hairstyle}`;
+  const hairInk = makeInk(hair, skin.shadowColor);
 
   // Eye gaze offset calculation
   let gazeDx = 0;
@@ -477,408 +481,6 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
     }
   };
 
-  // Laid baby hairs along the forehead hairline
-  const renderBabyHairs = () => (
-    <g id="baby_hairs" opacity="0.9">
-      <path d="M 116 126 C 119 133, 125 133, 129 127" stroke={hair.primary} strokeWidth="1.6" strokeLinecap="round" fill="none" />
-      <path d="M 136 118 C 141 123, 147 123, 150 118" stroke={hair.primary} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <path d="M 170 118 C 173 123, 179 123, 184 118" stroke={hair.primary} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <path d="M 191 127 C 195 133, 201 133, 204 126" stroke={hair.primary} strokeWidth="1.6" strokeLinecap="round" fill="none" />
-    </g>
-  );
-
-  // Crown shine highlight across the top of skull
-  const renderCrownHighlight = (ry = 12) => (
-    <g id="crown_highlight">
-      <ellipse cx="160" cy="46" rx="44" ry={ry} fill={hair.accent} opacity="0.42" />
-      <ellipse cx="160" cy="42" rx="26" ry={ry * 0.55} fill="#FFFFFF" opacity="0.25" />
-    </g>
-  );
-
-  // Hairstyles: complete skull coverage (at least 6% above skull, past temples), natural hairline & baby hairs
-  const renderHairstyle = () => {
-    switch (customization.hairstyle) {
-      case 'knotless_braids':
-        return (
-          <g id="hair_knotless_braids">
-            {/* Front cap fully covers top of skull up to y=22 and past temples (x=86 to 234) */}
-            <path
-              d="M 86 128 C 86 24, 120 22, 160 22 C 200 22, 234 24, 234 128 C 234 146, 226 165, 218 178 C 210 156, 202 136, 192 116 C 170 108, 150 108, 128 116 C 118 136, 110 156, 102 178 C 94 165, 86 146, 86 128 Z"
-              fill={hair.primary}
-            />
-            {renderCrownHighlight(12)}
-            {renderBabyHairs()}
-            {/* Individual Knotless Braid Strands framing face outside eye boundaries */}
-            {[
-              { d: "M 86 150 C 80 205, 74 270, 72 390", w: 5.5 },
-              { d: "M 94 145 C 88 210, 84 280, 82 390", w: 6 },
-              { d: "M 102 140 C 98 205, 94 280, 92 390", w: 6 },
-              { d: "M 234 150 C 240 205, 246 270, 248 390", w: 5.5 },
-              { d: "M 226 145 C 232 210, 236 280, 238 390", w: 6 },
-              { d: "M 218 140 C 222 205, 226 280, 228 390", w: 6 },
-            ].map((braid, i) => (
-              <g key={`b_${i}`}>
-                <path d={braid.d} stroke={hair.primary} strokeWidth={braid.w} strokeLinecap="round" fill="none" />
-                <path d={braid.d} stroke={hair.accent} strokeWidth={braid.w * 0.4} strokeDasharray="3 3" fill="none" opacity="0.8" />
-              </g>
-            ))}
-            <rect x="79" y="235" width="6" height="5" rx="1" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-            <rect x="235" y="245" width="6" height="5" rx="1" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-          </g>
-        );
-
-      case 'box_braids':
-        return (
-          <g id="hair_box_braids">
-            {/* Front cap fully covers skull up to y=22 and past temples */}
-            <path
-              d="M 86 128 C 86 24, 120 22, 160 22 C 200 22, 234 24, 234 128 C 234 150, 228 178, 220 196 C 212 176, 204 142, 194 116 C 172 108, 148 108, 126 116 C 116 142, 108 176, 100 196 C 92 178, 86 150, 86 128 Z"
-              fill={hair.primary}
-            />
-            {renderCrownHighlight(12)}
-            {renderBabyHairs()}
-            {/* Box braid scalp division lines */}
-            <line x1="160" y1="28" x2="160" y2="114" stroke={hair.accent} strokeWidth="1.2" opacity="0.45" />
-            <line x1="120" y1="68" x2="200" y2="68" stroke={hair.accent} strokeWidth="1" opacity="0.35" />
-            {[
-              { d: "M 92 165 C 80 225, 72 295, 68 390", w: 7 },
-              { d: "M 104 155 C 94 225, 88 300, 84 390", w: 7.5 },
-              { d: "M 228 165 C 240 225, 248 295, 252 390", w: 7 },
-              { d: "M 216 155 C 226 225, 232 300, 236 390", w: 7.5 },
-            ].map((braid, i) => (
-              <g key={`box_${i}`}>
-                <path d={braid.d} stroke={hair.primary} strokeWidth={braid.w} strokeLinecap="round" fill="none" />
-                <path d={braid.d} stroke={hair.accent} strokeWidth={braid.w * 0.4} strokeDasharray="4 3" fill="none" opacity="0.8" />
-              </g>
-            ))}
-            <circle cx="76" cy="260" r="3.5" fill="none" stroke="#FFD700" strokeWidth="1.5" />
-            <circle cx="244" cy="260" r="3.5" fill="none" stroke="#FFD700" strokeWidth="1.5" />
-          </g>
-        );
-
-      case 'cornrows':
-        return (
-          <g id="hair_cornrows">
-            {/* Front cap fully covers skull up to y=22 and past temples */}
-            <path
-              d="M 86 128 C 86 24, 120 22, 160 22 C 200 22, 234 24, 234 128 C 234 148, 224 170, 214 182 C 206 156, 198 138, 188 116 C 168 110, 152 110, 132 116 C 122 138, 114 156, 106 182 C 96 170, 86 148, 86 128 Z"
-              fill={hair.primary}
-            />
-            {renderCrownHighlight(11)}
-            {renderBabyHairs()}
-            {/* Sleek Row Tracks going up over crown */}
-            {[
-              "M 160 116 C 160 85, 160 55, 160 26",
-              "M 144 118 C 142 90, 138 60, 134 30",
-              "M 130 122 C 126 95, 118 68, 110 40",
-              "M 176 118 C 178 90, 182 60, 186 30",
-              "M 190 122 C 194 95, 202 68, 210 40",
-            ].map((track, i) => (
-              <path key={`cr_${i}`} d={track} stroke={hair.accent} strokeWidth="3" strokeDasharray="3 2" fill="none" />
-            ))}
-            <path d="M 96 160 C 88 215, 82 280, 78 360" stroke={hair.primary} strokeWidth="5.5" strokeLinecap="round" fill="none" />
-            <path d="M 224 160 C 232 215, 238 280, 242 360" stroke={hair.primary} strokeWidth="5.5" strokeLinecap="round" fill="none" />
-          </g>
-        );
-
-      case 'natural_afro':
-        return (
-          <g id="hair_natural_afro">
-            {/* Voluminous Afro Crown extends well above skull up to y=6 and wide across temples */}
-            <path
-              d="M 76 158 C 42 130, 32 70, 64 24 C 96 -14, 224 -14, 256 24 C 288 70, 278 130, 244 158 C 242 182, 222 200, 206 188 C 194 152, 186 132, 172 116 C 148 116, 132 132, 118 188 C 102 200, 78 182, 76 158 Z"
-              fill={hair.primary}
-            />
-            {renderBabyHairs()}
-            {/* Luminous Curls & Depth */}
-            <circle cx="86" cy="74" r="34" fill={hair.accent} opacity="0.4" />
-            <circle cx="160" cy="22" r="42" fill={hair.accent} opacity="0.45" />
-            <circle cx="234" cy="74" r="34" fill={hair.accent} opacity="0.4" />
-            <ellipse cx="160" cy="18" rx="52" ry="16" fill="#FFFFFF" opacity="0.22" />
-          </g>
-        );
-
-      case 'bantu_knots':
-        return (
-          <g id="hair_bantu_knots">
-            {/* Base skull cap covers skull up to y=22 and past temples */}
-            <path
-              d="M 86 128 C 86 24, 120 22, 160 22 C 200 22, 234 24, 234 128 C 234 150, 224 170, 216 180 C 204 156, 196 138, 188 116 C 168 110, 152 110, 132 116 C 124 138, 116 156, 104 180 C 96 170, 86 150, 86 128 Z"
-              fill={hair.primary}
-            />
-            {renderCrownHighlight(12)}
-            {renderBabyHairs()}
-            {/* Sculpted Knots */}
-            {[
-              { x: 160, y: 28, r: 16 },
-              { x: 120, y: 44, r: 15 },
-              { x: 200, y: 44, r: 15 },
-              { x: 92, y: 84, r: 14 },
-              { x: 228, y: 84, r: 14 },
-              { x: 132, y: 88, r: 15 },
-              { x: 188, y: 88, r: 15 },
-            ].map((k, idx) => (
-              <g key={`knot_${idx}`}>
-                <circle cx={k.x} cy={k.y} r={k.r} fill={hair.primary} stroke={hair.accent} strokeWidth="1.8" />
-                <circle cx={k.x} cy={k.y} r={k.r * 0.6} fill={hair.accent} opacity="0.6" />
-              </g>
-            ))}
-          </g>
-        );
-
-      case 'long_straight_wig':
-        return (
-          <g id="hair_long_straight">
-            {/* Lace Front Skull Cap: covers crown cleanly and frames upper forehead */}
-            <path
-              d="M 84 126 C 84 22, 120 20, 160 20 C 200 20, 236 22, 236 126 C 224 126, 192 112, 160 106 C 128 112, 96 126, 84 126 Z"
-              fill={hair.primary}
-            />
-            {/* Center Part Line */}
-            <line x1="160" y1="22" x2="160" y2="106" stroke={hair.accent} strokeWidth="1.2" opacity="0.6" />
-            {renderCrownHighlight(13)}
-            {renderBabyHairs()}
-
-            {/* Left Sleek Front Tress: frames side of face and falls over shoulder, leaves face open */}
-            <path
-              d="M 84 126 C 80 180, 74 270, 70 420 L 104 420 C 102 270, 100 180, 96 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 88 160 C 86 230, 84 310, 82 400" stroke={hair.accent} strokeWidth="2.5" fill="none" opacity="0.6" />
-            <path d="M 96 180 C 94 250, 92 330, 90 410" stroke="#FFFFFF" strokeWidth="1" fill="none" opacity="0.25" />
-
-            {/* Right Sleek Front Tress: frames right side of face and falls over shoulder */}
-            <path
-              d="M 224 126 C 220 180, 218 270, 216 420 L 250 420 C 246 270, 240 180, 236 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 232 160 C 234 230, 236 310, 238 400" stroke={hair.accent} strokeWidth="2.5" fill="none" opacity="0.6" />
-            <path d="M 224 180 C 226 250, 228 330, 230 410" stroke="#FFFFFF" strokeWidth="1" fill="none" opacity="0.25" />
-          </g>
-        );
-
-      case 'body_wave_wig':
-        return (
-          <g id="hair_body_wave">
-            {/* Lace Front Cap with natural curved hairline */}
-            <path
-              d="M 82 126 C 80 20, 118 18, 160 18 C 202 18, 238 20, 238 126 C 224 126, 192 110, 160 106 C 128 110, 96 126, 82 126 Z"
-              fill={hair.primary}
-            />
-            {/* Center Part */}
-            <line x1="160" y1="20" x2="160" y2="106" stroke={hair.accent} strokeWidth="1.2" opacity="0.55" />
-            {renderCrownHighlight(14)}
-            {renderBabyHairs()}
-
-            {/* Left Voluminous Body Wave Falls */}
-            <path
-              d="M 82 126 C 72 170, 84 220, 68 270 C 56 320, 74 370, 64 420 L 106 420 C 104 365, 96 315, 102 265 C 102 210, 96 160, 96 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 76 175 Q 86 215 74 255 Q 64 295 80 345 Q 70 385 76 415" stroke={hair.accent} strokeWidth="4.5" fill="none" opacity="0.75" />
-            <path d="M 82 220 Q 94 255 86 295" stroke="#FFFFFF" strokeWidth="1.4" fill="none" opacity="0.3" />
-
-            {/* Right Voluminous Body Wave Falls */}
-            <path
-              d="M 224 126 C 224 160, 218 210, 218 265 C 224 315, 216 365, 214 420 L 256 420 C 246 370, 264 320, 252 270 C 236 220, 248 170, 238 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 244 175 Q 234 215 246 255 Q 256 295 240 345 Q 250 385 244 415" stroke={hair.accent} strokeWidth="4.5" fill="none" opacity="0.75" />
-            <path d="M 238 220 Q 226 255 234 295" stroke="#FFFFFF" strokeWidth="1.4" fill="none" opacity="0.3" />
-          </g>
-        );
-
-      case 'bob_wig':
-        return (
-          <g id="hair_bob_wig">
-            {/* Sleek Blunt Bob Cap */}
-            <path
-              d="M 82 126 C 82 22, 120 20, 160 20 C 200 20, 238 22, 238 126 C 224 126, 192 112, 160 108 C 128 112, 96 126, 82 126 Z"
-              fill={hair.primary}
-            />
-            {/* Center Part */}
-            <line x1="160" y1="22" x2="160" y2="108" stroke={hair.accent} strokeWidth="1.2" opacity="0.6" />
-            {renderCrownHighlight(12)}
-            {renderBabyHairs()}
-
-            {/* Left Sleek Bob Wing: frames jawline cleanly, leaves face fully open */}
-            <path
-              d="M 82 126 C 76 160, 72 205, 78 250 C 86 254, 98 254, 104 246 C 102 205, 98 160, 96 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 76 195 Q 92 200 102 195" stroke={hair.accent} strokeWidth="3" fill="none" opacity="0.65" />
-
-            {/* Right Sleek Bob Wing: frames jawline cleanly, leaves face fully open */}
-            <path
-              d="M 224 126 C 222 160, 218 205, 216 246 C 222 254, 234 254, 242 250 C 248 205, 244 160, 238 126 Z"
-              fill={hair.primary}
-            />
-            <path d="M 218 195 Q 228 200 244 195" stroke={hair.accent} strokeWidth="3" fill="none" opacity="0.65" />
-          </g>
-        );
-
-      case 'curly_wig':
-        return (
-          <g id="hair_curly_wig">
-            {/* Curly Wig Cap with natural hairline */}
-            <path
-              d="M 80 126 C 68 65, 92 16, 160 16 C 228 16, 252 65, 240 126 C 224 126, 194 112, 160 108 C 126 112, 96 126, 80 126 Z"
-              fill={hair.primary}
-            />
-            {renderCrownHighlight(14)}
-            {renderBabyHairs()}
-
-            {/* Left Bouncy Curly Clusters */}
-            <g id="curls_left">
-              <path
-                d="M 80 126 C 68 170, 60 240, 64 420 L 106 420 C 104 350, 96 240, 96 126 Z"
-                fill={hair.primary}
-              />
-              {[
-                { cx: 78, cy: 165, r: 12 },
-                { cx: 72, cy: 210, r: 13 },
-                { cx: 76, cy: 255, r: 12.5 },
-                { cx: 70, cy: 300, r: 13 },
-                { cx: 76, cy: 350, r: 13.5 },
-                { cx: 72, cy: 395, r: 13 },
-              ].map((c, i) => (
-                <circle key={`lc_${i}`} cx={c.cx} cy={c.cy} r={c.r} stroke={hair.accent} strokeWidth="3" fill="none" opacity="0.75" />
-              ))}
-            </g>
-
-            {/* Right Bouncy Curly Clusters */}
-            <g id="curls_right">
-              <path
-                d="M 224 126 C 224 240, 216 350, 214 420 L 256 420 C 260 240, 252 170, 240 126 Z"
-                fill={hair.primary}
-              />
-              {[
-                { cx: 242, cy: 165, r: 12 },
-                { cx: 248, cy: 210, r: 13 },
-                { cx: 244, cy: 255, r: 12.5 },
-                { cx: 250, cy: 300, r: 13 },
-                { cx: 244, cy: 350, r: 13.5 },
-                { cx: 248, cy: 395, r: 13 },
-              ].map((c, i) => (
-                <circle key={`rc_${i}`} cx={c.cx} cy={c.cy} r={c.r} stroke={hair.accent} strokeWidth="3" fill="none" opacity="0.75" />
-              ))}
-            </g>
-          </g>
-        );
-
-      case 'deep_wave_wig':
-        return (
-          <g id="hair_deep_wave">
-            {/* Deep Wave Cap with natural hairline */}
-            <path
-              d="M 82 126 C 82 22, 120 20, 160 20 C 200 20, 238 22, 238 126 C 224 126, 192 112, 160 108 C 128 112, 96 126, 82 126 Z"
-              fill={hair.primary}
-            />
-            {/* Center Part */}
-            <line x1="160" y1="22" x2="160" y2="108" stroke={hair.accent} strokeWidth="1.2" opacity="0.55" />
-            {renderCrownHighlight(13)}
-            {renderBabyHairs()}
-
-            {/* Left Deep Wave Ripples */}
-            <g id="deep_wave_left">
-              <path
-                d="M 82 126 C 76 170, 70 260, 68 420 L 104 420 C 102 260, 98 170, 96 126 Z"
-                fill={hair.primary}
-              />
-              {[155, 190, 225, 260, 295, 330, 365, 400].map((y) => (
-                <path key={`dw_l_${y}`} d={`M 76 ${y} Q 88 ${y + 8} 76 ${y + 16}`} stroke={hair.accent} strokeWidth="4" fill="none" opacity="0.8" />
-              ))}
-            </g>
-
-            {/* Right Deep Wave Ripples */}
-            <g id="deep_wave_right">
-              <path
-                d="M 224 126 C 222 170, 218 260, 216 420 L 252 420 C 250 260, 244 170, 238 126 Z"
-                fill={hair.primary}
-              />
-              {[155, 190, 225, 260, 295, 330, 365, 400].map((y) => (
-                <path key={`dw_r_${y}`} d={`M 244 ${y} Q 232 ${y + 8} 244 ${y + 16}`} stroke={hair.accent} strokeWidth="4" fill="none" opacity="0.8" />
-              ))}
-            </g>
-          </g>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  // Outfits: grounded waist-up, filling the bottom frame
-  const renderOutfit = () => {
-    switch (customization.outfit) {
-      case 'casual':
-        return (
-          <g id="outfit_casual">
-            <path d="M 116 265 Q 160 295 204 265 L 232 315 L 254 420 L 66 420 L 88 315 Z" fill="#1E3A5F" />
-            <path d="M 120 305 Q 160 328 200 305" stroke="#0F1E33" strokeWidth="2.5" fill="none" opacity="0.4" />
-            <text x="160" y="338" fill="#F8FAFC" fontSize="12" fontWeight="bold" textAnchor="middle" letterSpacing="3">
-              LAU
-            </text>
-          </g>
-        );
-
-      case 'corporate':
-        return (
-          <g id="outfit_corporate">
-            <path d="M 132 258 L 188 258 L 176 335 L 144 335 Z" fill="#F8FAFC" />
-            <path d="M 102 262 L 132 340 L 88 420 L 56 420 L 74 300 Z" fill="#1E293B" />
-            <path d="M 218 262 L 188 340 L 232 420 L 264 420 L 246 300 Z" fill="#1E293B" />
-            <path d="M 102 262 L 144 340 L 136 340 L 96 275 Z" fill="#0F172A" />
-            <path d="M 218 262 L 176 340 L 184 340 L 224 275 Z" fill="#0F172A" />
-          </g>
-        );
-
-      case 'ankara':
-        return (
-          <g id="outfit_ankara">
-            <path d="M 118 262 C 136 278, 148 278, 160 270 C 172 278, 184 278, 202 262 L 238 310 L 256 420 L 64 420 L 82 310 Z" fill="#D97706" />
-            <circle cx="120" cy="345" r="16" fill="#DC2626" />
-            <circle cx="200" cy="345" r="16" fill="#DC2626" />
-            <circle cx="160" cy="385" r="18" fill="#1E40AF" />
-            <path d="M 90 330 Q 160 365 230 330" stroke="#FDE047" strokeWidth="3" fill="none" opacity="0.8" />
-          </g>
-        );
-
-      case 'party_dress':
-        return (
-          <g id="outfit_party">
-            <line x1="126" y1="255" x2="126" y2="276" stroke="#D1D5DB" strokeWidth="1.8" />
-            <line x1="194" y1="255" x2="194" y2="276" stroke="#D1D5DB" strokeWidth="1.8" />
-            <path d="M 120 276 Q 160 295 200 276 L 226 330 L 246 420 L 74 420 L 94 330 Z" fill="#064E3B" />
-            <path d="M 128 310 Q 160 326 192 310" stroke="#34D399" strokeWidth="3" fill="none" opacity="0.65" />
-          </g>
-        );
-
-      case 'hoodie':
-        return (
-          <g id="outfit_hoodie">
-            <path d="M 108 258 Q 160 290 212 258 L 240 320 L 258 420 L 62 420 L 80 320 Z" fill="#B45309" />
-            <path d="M 120 254 C 138 288, 182 288, 200 254 Z" fill="#92400E" />
-            <line x1="148" y1="280" x2="148" y2="318" stroke="#FEF3C7" strokeWidth="2.5" strokeLinecap="round" />
-            <line x1="172" y1="280" x2="172" y2="312" stroke="#FEF3C7" strokeWidth="2.5" strokeLinecap="round" />
-          </g>
-        );
-
-      case 'native_lace':
-        return (
-          <g id="outfit_native_lace">
-            <path d="M 114 262 Q 160 286 206 262 L 236 320 L 256 420 L 64 420 L 84 320 Z" fill="#7E22CE" />
-            {[118, 132, 146, 160, 174, 188, 202].map((x) => (
-              <circle key={`l_${x}`} cx={x} cy="274" r="4.5" fill="none" stroke="#FDE047" strokeWidth="1.4" />
-            ))}
-          </g>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   const renderEarrings = () => {
     switch (customization.earrings) {
       case 'studs':
@@ -957,73 +559,7 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       </defs>
 
       {/* Back layer hair behind head and neck */}
-      {(() => {
-        switch (customization.hairstyle) {
-          case 'natural_afro':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 72 160 C 38 130, 26 70, 60 20 C 94 -16, 226 -16, 260 20 C 294 70, 282 130, 248 160 C 246 220, 220 280, 210 320 L 110 320 C 100 280, 74 220, 72 160 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          case 'bob_wig':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 80 120 C 80 26, 240 26, 240 120 C 252 170, 252 230, 246 265 L 74 265 C 68 230, 68 170, 80 120 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          case 'cornrows':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 88 90 C 88 24, 232 24, 232 90 C 242 160, 246 270, 248 380 L 72 380 C 74 270, 78 160, 88 90 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          case 'bantu_knots':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 88 90 C 88 24, 232 24, 232 90 C 238 140, 236 180, 230 205 L 90 205 C 84 180, 82 140, 88 90 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          case 'body_wave_wig':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 80 80 C 80 18, 240 18, 240 80 C 265 150, 275 280, 278 420 L 42 420 C 45 280, 55 150, 80 80 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          case 'curly_wig':
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 76 80 C 50 40, 80 14, 160 14 C 240 14, 270 40, 244 80 C 270 160, 278 280, 280 420 L 40 420 C 42 280, 50 160, 76 80 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-          default:
-            return (
-              <g id="back_hair" opacity="0.95">
-                <path
-                  d="M 84 90 C 84 20, 236 20, 236 90 C 254 180, 266 300, 270 420 L 50 420 C 54 300, 66 180, 84 90 Z"
-                  fill={hair.primary}
-                />
-              </g>
-            );
-        }
-      })()}
+      <HairBack style={customization.hairstyle} ink={hairInk} id={hairId} />
 
       {/* Grounded shoulders & bust: fills lower screen down to 420 */}
       <path
@@ -1036,7 +572,7 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       <path d="M 164 260 Q 172 264 194 256" stroke={skin.shadowColor} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.6" />
 
       {/* Outfit */}
-      {renderOutfit()}
+      <OutfitArt outfit={customization.outfit} id={`${uniqueId}_${customization.outfit}`} skin={skin} />
 
       {/* Necklace */}
       {renderNecklace()}
@@ -1135,18 +671,37 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       {renderEarrings()}
 
       {/* Front Hairstyle (Natural seamless hairline, no bands) */}
-      {renderHairstyle()}
+      <HairFront style={customization.hairstyle} ink={hairInk} id={hairId} />
 
       {/* Silk headwrap (turban) over the hair */}
       {face?.headwrap && (
-        <g>
+        <g id="headwrap">
+          <defs>
+            <clipPath id={`${uniqueId}_wrap`}>
+              <path d="M 86 118 C 74 60, 106 14, 160 12 C 214 14, 246 60, 234 118 C 216 100, 194 92, 160 92 C 126 92, 104 100, 86 118 Z" />
+            </clipPath>
+          </defs>
           <path
-            d="M 90 116 C 80 64, 108 22, 160 20 C 212 22, 240 64, 230 116 C 216 98, 196 90, 160 90 C 124 90, 104 98, 90 116 Z"
+            d="M 86 118 C 74 60, 106 14, 160 12 C 214 14, 246 60, 234 118 C 216 100, 194 92, 160 92 C 126 92, 104 100, 86 118 Z"
             fill={face.headwrap}
           />
-          <path d="M 104 92 C 124 70, 196 70, 216 92" stroke="#FFFFFF" strokeOpacity="0.18" strokeWidth="5" fill="none" />
-          <path d="M 98 74 C 126 46, 194 46, 222 74" stroke="#000000" strokeOpacity="0.18" strokeWidth="4" fill="none" />
-          <path d="M 140 24 C 150 44, 170 44, 180 24 C 176 50, 144 50, 140 24 Z" fill={face.headwrap} stroke="#000000" strokeOpacity="0.2" strokeWidth="1.5" />
+          <g clipPath={`url(#${uniqueId}_wrap)`} fill="none" strokeLinecap="round">
+            {/* wrapped layers crossing at the front */}
+            {[0, 1, 2, 3].map((k) => (
+              <g key={k}>
+                <path d={`M ${76 + k * 4} ${112 - k * 22} C ${110 + k * 6} ${80 - k * 20}, ${150} ${70 - k * 16}, ${176 + k * 4} ${40 - k * 10}`} stroke="#000" strokeOpacity="0.22" strokeWidth="5" />
+                <path d={`M ${78 + k * 4} ${108 - k * 22} C ${112 + k * 6} ${76 - k * 20}, ${152} ${66 - k * 16}, ${178 + k * 4} ${36 - k * 10}`} stroke="#FFF" strokeOpacity="0.2" strokeWidth="2" />
+                <path d={`M ${244 - k * 4} ${112 - k * 22} C ${210 - k * 6} ${80 - k * 20}, ${170} ${70 - k * 16}, ${144 - k * 4} ${40 - k * 10}`} stroke="#000" strokeOpacity="0.16" strokeWidth="4" />
+              </g>
+            ))}
+            <rect x="70" y="10" width="180" height="110" fill="#000" opacity="0.06" />
+            <path d="M 88 116 C 106 98, 130 92, 160 92 C 190 92, 214 98, 232 116" stroke="#000" strokeOpacity="0.3" strokeWidth="5" />
+          </g>
+          {/* fanned knot on top */}
+          <path d="M 136 26 C 132 6, 150 0, 160 14 C 170 0, 188 6, 184 26 C 174 34, 146 34, 136 26 Z" fill={face.headwrap} />
+          <path d="M 140 24 C 140 12, 150 8, 158 18 M 180 24 C 180 12, 170 8, 162 18" stroke="#000" strokeOpacity="0.28" strokeWidth="2" fill="none" />
+          <path d="M 144 20 C 146 12, 152 10, 156 16" stroke="#FFF" strokeOpacity="0.3" strokeWidth="1.4" fill="none" />
+          <ellipse cx="160" cy="24" rx="7" ry="5" fill={face.headwrap} stroke="#000" strokeOpacity="0.3" strokeWidth="1.2" />
         </g>
       )}
     </svg>

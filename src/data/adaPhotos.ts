@@ -59,6 +59,12 @@ const OUTFIT_LABELS: Record<OutfitId, string> = {
   party_dress: 'party dress',
   hoodie: 'cosy hoodie',
   native_lace: 'native lace',
+  bubu_kaftan: 'owambe bubu',
+  adire_shirt: 'adire',
+  aso_oke: 'aso-oke',
+  denim_jacket: 'denim',
+  corset_top: 'satin corset',
+  athleisure: 'track half-zip',
 };
 
 const LOCATION_TAGS: Record<LocationType, PhotoTag[]> = {

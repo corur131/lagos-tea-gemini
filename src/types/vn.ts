@@ -108,7 +108,13 @@ export type OutfitId =
   | 'ankara'
   | 'party_dress'
   | 'hoodie'
-  | 'native_lace';
+  | 'native_lace'
+  | 'bubu_kaftan'
+  | 'adire_shirt'
+  | 'aso_oke'
+  | 'denim_jacket'
+  | 'corset_top'
+  | 'athleisure';
 
 export type EarringsId = 'none' | 'studs' | 'hoops' | 'drops';
 
