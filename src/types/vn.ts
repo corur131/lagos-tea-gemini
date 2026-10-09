@@ -193,6 +193,10 @@ export interface DialogueLine {
   text: string;
   sfx?: 'tap' | 'suspense' | 'suspenseSting' | 'shock' | 'gasp' | 'heartbeat' | 'thunder' | 'chime';
   musicMood?: MusicMood;
+  /** Only shown when this story flag has been set by an earlier choice */
+  ifFlag?: string;
+  /** Hidden when this story flag has been set by an earlier choice */
+  ifNotFlag?: string;
 }
 
 export interface Meters {
@@ -217,6 +221,8 @@ export interface ChoiceOption {
   nextSceneId?: string;
   nextSceneIndex?: number;
   nextEpisode?: number;
+  /** Lines that play right after this choice, in the same scene, before the story moves on */
+  followUp?: DialogueLine[];
 }
 
 export interface SceneData {
@@ -235,6 +241,8 @@ export interface SceneData {
     description: string;
     type: 'revelation' | 'danger' | 'clue';
   };
+  /** Set on generated follow-up scenes: which scene + choice this follow-up belongs to */
+  afterChoice?: { sceneId: string; choiceId: string };
 }
 
 export type CulpritId = 'zee' | 'tamara' | 'chi' | 'bisola' | 'hauwa';

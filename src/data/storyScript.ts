@@ -740,6 +740,7 @@ export const EPISODE_2_SCENES: SceneData[] = [
       {
         speaker: 'heroine',
         text: '“Did you find something in your raw camera files, Chidi?”',
+        ifNotFlag: 'chidi_archive_alliance',
       },
       {
         speaker: 'chidi',
@@ -1549,7 +1550,7 @@ export const EPISODE_3_SCENES: SceneData[] = [
       },
       {
         speaker: 'heroine',
-        text: 'End of Episode 3. The trap has snapped shut.',
+        text: 'The trap had snapped shut. Whoever was on the other side of that door had a key, and I was out of places to hide.',
       },
     ],
     choices: [

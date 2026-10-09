@@ -10,6 +10,7 @@ import {
   DialogueLine,
   InventoryItem,
   EndingType,
+  ChoiceOption,
   CulpritId,
   CulpritMotive,
   MysterySecret,
@@ -24,6 +25,13 @@ import { EndingScreen } from './components/vn/EndingScreen';
 import { MusicPlayerModal } from './components/vn/MusicPlayerModal';
 import { SocialFeedOverlay } from './components/social/SocialFeedOverlay';
 import { CANONICAL_STORY, EPISODE_METAS } from './data/storyScript';
+import {
+  getFollowUpLines,
+  buildFollowUpScene,
+  findFollowUpScene,
+  followUpSceneId,
+  applyFlagLines,
+} from './data/choiceFollowUps';
 import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
 import { countUnreadDms } from './components/social/DmInbox';
@@ -259,42 +267,35 @@ export default function App() {
   );
 
   // Current Scene: hand-written scenes always win; Gemini scenes only fill episodes/scenes with no hand-written version
+  const allKnownScenes = useMemo(() => [...CANONICAL_STORY, ...Object.values(dynamicScenes)], [dynamicScenes]);
+  const findAnyScene = useCallback(
+    (sceneId: string) => allKnownScenes.find((s) => s.id === sceneId),
+    [allKnownScenes]
+  );
+
   const rawBaseScene: SceneData =
+    (gameState.currentSceneId ? findFollowUpScene(gameState.currentSceneId, allKnownScenes) : undefined) ||
     findCanonicalScene(gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId) ||
     (gameState.currentSceneId ? dynamicScenes[gameState.currentSceneId] : undefined) ||
     dynamicScenes[`${gameState.currentEpisode}_${gameState.currentSceneIndex}`] ||
     CANONICAL_STORY[0];
 
-  // Open scenes with the previous choice's consequence and any earned follow-through.
+  // Open scenes with the previous choice's consequence, then add callback lines earned by earlier choices.
   const currentScene: SceneData = useMemo(() => {
     const sceneKey = gameState.currentSceneId || `${gameState.currentEpisode}_${gameState.currentSceneIndex}`;
-    const openingLines: DialogueLine[] = [];
+    const withCallbacks = applyFlagLines(rawBaseScene, gameState.flags);
 
     if (lastChoice && lastChoice.sceneKey === sceneKey && lastChoice.consequenceText) {
-      openingLines.push({
-        speaker: 'narrator',
-        text: lastChoice.consequenceText,
-      });
+      return {
+        ...withCallbacks,
+        lines: [{ speaker: 'narrator', text: lastChoice.consequenceText }, ...withCallbacks.lines],
+      };
     }
-
-    // If Ada asked Chidi to check his camera archives, pay that choice off when they meet
-    // in the studio. Other routes still get the shared investigation scene without this line.
-    if (rawBaseScene.id === 'ep2_sc2' && gameState.flags.chidi_archive_alliance) {
-      openingLines.push({
-        speaker: 'chidi',
-        speakerDisplayName: 'Chidi Nwosu',
-        expression: 'serious',
-        text: '“I went through the party archive like you asked. I still can’t identify the person who sent the photo, but the original wide shot confirms it came from the second-floor mezzanine. We have a narrower list of suspects now.”',
-      });
-    }
-
-    if (openingLines.length === 0) return rawBaseScene;
-
-    return {
-      ...rawBaseScene,
-      lines: [...openingLines, ...rawBaseScene.lines],
-    };
+    return withCallbacks;
   }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId, gameState.flags]);
+
+  const isFollowUpScene = !!currentScene.afterChoice;
+  const visibleChoices = currentScene.choices.filter((c) => !c.conditionFlag || gameState.flags[c.conditionFlag]);
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
@@ -442,6 +443,13 @@ export default function App() {
         currentLineIndex: prev.currentLineIndex + 1,
         historyLog: [...prev.historyLog, { speaker: speakerName || 'Narrator', text: currentLine.text }],
       }));
+      return;
+    }
+
+    // End of a choice's follow-up beat: now move on to wherever that choice leads
+    if (currentScene.afterChoice) {
+      if (gameState.soundEnabled) playSound.click();
+      handleContinueAfterFollowUp();
     }
   };
 
@@ -502,97 +510,118 @@ export default function App() {
       bgmManager.setMood(choice.musicMood);
     }
 
-    // Check if this scene has an episode twist
-    if (currentScene.twistMoment) {
-      setActiveTwistModal({
-        title: currentScene.twistMoment.title,
-        description: currentScene.twistMoment.description,
-      });
+    const historyEntry = { speaker: gameState.heroine.name, text: choice.text };
+
+    // 1. The choice has its own follow-up beat: play it in this scene before moving on
+    const followUpScene = getFollowUpLines(choice) ? buildFollowUpScene(currentScene, choice) : undefined;
+    if (followUpScene) {
+      setGameState((prev) => ({
+        ...prev,
+        currentSceneId: followUpSceneId(currentScene.id, choice.id),
+        currentLineIndex: 0,
+        meters: updatedMeters,
+        flags: updatedFlags,
+        inventory: updatedInventory,
+        historyLog: [...prev.historyLog, historyEntry],
+      }));
+      return;
+    }
+
+    // 2. No follow-up: go straight to the next scene, opening with the consequence line
+    moveToNextScene(currentScene, choice, { meters: updatedMeters, flags: updatedFlags, inventory: updatedInventory }, {
+      showConsequence: true,
+      historyEntry,
+    });
+  };
+
+  // After the follow-up lines finish, continue as if the choice had just been made in its original scene
+  const handleContinueAfterFollowUp = () => {
+    const link = currentScene.afterChoice;
+    if (!link) return;
+    const parent = findAnyScene(link.sceneId);
+    const choice = parent?.choices.find((c) => c.id === link.choiceId);
+    if (!parent || !choice) return;
+
+    const lastLineEntry = {
+      speaker: getSpeakerDisplayName(currentLine.speaker) || 'Narrator',
+      text: currentLine.text,
+    };
+    moveToNextScene(parent, choice, { meters: gameState.meters, flags: gameState.flags, inventory: gameState.inventory }, {
+      showConsequence: false,
+      historyEntry: lastLineEntry,
+    });
+  };
+
+  // Works out where a choice leads: next scene, a branch scene, the next episode, or the end of written content
+  const resolveDestination = (
+    fromScene: SceneData,
+    choice: ChoiceOption
+  ): { episode: number; sceneIndex: number; sceneId?: string; newEpisode: boolean } | null => {
+    const isEpisodeFinale = fromScene.id === 'ep1_sc6' || fromScene.id === 'ep2_sc6' || fromScene.id === 'ep3_sc6';
+
+    if (isEpisodeFinale) {
+      if (fromScene.episode >= LAST_EPISODE) return null;
+      const episode = fromScene.episode + 1;
+      return { episode, sceneIndex: 0, sceneId: `ep${episode}_sc0`, newEpisode: true };
+    }
+
+    if (choice.nextSceneId) {
+      const target = findAnyScene(choice.nextSceneId);
+      return target
+        ? { episode: target.episode, sceneIndex: target.sceneIndex, sceneId: target.id, newEpisode: target.episode !== fromScene.episode }
+        : { episode: fromScene.episode, sceneIndex: fromScene.sceneIndex + 1, sceneId: choice.nextSceneId, newEpisode: false };
+    }
+
+    if (choice.nextSceneIndex !== undefined) {
+      const episode = choice.nextEpisode ?? fromScene.episode;
+      const target = CANONICAL_STORY.find((s) => s.episode === episode && s.sceneIndex === choice.nextSceneIndex);
+      return { episode, sceneIndex: choice.nextSceneIndex, sceneId: target?.id, newEpisode: episode !== fromScene.episode };
+    }
+
+    const nextIndex = fromScene.sceneIndex + 1;
+    const target = CANONICAL_STORY.find((s) => s.episode === fromScene.episode && s.sceneIndex === nextIndex);
+    if (target) return { episode: target.episode, sceneIndex: nextIndex, sceneId: target.id, newEpisode: false };
+
+    if (nextIndex >= getSceneCount(fromScene.episode)) {
+      if (fromScene.episode >= LAST_EPISODE) return null;
+      const episode = fromScene.episode + 1;
+      return { episode, sceneIndex: 0, sceneId: `ep${episode}_sc0`, newEpisode: true };
+    }
+    return { episode: fromScene.episode, sceneIndex: nextIndex, newEpisode: false };
+  };
+
+  const moveToNextScene = (
+    fromScene: SceneData,
+    choice: ChoiceOption,
+    base: { meters: GameState['meters']; flags: GameState['flags']; inventory: InventoryItem[] },
+    opts: { showConsequence: boolean; historyEntry: { speaker: string; text: string } }
+  ) => {
+    // Episode twist reveal plays once the scene (and its follow-up) is over
+    if (fromScene.twistMoment) {
+      setActiveTwistModal({ title: fromScene.twistMoment.title, description: fromScene.twistMoment.description });
       if (gameState.soundEnabled) {
         playSound.suspenseSting();
         bgmManager.playStingThenMood('reveal', 'mystery_climax');
       }
     }
 
-    // Determine target destination: explicit nextSceneId / nextSceneIndex vs sequential progression
-    let nextEpisode = gameState.currentEpisode;
-    let nextSceneIndex = gameState.currentSceneIndex + 1;
-    let nextSceneId: string | undefined = undefined;
-
-    // Check if current scene is an episode finale
-    const isEpisodeFinale =
-      currentScene.id === 'ep1_sc6' ||
-      currentScene.id === 'ep2_sc6' ||
-      currentScene.id === 'ep3_sc6';
-
-    if (isEpisodeFinale) {
-      if (nextEpisode >= LAST_EPISODE) {
-        // No more episodes written yet: stop here instead of looping back to Episode 1
-        setGameState((prev) => ({
-          ...prev,
-          meters: updatedMeters,
-          flags: updatedFlags,
-          inventory: updatedInventory,
-          historyLog: [...prev.historyLog, { speaker: gameState.heroine.name, text: choice.text }],
-          reachedEndOfContent: true,
-        }));
-        return;
-      }
-      nextEpisode += 1;
-      nextSceneIndex = 0;
-      nextSceneId = `ep${nextEpisode}_sc0`;
-      setShowRecapModal(true);
-    } else if (choice.nextSceneId) {
-      // 1. Explicit scene destination by ID
-      const targetScene = CANONICAL_STORY.find((s) => s.id === choice.nextSceneId);
-      if (targetScene) {
-        nextEpisode = targetScene.episode;
-        nextSceneIndex = targetScene.sceneIndex;
-        nextSceneId = targetScene.id;
-      } else {
-        nextSceneId = choice.nextSceneId;
-      }
-    } else if (choice.nextSceneIndex !== undefined) {
-      // 2. Explicit scene destination by index
-      nextSceneIndex = choice.nextSceneIndex;
-      nextEpisode = choice.nextEpisode ?? gameState.currentEpisode;
-      const targetScene = CANONICAL_STORY.find(
-        (s) => s.episode === nextEpisode && s.sceneIndex === nextSceneIndex
-      );
-      nextSceneId = targetScene?.id;
-    } else {
-      // 3. Sequential progression: advance to next sequential scene in episode
-      nextEpisode = gameState.currentEpisode;
-      nextSceneIndex = gameState.currentSceneIndex + 1;
-      const targetScene = CANONICAL_STORY.find(
-        (s) => s.episode === nextEpisode && s.sceneIndex === nextSceneIndex
-      );
-      if (targetScene) {
-        nextSceneId = targetScene.id;
-      } else if (nextSceneIndex >= getSceneCount(nextEpisode)) {
-        if (nextEpisode >= LAST_EPISODE) {
-          setGameState((prev) => ({
-            ...prev,
-            meters: updatedMeters,
-            flags: updatedFlags,
-            inventory: updatedInventory,
-            historyLog: [...prev.historyLog, { speaker: gameState.heroine.name, text: choice.text }],
-            reachedEndOfContent: true,
-          }));
-          return;
-        }
-        nextEpisode += 1;
-        nextSceneIndex = 0;
-        nextSceneId = `ep${nextEpisode}_sc0`;
-        setShowRecapModal(true);
-      }
+    const dest = resolveDestination(fromScene, choice);
+    if (!dest) {
+      setGameState((prev) => ({
+        ...prev,
+        ...base,
+        historyLog: [...prev.historyLog, opts.historyEntry],
+        reachedEndOfContent: true,
+      }));
+      return;
     }
 
-    // Save exact choice for next scene's opening line and character reaction
-    const nextSceneKey = nextSceneId || `${nextEpisode}_${nextSceneIndex}`;
+    if (dest.newEpisode) setShowRecapModal(true);
+
+    const nextSceneKey = dest.sceneId || `${dest.episode}_${dest.sceneIndex}`;
     const newLastChoice = {
       text: choice.text,
-      consequenceText: choice.consequenceText,
+      consequenceText: opts.showConsequence ? choice.consequenceText : undefined,
       sceneKey: nextSceneKey,
     };
     setLastChoice(newLastChoice);
@@ -602,22 +631,17 @@ export default function App() {
 
     setGameState((prev) => ({
       ...prev,
-      currentEpisode: nextEpisode,
-      currentSceneIndex: nextSceneIndex,
-      currentSceneId: nextSceneId,
+      currentEpisode: dest.episode,
+      currentSceneIndex: dest.sceneIndex,
+      currentSceneId: dest.sceneId,
       currentLineIndex: 0,
-      meters: updatedMeters,
-      flags: updatedFlags,
-      inventory: updatedInventory,
-      historyLog: [
-        ...prev.historyLog,
-        { speaker: gameState.heroine.name, text: choice.text },
-      ],
+      ...base,
+      historyLog: [...prev.historyLog, opts.historyEntry],
     }));
 
     // Only ask Gemini for scenes that have no hand-written version
-    if (!findCanonicalScene(nextEpisode, nextSceneIndex, nextSceneId)) {
-      triggerGeminiGeneration(nextEpisode, nextSceneIndex, choice.text, updatedMeters, updatedFlags);
+    if (!findCanonicalScene(dest.episode, dest.sceneIndex, dest.sceneId)) {
+      triggerGeminiGeneration(dest.episode, dest.sceneIndex, choice.text, base.meters, base.flags);
     }
   };
 
@@ -1062,7 +1086,7 @@ export default function App() {
             </p>
 
             {/* Advance Prompt Hint */}
-            {!isLastLineOfScene && isTypingComplete && (
+            {(!isLastLineOfScene || isFollowUpScene) && isTypingComplete && (
               <div className="self-end mt-2 flex items-center gap-1 text-[11px] text-amber-400/80 font-medium animate-pulse">
                 <span>Tap to continue</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -1071,7 +1095,7 @@ export default function App() {
           </div>
 
           {/* Choice Selection Grid (Appears on last line of the scene) */}
-          {isLastLineOfScene && isTypingComplete && (
+          {isLastLineOfScene && isTypingComplete && !isFollowUpScene && (
             <div className="mt-4 pt-3.5 border-t border-neutral-800/80 space-y-2.5 animate-in fade-in duration-200">
               <span className="text-[10px] font-mono tracking-widest uppercase text-amber-400/90 block font-bold">
                 CHOOSE YOUR MOVE:
@@ -1079,7 +1103,7 @@ export default function App() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[45vh] overflow-y-auto overscroll-contain">
 
-                {currentScene.choices.map((choice) => (
+                {visibleChoices.map((choice) => (
                   <button
                     key={choice.id}
                     onClick={() => handleSelectChoice(choice.id)}
@@ -1088,11 +1112,6 @@ export default function App() {
                     <span className="text-xs sm:text-sm font-semibold text-neutral-100 group-hover:text-pink-300 transition-colors leading-snug">
                       {choice.text}
                     </span>
-                    {choice.consequenceText && (
-                      <span className="mt-1.5 text-[11px] text-neutral-400 group-hover:text-neutral-300 leading-tight">
-                        {choice.consequenceText}
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
