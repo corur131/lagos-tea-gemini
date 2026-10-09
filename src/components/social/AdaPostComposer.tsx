@@ -12,6 +12,9 @@ interface AdaPostComposerProps {
   meters: Meters;
   location: LocationType;
   episode: number;
+  /** Social progress: current scene index, +1 once its choice is made */
+  sceneIndex?: number;
+  flags?: Record<string, boolean>;
   alreadyPostedThisEpisode: boolean;
   isPosting: boolean;
   soundEnabled: boolean;
@@ -26,13 +29,15 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
   meters,
   location,
   episode,
+  sceneIndex = 0,
+  flags = {},
   alreadyPostedThisEpisode,
   isPosting,
   soundEnabled,
   unfollowed = {},
   onPost,
 }) => {
-  const photos = getPhotoOptions(heroine, location);
+  const photos = getPhotoOptions(heroine, location, { episode, sceneIndex, flags });
   const [photoIdx, setPhotoIdx] = useState(0);
   const [tone, setTone] = useState<AdaPostTone | null>(null);
   const [caption, setCaption] = useState<string | null>(null);
@@ -51,7 +56,7 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
     );
   }
 
-  const photo = photos[photoIdx];
+  const photo = photos[photoIdx] || photos[0];
   const reach = tone ? computeReach(tone, meters.popularity, unfollowed) : null;
 
   return (
@@ -59,6 +64,7 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
       <div>
         <h3 className="font-bold text-sm text-neutral-100">New post</h3>
         <p className="text-[11px] text-neutral-500">One post per episode. Choose wisely, everyone is watching.</p>
+        <p className="text-[10px] text-neutral-600 mt-0.5">New photos appear as the story happens.</p>
       </div>
 
       {/* 1. Photo */}
@@ -77,15 +83,19 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
               }`}
             >
               <div className={`absolute inset-0 bg-gradient-to-tr ${p.bgGradient}`} />
-              <div className="absolute inset-x-0 bottom-6 top-2 pointer-events-none">
+              <div className="absolute inset-x-0 bottom-6 top-2 pointer-events-none flex items-center justify-center">
+                {p.emoji ? (
+                  <span className="text-4xl sm:text-5xl drop-shadow-lg" aria-hidden>{p.emoji}</span>
+                ) : (
                 <HeroineSvg
-                  customization={heroine}
-                  expression={p.kind === 'throwback' ? 'happy' : 'flirty'}
+                  customization={p.outfit ? { ...heroine, outfit: p.outfit } : heroine}
+                  expression={p.expression || 'flirty'}
                   isTalking={false}
                   lookDirection="center"
                   reduceMotion={true}
                   className="w-full h-full"
                 />
+                )}
               </div>
               <span className="absolute inset-x-1 bottom-1 text-[9px] leading-tight text-white font-semibold drop-shadow line-clamp-2">
                 {p.label}

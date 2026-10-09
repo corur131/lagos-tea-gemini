@@ -445,10 +445,19 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
             </div>
 
             <div className="relative w-48 sm:w-56 h-48 sm:h-56 mx-auto flex items-end justify-center pointer-events-none drop-shadow-2xl">
+              {post.graphic.emoji && !post.graphic.characterId && (
+                <span className="text-8xl sm:text-9xl self-center select-none" aria-hidden>
+                  {post.graphic.emoji}
+                </span>
+              )}
               {post.graphic.characterId === 'heroine' && (
                 <HeroineSvg
-                  customization={heroineCustomization}
-                  expression="happy"
+                  customization={
+                    post.graphic.heroineOutfit
+                      ? { ...heroineCustomization, outfit: post.graphic.heroineOutfit }
+                      : heroineCustomization
+                  }
+                  expression={post.graphic.heroineExpression || 'happy'}
                   isTalking={false}
                   lookDirection="center"
                   reduceMotion={true}

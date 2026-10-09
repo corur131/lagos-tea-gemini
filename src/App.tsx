@@ -1337,6 +1337,7 @@ export default function App() {
         <SocialFeedOverlay
           currentEpisode={gameState.currentEpisode}
           currentSceneIndex={socialSceneIndex}
+          currentLocation={currentScene.location}
           heroineCustomization={gameState.heroine}
           meters={gameState.meters}
           inventory={gameState.inventory}

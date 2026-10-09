@@ -1,6 +1,5 @@
 import { HeroineCustomization, LocationType, Meters, OutfitId, CharacterId } from '../types/vn';
 import {
-  AdaPhotoKind,
   AdaPost,
   AdaPostTone,
   CommentWar,
@@ -11,62 +10,9 @@ import {
 import { castComment } from './socialRules';
 import { createLightweightComment } from './gidiUsers';
 
-const LOCATION_LABELS: Record<LocationType, string> = {
-  ajegunle_apartment: 'my little room in Ajegunle',
-  banana_island_mansion: 'the Banana Island mansion',
-  rooftop_party: 'a VI rooftop',
-  mall: 'The Palms',
-  university_campus: 'Lekki Atlantic campus',
-  beach_house: 'Ilashe beach house',
-  photoshoot_studio: 'the photo studio',
-  night_street: 'Lagos at night',
-};
-
-const LOCATION_GRADIENTS: Record<LocationType, string> = {
-  ajegunle_apartment: 'from-amber-600 via-orange-800 to-neutral-950',
-  banana_island_mansion: 'from-amber-500 via-rose-700 to-neutral-950',
-  rooftop_party: 'from-indigo-700 via-fuchsia-800 to-neutral-950',
-  mall: 'from-sky-500 via-indigo-700 to-neutral-950',
-  university_campus: 'from-emerald-600 via-sky-800 to-neutral-950',
-  beach_house: 'from-cyan-400 via-teal-700 to-neutral-950',
-  photoshoot_studio: 'from-neutral-300 via-neutral-600 to-neutral-950',
-  night_street: 'from-violet-900 via-neutral-900 to-black',
-};
-
-const OUTFIT_LABELS: Record<OutfitId, string> = {
-  casual: 'campus casual',
-  corporate: 'boss-girl corporate',
-  ankara: 'Ankara print',
-  party_dress: 'party dress',
-  hoodie: 'cosy hoodie',
-  native_lace: 'native lace',
-};
-
-export interface PhotoOption {
-  kind: AdaPhotoKind;
-  label: string;
-  bgGradient: string;
-}
-
-export function getPhotoOptions(heroine: HeroineCustomization, location: LocationType): PhotoOption[] {
-  return [
-    {
-      kind: 'mirror_selfie',
-      label: `Mirror selfie in my ${OUTFIT_LABELS[heroine.outfit]} fit`,
-      bgGradient: 'from-pink-500 via-purple-700 to-neutral-950',
-    },
-    {
-      kind: 'location',
-      label: `A moment at ${LOCATION_LABELS[location]}`,
-      bgGradient: LOCATION_GRADIENTS[location],
-    },
-    {
-      kind: 'throwback',
-      label: 'Ajegunle throwback, baby photo 💛',
-      bgGradient: 'from-amber-700 via-orange-900 to-neutral-950',
-    },
-  ];
-}
+// Photo library lives in adaPhotos.ts (story-driven camera roll)
+export { getPhotoOptions } from './adaPhotos';
+export type { PhotoOption } from './adaPhotos';
 
 export const TONE_INFO: Record<
   AdaPostTone,
@@ -739,7 +685,10 @@ export function adaPostToSocialPost(post: AdaPost, heroineName: string, isVerifi
     hashtags: [],
     graphic: {
       type: 'luxe_portrait',
-      characterId: 'heroine',
+      characterId: post.photoEmoji ? undefined : 'heroine',
+      emoji: post.photoEmoji,
+      heroineOutfit: post.photoOutfit,
+      heroineExpression: post.photoExpression,
       bgGradient: post.bgGradient,
       badgeLabel: TONE_INFO[post.tone].badge,
       headline: post.photoLabel.toUpperCase(),

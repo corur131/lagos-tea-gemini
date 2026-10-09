@@ -1,4 +1,4 @@
-import { CharacterId, Expression, Meters } from './vn';
+import { CharacterId, Expression, Meters, OutfitId } from './vn';
 
 export type SocialAuthorId = CharacterId | 'lagos_tea' | 'lekki_insider' | 'gidi_paparazzi';
 
@@ -76,6 +76,11 @@ export interface PostGraphic {
   leakSource?: string;
   leakFooterLeft?: string;
   leakFooterRight?: string;
+  /** Object shot: big emoji instead of a character */
+  emoji?: string;
+  /** Overrides for how Ada looks in her own photo */
+  heroineOutfit?: OutfitId;
+  heroineExpression?: Expression;
 }
 
 // Text that changes depending on the player's story choices (first matching flag wins)
@@ -243,7 +248,8 @@ export interface SocialNotification {
 /* ------------------------------ Ada's posts ------------------------------ */
 
 export type AdaPostTone = 'humble' | 'shady' | 'flex';
-export type AdaPhotoKind = 'mirror_selfie' | 'location' | 'throwback';
+/** Id of the photo from Ada's camera roll (see adaPhotos.ts) */
+export type AdaPhotoKind = string;
 
 export interface AdaPost {
   id: string;
@@ -252,6 +258,11 @@ export interface AdaPost {
   photoKind: AdaPhotoKind;
   photoLabel: string;
   bgGradient: string;
+  /** Object shots: emoji shown instead of Ada */
+  photoEmoji?: string;
+  /** Outfit Ada wears in the shot */
+  photoOutfit?: OutfitId;
+  photoExpression?: Expression;
   tone: AdaPostTone;
   caption: string;
   likesCount: number;

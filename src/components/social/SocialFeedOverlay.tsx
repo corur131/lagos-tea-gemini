@@ -7,7 +7,7 @@ import {
   AdaPost,
   AdaPostTone,
 } from '../../types/socialFeed';
-import { HeroineCustomization, Meters, InventoryItem, CharacterId } from '../../types/vn';
+import { HeroineCustomization, Meters, InventoryItem, CharacterId, LocationType } from '../../types/vn';
 import { INITIAL_POSTS, INITIAL_STORIES } from '../../data/socialFeedData';
 import { SocialPostCard } from './SocialPostCard';
 import { SocialAvatar } from './SocialAvatar';
@@ -63,6 +63,8 @@ import { DmThread, DmBeat, DmReplyOption } from '../../types/socialFeed';
 interface SocialFeedOverlayProps {
   currentEpisode: number;
   currentSceneIndex: number;
+  /** Where Ada is in the story right now (for "Right now at…" photos) */
+  currentLocation?: LocationType;
   heroineCustomization: HeroineCustomization;
   meters: Meters;
   inventory: InventoryItem[];
@@ -187,6 +189,7 @@ const CAST_DIRECTORY: Array<{
 export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   currentEpisode,
   currentSceneIndex,
+  currentLocation = 'university_campus',
   heroineCustomization,
   meters,
   inventory,
@@ -587,6 +590,9 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         sceneIndex: currentSceneIndex,
         photoKind: photo.kind,
         photoLabel: photo.label,
+        photoEmoji: photo.emoji,
+        photoOutfit: photo.outfit,
+        photoExpression: photo.expression,
         bgGradient: photo.bgGradient,
         tone,
         caption,
@@ -1286,8 +1292,10 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
               <AdaPostComposer
                 heroine={heroineCustomization}
                 meters={meters}
-                location="banana_island_mansion"
+                location={currentLocation}
                 episode={currentEpisode}
+                sceneIndex={currentSceneIndex}
+                flags={flags}
                 alreadyPostedThisEpisode={false}
                 isPosting={isPostingAda}
                 soundEnabled={soundEnabled}
