@@ -65,6 +65,12 @@ const OUTFIT_LABELS: Record<OutfitId, string> = {
   denim_jacket: 'denim',
   corset_top: 'satin corset',
   athleisure: 'track half-zip',
+  crop_top: 'crop top',
+  baby_tee: 'baby tee',
+  tube_top: 'tube top',
+  jersey_top: 'jersey',
+  halter_top: 'crochet halter',
+  cardigan_set: 'cardigan set',
 };
 
 const LOCATION_TAGS: Record<LocationType, PhotoTag[]> = {

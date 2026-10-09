@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CharacterId, Expression, HeroineCustomization, LocationType } from '../../types/vn';
 import { getNpcLook, NPC_BASE_LOOKS } from './npcLooks';
 import { HeroineSvg } from './HeroineSvg';
+import { MaleAccessory, MaleBody, MaleHairBack, MaleHairFront, MaleLook, MaleOutfit, MaleSkin, getMaleLook } from './art/MaleArt';
 
 /** Episode 1 base looks (kept for older imports); faces & story outfits live in npcLooks.ts */
 export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'hauwa', HeroineCustomization> = NPC_BASE_LOOKS;
@@ -96,6 +97,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
   if (characterId === 'chidi') {
     return (
       <ChidiSvg
+        look={getMaleLook('chidi', { episode, location })}
         expression={expression}
         isBlinking={isBlinking}
         mouthFrame={mouthFrame}
@@ -109,6 +111,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
   if (characterId === 'kelvin') {
     return (
       <KelvinSvg
+        look={getMaleLook('kelvin', { episode, location })}
         expression={expression}
         isBlinking={isBlinking}
         mouthFrame={mouthFrame}
@@ -122,6 +125,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
   if (characterId === 'dayo') {
     return (
       <DayoSvg
+        look={getMaleLook('dayo', { episode, location })}
         expression={expression}
         isBlinking={isBlinking}
         mouthFrame={mouthFrame}
@@ -141,6 +145,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
    fitted dark shirt, clean hairline fade with full crown coverage.
    ========================================================================= */
 interface MalePartProps {
+  look: MaleLook;
   expression: Expression;
   isBlinking: boolean;
   mouthFrame: number;
@@ -156,8 +161,9 @@ const ChidiSvg: React.FC<MalePartProps> = ({
   isBlushing,
   gazeDx,
   className,
+  look,
 }) => {
-  const skin = {
+  const skin: MaleSkin = {
     base: '#6B3919',
     shadow: '#542A12',
     highlight: '#8A4A22',
@@ -277,45 +283,11 @@ const ChidiSvg: React.FC<MalePartProps> = ({
         </radialGradient>
       </defs>
 
-      {/* Back hair layer behind head */}
-      <path
-        d="M 90 90 C 90 20, 230 20, 230 90 C 236 140, 236 195, 234 220 L 86 220 C 84 195, 84 140, 90 90 Z"
-        fill="#141215"
-      />
-
-      {/* Grounded body touching y=420 */}
-      <path
-        d="M 68 320 C 85 275, 118 245, 140 238 L 140 215 L 180 215 L 180 238 C 202 245, 235 275, 252 320 L 268 420 L 52 420 Z"
-        fill="url(#chidi_skin)"
-      />
-
-      {/* Fitted photographer dark shirt */}
-      <path
-        d="M 60 330 C 80 288, 120 255, 140 252 L 140 270 C 150 285, 170 285, 180 270 L 180 252 C 200 255, 240 288, 260 330 L 272 420 L 48 420 Z"
-        fill="#18181B"
-      />
-      {/* V-neck stitch */}
-      <path d="M 142 254 L 160 278 L 178 254" stroke="#27272A" strokeWidth="2" fill="none" />
-
-      {/* Camera Strap across shoulder */}
-      <path
-        d="M 85 285 L 245 420"
-        stroke="#E11D48"
-        strokeWidth="10"
-        strokeLinecap="square"
-        opacity="0.9"
-      />
-      <path
-        d="M 85 285 L 245 420"
-        stroke="#111827"
-        strokeWidth="6"
-        strokeLinecap="square"
-      />
-      {/* Camera brand accent on strap */}
-      <rect x="135" y="325" width="22" height="7" rx="1.5" fill="#F43F5E" transform="rotate(40, 146, 328)" />
-
-      {/* Neck shadow */}
-      <path d="M 140 215 L 180 215 L 174 235 L 146 235 Z" fill={skin.shadow} opacity="0.6" />
+      {/* Hair behind, body, clothes and signature accessory (scene-dependent) */}
+      <MaleHairBack look={look} id={`chidi_${look.hair}_${look.hairColor}`} skin={skin} />
+      <MaleBody skinId="chidi_skin" skin={skin} />
+      <MaleOutfit look={look} id={`chidi_${look.outfit}`} />
+      <MaleAccessory look={look} />
 
       {/* Head shape */}
       <path
@@ -327,21 +299,8 @@ const ChidiSvg: React.FC<MalePartProps> = ({
       <path d="M 98 140 C 88 140, 88 165, 98 165 Z" fill={skin.base} />
       <path d="M 222 140 C 232 140, 232 165, 222 165 Z" fill={skin.base} />
 
-      {/* Hair fade: fully covers top of skull up to y=20, past temples, with crown highlight & edge-up */}
-      <path
-        d="M 88 126 C 88 20, 120 18, 160 18 C 200 18, 232 20, 232 126 C 236 138, 230 150, 220 148 C 214 128, 206 116, 194 114 C 160 114, 150 114, 126 114 C 114 116, 106 128, 100 148 C 90 150, 84 138, 88 126 Z"
-        fill="#141215"
-      />
-      {/* Crown shine highlight */}
-      <ellipse cx="160" cy="50" rx="46" ry="24" fill="url(#chidi_crown_shine)" />
-      {/* Hairline edge-up */}
-      <path
-        d="M 104 135 L 122 120 L 198 120 L 216 135"
-        stroke="#0F0D10"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
+      {/* Hair (scene-dependent) */}
+      <MaleHairFront look={look} id={`chidi_${look.hair}_${look.hairColor}`} skin={skin} />
 
       {/* Beard & Mustache fade */}
       <path
@@ -417,8 +376,9 @@ const KelvinSvg: React.FC<MalePartProps> = ({
   isBlushing,
   gazeDx,
   className,
+  look,
 }) => {
-  const skin = {
+  const skin: MaleSkin = {
     base: '#784320',
     shadow: '#5E3114',
     highlight: '#99582D',
@@ -538,38 +498,11 @@ const KelvinSvg: React.FC<MalePartProps> = ({
         </radialGradient>
       </defs>
 
-      {/* Back hair layer behind head */}
-      <path
-        d="M 90 90 C 90 18, 230 18, 230 90 C 236 140, 236 195, 234 220 L 86 220 C 84 195, 84 140, 90 90 Z"
-        fill="#161214"
-      />
-
-      <path
-        d="M 70 320 C 88 275, 120 245, 140 238 L 140 215 L 180 215 L 180 238 C 200 245, 232 275, 250 320 L 265 420 L 55 420 Z"
-        fill="url(#kelvin_skin)"
-      />
-
-      {/* Tailored crisp open-collar silk/linen cream shirt */}
-      <path
-        d="M 64 330 C 84 285, 122 255, 140 252 L 140 290 L 160 305 L 180 290 L 180 252 C 198 255, 236 285, 256 330 L 270 420 L 50 420 Z"
-        fill="#F5F5F4"
-      />
-      {/* Open collar lapels */}
-      <polygon points="140,252 120,295 145,288" fill="#E7E5E4" stroke="#D6D3D1" strokeWidth="1" />
-      <polygon points="180,252 200,295 175,288" fill="#E7E5E4" stroke="#D6D3D1" strokeWidth="1" />
-
-      {/* Gold Cuban chain necklace */}
-      <path
-        d="M 135 258 Q 160 286 185 258"
-        stroke="#F59E0B"
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="160" cy="275" r="3" fill="#FBBF24" />
-
-      {/* Neck shadow */}
-      <path d="M 140 215 L 180 215 L 174 235 L 146 235 Z" fill={skin.shadow} opacity="0.6" />
+      {/* Hair behind, body, clothes and signature accessory (scene-dependent) */}
+      <MaleHairBack look={look} id={`kelvin_${look.hair}_${look.hairColor}`} skin={skin} />
+      <MaleBody skinId="kelvin_skin" skin={skin} />
+      <MaleOutfit look={look} id={`kelvin_${look.outfit}`} />
+      <MaleAccessory look={look} />
 
       {/* Head shape */}
       <path
@@ -583,42 +516,8 @@ const KelvinSvg: React.FC<MalePartProps> = ({
       {/* Kelvin's diamond ear stud */}
       <circle cx="228" cy="152" r="2.2" fill="#FFFFFF" stroke="#D4D4D8" strokeWidth="0.8" />
 
-      {/* Kelvin's stylish twists/fade covering top of skull up to y=18 */}
-      <g id="kelvin_twists">
-        <path
-          d="M 88 124 C 88 20, 120 18, 160 18 C 200 18, 232 20, 232 124 C 234 136, 226 148, 218 144 C 210 125, 200 112, 188 109 C 160 107, 150 107, 132 109 C 120 112, 110 125, 102 144 C 94 148, 86 136, 88 124 Z"
-          fill="#161214"
-        />
-        <ellipse cx="160" cy="46" rx="44" ry="22" fill="url(#kelvin_crown_shine)" />
-
-        {/* Individual twist textures */}
-        {[
-          { x: 120, y: 70 },
-          { x: 135, y: 55 },
-          { x: 152, y: 48 },
-          { x: 168, y: 48 },
-          { x: 185, y: 55 },
-          { x: 200, y: 70 },
-          { x: 126, y: 92 },
-          { x: 142, y: 80 },
-          { x: 160, y: 72 },
-          { x: 178, y: 80 },
-          { x: 194, y: 92 },
-          { x: 150, y: 98 },
-          { x: 170, y: 98 },
-        ].map((pt, i) => (
-          <ellipse
-            key={`twist_${i}`}
-            cx={pt.x}
-            cy={pt.y}
-            rx="6.5"
-            ry="4.5"
-            fill="#231E21"
-            stroke="#161214"
-            strokeWidth="1.2"
-          />
-        ))}
-      </g>
+      {/* Hair (scene-dependent) */}
+      <MaleHairFront look={look} id={`kelvin_${look.hair}_${look.hairColor}`} skin={skin} />
 
       {/* Clean sculpt beard line */}
       <path
@@ -694,8 +593,9 @@ const DayoSvg: React.FC<MalePartProps> = ({
   isBlushing,
   gazeDx,
   className,
+  look,
 }) => {
-  const skin = {
+  const skin: MaleSkin = {
     base: '#78350F',
     shadow: '#592208',
     highlight: '#92400E',
@@ -776,31 +676,11 @@ const DayoSvg: React.FC<MalePartProps> = ({
         </linearGradient>
       </defs>
 
-      {/* Shoulders / Deep Plum Velvet Producer Jacket */}
-      <path
-        d="M 50 420 L 62 335 C 80 285, 118 252, 160 252 C 202 252, 240 285, 258 335 L 270 420 Z"
-        fill="#2A0845"
-      />
-      {/* Matte Black Turtleneck Inner */}
-      <path
-        d="M 134 250 L 134 285 C 134 296, 186 296, 186 285 L 186 250 Z"
-        fill="#111827"
-      />
-      {/* Studio Monitor Headphones around neck */}
-      <path
-        d="M 108 268 C 112 305, 208 305, 212 268"
-        stroke="#4B5563"
-        strokeWidth="9"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Left headphone ear cup */}
-      <rect x="96" y="246" width="22" height="34" rx="10" fill="#1F2937" stroke="#9CA3AF" strokeWidth="1.5" />
-      {/* Right headphone ear cup */}
-      <rect x="202" y="246" width="22" height="34" rx="10" fill="#1F2937" stroke="#9CA3AF" strokeWidth="1.5" />
-
-      {/* Neck */}
-      <path d="M 142 208 L 178 208 L 174 252 L 146 252 Z" fill="url(#dayo_skin)" />
+      {/* Hair behind, body, clothes and signature accessory (scene-dependent) */}
+      <MaleHairBack look={look} id={`dayo_${look.hair}_${look.hairColor}`} skin={skin} />
+      <MaleBody skinId="dayo_skin" skin={skin} />
+      <MaleOutfit look={look} id={`dayo_${look.outfit}`} />
+      <MaleAccessory look={look} />
 
       {/* Head shape */}
       <path
@@ -812,11 +692,8 @@ const DayoSvg: React.FC<MalePartProps> = ({
       <path d="M 102 138 C 92 138, 92 163, 102 163 Z" fill={skin.base} />
       <path d="M 218 138 C 228 138, 228 163, 218 163 Z" fill={skin.base} />
 
-      {/* Dayo Hair: Clean geometric low fade & short textured curls */}
-      <path
-        d="M 94 124 C 94 26, 122 22, 160 22 C 198 22, 226 26, 226 124 C 228 136, 220 146, 214 142 C 206 122, 198 108, 186 106 C 160 104, 150 104, 134 106 C 122 108, 114 122, 106 142 C 100 146, 92 136, 94 124 Z"
-        fill="#111113"
-      />
+      {/* Hair (scene-dependent) */}
+      <MaleHairFront look={look} id={`dayo_${look.hair}_${look.hairColor}`} skin={skin} />
 
       {/* Goatee & sharp jaw shadow */}
       <path

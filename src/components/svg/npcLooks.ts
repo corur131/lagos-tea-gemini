@@ -77,35 +77,84 @@ export interface StoryMoment {
   location?: LocationType;
 }
 
+/** The kind of scene a location is, for wardrobe and makeup */
+type Vibe = 'party' | 'campus' | 'mall' | 'beach' | 'home' | 'night' | 'studio' | 'everyday';
+
+function vibeOf(loc: LocationType | undefined, episode: number): Vibe {
+  if ((loc === 'banana_island_mansion' && episode === 1) || loc === 'rooftop_party') return 'party';
+  if (loc === 'university_campus') return 'campus';
+  if (loc === 'mall') return 'mall';
+  if (loc === 'beach_house') return 'beach';
+  if (loc === 'banana_island_mansion') return 'home'; // the Content House
+  if (loc === 'night_street') return 'night';
+  if (loc === 'photoshoot_studio') return 'studio';
+  return 'everyday';
+}
+
+type LookChange = Partial<HeroineCustomization> & { headwrap?: string };
+
 /**
- * How a girl looks at this point in the story: party dresses at the party, campus fits on campus,
- * home looks in the Content House, and new hair as the season goes on.
+ * Each girl's wardrobe, hair and makeup per kind of scene. Faces and skin
+ * tones never change; everything here is what she'd swap for the occasion.
+ */
+const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
+  zee: {
+    party: { outfit: 'party_dress', lashes: 'dramatic', eyeshadow: 'gold', lipColor: 'classic_red', lipFinish: 'gloss', earrings: 'drops', necklace: 'pendant' },
+    campus: { outfit: 'corporate', lipColor: 'berry', lipFinish: 'matte', eyeshadow: 'bronze', lashes: 'classic', earrings: 'studs', necklace: 'thin_chain' },
+    mall: { outfit: 'corset_top', lipColor: 'soft_pink', lipFinish: 'gloss', eyeshadow: 'rose', lashes: 'volume', earrings: 'hoops', necklace: 'thin_chain' },
+    beach: { outfit: 'tube_top', hairstyle: 'genie_ponytail', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'volume', earrings: 'hoops', necklace: 'none' },
+    home: { outfit: 'athleisure', lipColor: 'nude', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'natural', blush: 'soft_peach', earrings: 'studs', necklace: 'none' },
+    night: { outfit: 'denim_jacket', lipColor: 'chocolate_brown', lipFinish: 'matte', eyeshadow: 'smoky_black', lashes: 'dramatic', earrings: 'hoops' },
+    studio: { outfit: 'corset_top', hairstyle: 'bangs_wig', lipColor: 'gold', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
+  },
+  tamara: {
+    party: { outfit: 'tube_top', lipColor: 'berry', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
+    campus: { outfit: 'adire_shirt', lipColor: 'nude', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'natural', earrings: 'hoops' },
+    mall: { outfit: 'crop_top', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'bronze', lashes: 'volume', earrings: 'hoops' },
+    beach: { outfit: 'halter_top', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'natural', necklace: 'none' },
+    home: { outfit: 'ankara', lipColor: 'nude', lipFinish: 'matte', eyeshadow: 'none', lashes: 'natural', earrings: 'studs' },
+    night: { outfit: 'hoodie', lipColor: 'plum', lipFinish: 'matte', eyeshadow: 'smoky_black', lashes: 'classic' },
+    studio: { outfit: 'aso_oke', hairstyle: 'water_wave_wig', lipColor: 'gold', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops' },
+  },
+  chi: {
+    party: { outfit: 'party_dress', hairstyle: 'side_part_wig', lipColor: 'classic_red', lipFinish: 'matte', eyeshadow: 'smoky_black', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
+    campus: { outfit: 'corporate' },
+    mall: { outfit: 'denim_jacket', lipColor: 'berry', eyeshadow: 'bronze', earrings: 'hoops' },
+    beach: { outfit: 'casual', hairstyle: 'genie_ponytail', lipColor: 'nude', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'natural', earrings: 'hoops', necklace: 'none' },
+    home: { outfit: 'adire_shirt', lipColor: 'nude', eyeshadow: 'none', lashes: 'natural' },
+    night: { outfit: 'athleisure', lipColor: 'berry', eyeshadow: 'smoky_black' },
+    studio: { outfit: 'cardigan_set', hairstyle: 'side_part_wig', lipColor: 'chocolate_brown', eyeshadow: 'bronze', lashes: 'classic' },
+  },
+  bisola: {
+    party: { outfit: 'halter_top', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'purple', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
+    campus: { outfit: 'baby_tee', hairstyle: 'pixie_wig' },
+    mall: { outfit: 'jersey_top', hairstyle: 'bangs_wig', eyeshadow: 'teal' },
+    beach: { outfit: 'crop_top', hairstyle: 'water_wave_wig', lipColor: 'coral', eyeshadow: 'none', lashes: 'natural', necklace: 'none' },
+    home: { outfit: 'hoodie', lipColor: 'soft_pink', eyeshadow: 'none', lashes: 'natural', earrings: 'studs' },
+    night: { outfit: 'hoodie', lipColor: 'plum', eyeshadow: 'purple' },
+    studio: { outfit: 'baby_tee', hairstyle: 'genie_ponytail', lipColor: 'berry', eyeshadow: 'purple', lashes: 'dramatic' },
+  },
+  hauwa: {
+    party: { outfit: 'native_lace', lipColor: 'chocolate_brown', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'classic', earrings: 'drops', headwrap: '#B7791F' },
+    campus: { outfit: 'bubu_kaftan' },
+    mall: { outfit: 'cardigan_set', headwrap: '#9D174D' },
+    beach: { outfit: 'bubu_kaftan', headwrap: '#0E7490' },
+    home: { outfit: 'bubu_kaftan', lashes: 'natural', eyeshadow: 'none' },
+    night: { outfit: 'native_lace', headwrap: '#1E293B' },
+    studio: { outfit: 'aso_oke', lipColor: 'plum', eyeshadow: 'bronze', lashes: 'classic', headwrap: '#6E1423' },
+  },
+};
+
+/**
+ * How a girl looks at this point in the story: her outfit, hair, makeup and
+ * jewellery follow the scene, and her hair changes as the season goes on.
  */
 export function getNpcLook(id: GirlId, moment: StoryMoment = {}): { look: HeroineCustomization; face: FaceProfile } {
   const episode = moment.episode ?? 1;
-  const loc = moment.location;
   const look: HeroineCustomization = { ...NPC_BASE_LOOKS[id] };
   const face: FaceProfile = { ...NPC_FACES[id] };
 
-  // --- Outfits by place ---
-  const isParty = (loc === 'banana_island_mansion' && episode === 1) || loc === 'rooftop_party';
-  if (isParty) {
-    look.outfit = id === 'hauwa' ? 'native_lace' : 'party_dress';
-    look.necklace = id === 'chi' ? 'pendant' : look.necklace;
-  } else if (loc === 'university_campus') {
-    look.outfit = ({ zee: 'corporate', tamara: 'adire_shirt', chi: 'corporate', bisola: 'athleisure', hauwa: 'bubu_kaftan' } as const)[id];
-  } else if (loc === 'mall') {
-    look.outfit = ({ zee: 'corset_top', tamara: 'ankara', chi: 'denim_jacket', bisola: 'casual', hauwa: 'native_lace' } as const)[id];
-  } else if (loc === 'beach_house') {
-    look.outfit = ({ zee: 'party_dress', tamara: 'aso_oke', chi: 'casual', bisola: 'party_dress', hauwa: 'bubu_kaftan' } as const)[id];
-  } else if (loc === 'banana_island_mansion' && episode >= 3) {
-    // Content House at home
-    look.outfit = ({ zee: 'corporate', tamara: 'ankara', chi: 'adire_shirt', bisola: 'hoodie', hauwa: 'bubu_kaftan' } as const)[id];
-  } else if (loc === 'night_street') {
-    look.outfit = id === 'hauwa' ? 'native_lace' : 'hoodie';
-  }
-
-  // --- Hair and details change over the season ---
+  // --- Hair changes over the season ---
   if (id === 'zee') {
     if (episode === 2) look.hairstyle = 'long_straight_wig';
     if (episode >= 3) {
@@ -116,9 +165,15 @@ export function getNpcLook(id: GirlId, moment: StoryMoment = {}): { look: Heroin
   if (id === 'bisola' && episode >= 2) look.hairColor = 'rose_pink'; // "her pink wig" in Episode 3
   if (id === 'tamara' && episode >= 3) look.hairColor = 'ombre_blonde';
   if (id === 'chi' && episode >= 3) look.lipColor = 'berry';
-  if (id === 'hauwa') {
-    face.headwrap = episode === 1 ? '#B45309' : episode === 2 ? '#0F766E' : '#6B21A8';
-  }
+  if (id === 'hauwa') face.headwrap = episode === 1 ? '#B45309' : episode === 2 ? '#0F766E' : '#6B21A8';
+
+  // --- The scene: outfit, styling, makeup, jewellery ---
+  const vibe = vibeOf(moment.location, episode);
+  const { headwrap, ...change } = SCENE_LOOKS[id][vibe] ?? {};
+  Object.assign(look, change);
+  if (headwrap) face.headwrap = headwrap;
+  // Zee moves from the emerald gown to a corset for later parties
+  if (id === 'zee' && vibe === 'party' && episode >= 2) look.outfit = 'corset_top';
 
   return { look, face };
 }

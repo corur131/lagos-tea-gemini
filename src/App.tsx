@@ -153,6 +153,8 @@ export default function App() {
           heroine: {
             ...DEFAULT_HEROINE,
             ...parsed.heroine,
+            // The story names her Ada; older saves may hold a custom name
+            name: DEFAULT_HEROINE.name,
           },
           meters: calibratedMeters,
           mysterySecret: parsed.mysterySecret || generateNewSecret(),

@@ -11,16 +11,16 @@ import { Pt, f1, shade } from './artKit';
    ========================================================================= */
 
 // ---------- geometry helpers ----------
-const mirrorD = (d: string) => d.replace(/(-?[\d.]+) (-?[\d.]+)/g, (_, x, y) => `${f1(320 - parseFloat(x))} ${y}`);
+export const mirrorD = (d: string) => d.replace(/(-?[\d.]+) (-?[\d.]+)/g, (_, x, y) => `${f1(320 - parseFloat(x))} ${y}`);
 /** Both halves of a symmetric shape, given the left half */
-const both = (d: string) => `${d} ${mirrorD(d)}`;
+export const both = (d: string) => `${d} ${mirrorD(d)}`;
 
 /**
  * One closed outline from a left half that starts at the bottom centre (x=160)
  * and ends at the top centre: the right half is the mirror, walked backwards.
  * Absolute M/L/C/Q commands only.
  */
-const sym = (half: string) => {
+export const sym = (half: string) => {
   const toks = half.replace(/,/g, ' ').trim().split(/\s+/);
   type Seg = { c: string; pts: Pt[] };
   const segs: Seg[] = [];
@@ -56,13 +56,13 @@ const bodiceHalf = (top: string, centerY: number) =>
   `M 160 420 L 99 420 C 100 380, 101 346, 104 322 ${top} L 160 ${f1(centerY)}`;
 
 // ---------- drawing primitives ----------
-const Fold: React.FC<{ d: string; c: string; w?: number; o?: number }> = ({ d, c, w = 2.4, o = 1 }) => (
+export const Fold: React.FC<{ d: string; c: string; w?: number; o?: number }> = ({ d, c, w = 2.4, o = 1 }) => (
   <g fill="none" strokeLinecap="round">
     <path d={d} stroke={shade(c, -0.45)} strokeWidth={w} opacity={0.32 * o} />
     <path d={d} stroke={shade(c, 0.35)} strokeWidth={w * 0.45} opacity={0.38 * o} transform="translate(1.6 0.6)" />
   </g>
 );
-const Folds: React.FC<{ ds: string[]; c: string; w?: number; o?: number }> = ({ ds, c, w, o }) => (
+export const Folds: React.FC<{ ds: string[]; c: string; w?: number; o?: number }> = ({ ds, c, w, o }) => (
   <>
     {ds.map((d, i) => (
       <React.Fragment key={i}>
@@ -72,7 +72,7 @@ const Folds: React.FC<{ ds: string[]; c: string; w?: number; o?: number }> = ({ 
     ))}
   </>
 );
-const Seam: React.FC<{ d: string; c: string; sym?: boolean; o?: number }> = ({ d, c, sym = true, o = 0.7 }) => (
+export const Seam: React.FC<{ d: string; c: string; sym?: boolean; o?: number }> = ({ d, c, sym = true, o = 0.7 }) => (
   <g fill="none" strokeLinecap="round">
     <path d={sym ? both(d) : d} stroke={shade(c, -0.4)} strokeWidth="1.1" opacity={0.35 * o} />
     <path d={sym ? both(d) : d} stroke={shade(c, 0.45)} strokeWidth="0.7" strokeDasharray="1.8 1.6" opacity={o} transform="translate(0.8 0.4)" />
@@ -100,7 +100,7 @@ const ShadeDefs: React.FC<{ id: string }> = ({ id }) => (
  * A garment: clip to its outline, lay the fabric, then shading and details.
  * `fabric` is a colour or a url(#pattern). Children are drawn inside the clip.
  */
-const Garment: React.FC<{
+export const Garment: React.FC<{
   id: string;
   d: string;
   fabric: string;
@@ -123,10 +123,10 @@ const Garment: React.FC<{
     </defs>
     <path d={d} fill={base} />
     <g clipPath={`url(#${id}_clip)`}>
-      {fabric !== base && <rect x="40" y="200" width="240" height="220" fill={fabric} />}
+      {fabric !== base && <rect x="0" y="200" width="320" height="220" fill={fabric} />}
       {children}
-      <rect x="40" y="200" width="240" height="220" fill={`url(#${id}_side)`} />
-      <rect x="40" y="200" width="240" height="220" fill={`url(#${id}_down)`} />
+      <rect x="0" y="200" width="320" height="220" fill={`url(#${id}_side)`} />
+      <rect x="0" y="200" width="320" height="220" fill={`url(#${id}_down)`} />
     </g>
     <path d={d} fill="none" stroke={edge ?? shade(base, -0.5)} strokeWidth="1" opacity="0.55" clipPath={`url(#${id}_noc)`} />
     {over}
@@ -246,7 +246,7 @@ const AsoOkePattern: React.FC<{ id: string }> = ({ id }) => {
   );
 };
 
-const TwillPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => (
+export const TwillPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => (
   <pattern id={id} patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(-40)">
     <rect width="4" height="4" fill={base} />
     <rect width="4" height="1.3" fill={shade(base, 0.18)} />
@@ -254,7 +254,7 @@ const TwillPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => (
   </pattern>
 );
 
-const DamaskPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => {
+export const DamaskPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => {
   const motif = shade(base, 0.16);
   return (
     <pattern id={id} patternUnits="userSpaceOnUse" width="32" height="40">
@@ -270,7 +270,7 @@ const DamaskPattern: React.FC<{ id: string; base: string }> = ({ id, base }) => 
 };
 
 /** Gold embroidery band (scrolls along a path) */
-const Embroidery: React.FC<{ d: string; w?: number }> = ({ d, w = 7 }) => (
+export const Embroidery: React.FC<{ d: string; w?: number }> = ({ d, w = 7 }) => (
   <g fill="none" strokeLinecap="round">
     <path d={d} stroke="#5B3A07" strokeWidth={w + 1.6} opacity="0.55" />
     <path d={d} stroke="#C9971F" strokeWidth={w} />
@@ -280,11 +280,77 @@ const Embroidery: React.FC<{ d: string; w?: number }> = ({ d, w = 7 }) => (
   </g>
 );
 
-const Button: React.FC<{ x: number; y: number; r?: number; c?: string }> = ({ x, y, r = 2.6, c = '#C9A040' }) => (
+export const Button: React.FC<{ x: number; y: number; r?: number; c?: string }> = ({ x, y, r = 2.6, c = '#C9A040' }) => (
   <g>
     <circle cx={x} cy={y + 0.6} r={r} fill="#000" opacity="0.3" />
     <circle cx={x} cy={y} r={r} fill={c} />
     <circle cx={x - r * 0.3} cy={y - r * 0.3} r={r * 0.35} fill="#FFF" opacity="0.6" />
+  </g>
+);
+
+
+// ---------- Gen Z pieces ----------
+export const RibPattern: React.FC<{ id: string; base: string; w?: number }> = ({ id, base, w = 3 }) => (
+  <pattern id={id} patternUnits="userSpaceOnUse" width={w} height="10">
+    <rect width={w} height="10" fill={base} />
+    <rect width={w * 0.35} height="10" fill={shade(base, -0.14)} />
+    <rect x={w * 0.35} width={w * 0.15} height="10" fill={shade(base, 0.12)} />
+  </pattern>
+);
+
+const CrochetPattern: React.FC<{ id: string }> = ({ id }) => (
+  <pattern id={id} patternUnits="userSpaceOnUse" width="20" height="20">
+    <rect width="20" height="20" fill="#F7EBD7" />
+    {/* granny square: rings of colour inside a cream border, with gaps showing skin-dark lining */}
+    <rect x="2" y="2" width="16" height="16" fill="#2E7D5B" />
+    <rect x="4.5" y="4.5" width="11" height="11" fill="#F2B33D" />
+    <rect x="7" y="7" width="6" height="6" fill="#D9486A" />
+    <path d="M 2 2 H 18 V 18 H 2 Z M 4.5 4.5 H 15.5 V 15.5 H 4.5 Z M 7 7 H 13 V 13 H 7 Z" fill="none" stroke="#F7EBD7" strokeWidth="0.9" strokeDasharray="1.4 1" />
+    {[3.2, 10, 16.8].map((x) => [3.2, 10, 16.8].map((y) => <circle key={`${x}_${y}`} cx={x} cy={y} r="0.7" fill="#3A2416" opacity="0.55" />))}
+  </pattern>
+);
+
+const CablePattern: React.FC<{ id: string; base: string }> = ({ id, base }) => (
+  <pattern id={id} patternUnits="userSpaceOnUse" width="16" height="14">
+    <rect width="16" height="14" fill={base} />
+    <rect x="0" width="2" height="14" fill={shade(base, -0.12)} />
+    <rect x="14" width="2" height="14" fill={shade(base, -0.12)} />
+    {/* twisted cable down the middle */}
+    <path d="M 4 0 C 4 4, 12 3, 12 7 C 12 11, 4 10, 4 14 M 12 0 C 12 4, 4 3, 4 7" fill="none" stroke={shade(base, -0.22)} strokeWidth="3.4" />
+    <path d="M 4 0 C 4 4, 12 3, 12 7 C 12 11, 4 10, 4 14 M 12 0 C 12 4, 4 3, 4 7" fill="none" stroke={shade(base, 0.18)} strokeWidth="1.6" />
+  </pattern>
+);
+
+/** High-waisted jeans or cargo waistband for cropped tops */
+const Waistband: React.FC<{ kind: 'jeans' | 'cargo' | 'skirt'; id: string }> = ({ kind, id }) => {
+  const c = kind === 'jeans' ? '#4A6FA5' : kind === 'cargo' ? '#6B6A4B' : '#1F1F24';
+  const stitch = kind === 'jeans' ? '#D6A447' : shade(c, 0.4);
+  const d = 'M 99 394 C 120 390, 140 388, 160 388 C 180 388, 200 390, 221 394 L 224 420 L 96 420 Z';
+  return (
+    <g>
+      <defs>
+        {kind === 'jeans' && <TwillPattern id={`${id}_wb`} base={c} />}
+      </defs>
+      <path d={d} fill={kind === 'jeans' ? `url(#${id}_wb)` : c} />
+      <path d="M 99 394 C 120 390, 140 388, 160 388 C 180 388, 200 390, 221 394" stroke={shade(c, -0.5)} strokeWidth="1.4" fill="none" />
+      <path d="M 99 404 C 120 400, 140 398, 160 398 C 180 398, 200 400, 221 404" stroke={stitch} strokeWidth="0.7" strokeDasharray="1.8 1.4" fill="none" />
+      <path d="M 100 397 C 120 393, 140 391, 160 391 C 180 391, 200 393, 220 397" stroke={stitch} strokeWidth="0.7" strokeDasharray="1.8 1.4" fill="none" />
+      {[120, 200].map((x) => (
+        <rect key={x} x={x - 2} y="389" width="4" height="13" rx="1" fill={shade(c, -0.12)} stroke={stitch} strokeWidth="0.5" />
+      ))}
+      {kind !== 'skirt' && <Button x={160} y={398} r={3} c={kind === 'jeans' ? '#B87333' : '#3F3F46'} />}
+      {kind === 'jeans' && <path d="M 160 402 L 160 420" stroke={shade(c, -0.45)} strokeWidth="1.2" />}
+      {kind === 'skirt' && <path d="M 112 400 L 110 420 M 136 398 L 136 420 M 184 398 L 184 420 M 208 400 L 210 420" stroke="#000" strokeWidth="1.4" opacity="0.4" />}
+    </g>
+  );
+};
+
+/** Bare midriff between a cropped top and the waistband */
+const Midriff: React.FC<{ skin: SkinToneOption }> = ({ skin }) => (
+  <g fill="none" stroke={skin.shadowColor} strokeLinecap="round">
+    <path d="M 160 362 L 160 378" strokeWidth="1.2" opacity="0.35" />
+    <path d="M 157.5 382 Q 160 385 162.5 382" strokeWidth="1.3" opacity="0.6" />
+    <path d={both('M 118 360 C 116 372, 116 382, 118 392')} strokeWidth="2" opacity="0.3" />
   </g>
 );
 
@@ -664,6 +730,168 @@ export function OutfitArt({ outfit, id, skin }: { outfit: OutfitId; id: string; 
           <path d={both('M 132 252 C 136 244, 146 244, 154 250 L 154 264 C 146 262, 138 258, 132 252 Z')} fill={shade(c, 0.08)} stroke={shade(c, -0.5)} strokeWidth="0.8" />
           <rect x="157.8" y="298" width="6" height="11" rx="1.5" fill="#D1D5DB" stroke="#6B7280" strokeWidth="0.6" />
           <circle cx="160.8" cy="306" r="1.2" fill="#6B7280" />
+        </g>
+      );
+    }
+
+    case 'crop_top': {
+      // Fitted ribbed crop tee, scoop neck, high-waisted jeans
+      const c = '#C8A2E8';
+      const pid = `${id}_rib`;
+      const neck = 'C 140 268, 150 274, 160 274';
+      const half = `M 160 364 L 104 364 C 104 350, 104 336, 102 326 L 88 330 C 86 320, 86 312, 88 304 C 96 286, ${110} ${264}, 128 254 ${neck} L 160 274`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <Midriff skin={skin} />
+          <defs>
+            <RibPattern id={pid} base={c} />
+          </defs>
+          <Garment id={id} d={sym(half)} fabric={`url(#${pid})`} base={c}>
+            <Folds c={c} ds={['M 116 340 C 126 350, 140 354, 152 350', 'M 104 334 C 110 340, 114 348, 116 358']} o={0.8} />
+          </Garment>
+          <path d={both('M 128 254 ' + neck)} stroke={shade(c, -0.25)} strokeWidth="3" fill="none" />
+          <path d={both('M 104 364 L 160 364')} stroke={shade(c, -0.3)} strokeWidth="2" />
+          <Waistband kind="jeans" id={id} />
+        </g>
+      );
+    }
+
+    case 'baby_tee': {
+      // Ringer baby tee with a graphic, cropped over low-rise cargos
+      const c = '#FDF2F8';
+      const trim = '#E11D74';
+      const neck = 'C 140 260, 150 264, 160 264';
+      const half = `M 160 372 L 104 372 C 104 356, 104 340, 102 330 L 86 334 C 84 322, 84 312, 87 302 C 95 284, 110 262, 130 252 ${neck} L 160 264`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <Midriff skin={skin} />
+          <Garment id={id} d={sym(half)} fabric={c} base={c} edge={shade(c, -0.35)}>
+            <BodyFolds c={c} sleeves={false} />
+            <Folds c={c} ds={['M 104 346 C 112 354, 118 362, 120 370']} o={0.8} />
+            {/* butterfly graphic */}
+            <g transform="translate(160 324)">
+              <path d="M 0 0 C -6 -14, -22 -14, -20 -2 C -18 6, -6 6, 0 0 C -4 8, -16 14, -14 20 C -10 24, -2 14, 0 4 Z" fill="#F472B6" stroke="#9D174D" strokeWidth="0.8" />
+              <path d="M 0 0 C 6 -14, 22 -14, 20 -2 C 18 6, 6 6, 0 0 C 4 8, 16 14, 14 20 C 10 24, 2 14, 0 4 Z" fill="#F472B6" stroke="#9D174D" strokeWidth="0.8" />
+              <path d="M 0 -6 L 0 16" stroke="#831843" strokeWidth="1.6" strokeLinecap="round" />
+              <circle cx="-11" cy="-4" r="2.2" fill="#FDF2F8" opacity="0.8" />
+              <circle cx="11" cy="-4" r="2.2" fill="#FDF2F8" opacity="0.8" />
+            </g>
+            <text x="160" y="358" fill="#9D174D" fontSize="8" fontWeight="700" textAnchor="middle" letterSpacing="2" fontFamily="sans-serif">
+              GIDI GIRL
+            </text>
+          </Garment>
+          {/* contrast ringer trim on neck and sleeves */}
+          <path d={both('M 130 252 ' + neck)} stroke={trim} strokeWidth="3.2" fill="none" />
+          <path d={both('M 86 334 L 102 330')} stroke={trim} strokeWidth="3" fill="none" />
+          <Waistband kind="cargo" id={id} />
+        </g>
+      );
+    }
+
+    case 'tube_top': {
+      // Ruched satin tube top with low-rise jeans
+      const c = '#E5B53C';
+      const top = 'C 116 316, 134 312, 160 314';
+      const half = `M 160 370 L 104 370 C 104 352, 104 336, 104 322 ${top}`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <Midriff skin={skin} />
+          <Garment id={id} d={sym(half)} fabric={c} base={c}>
+            {/* gathered ruching pulling to the centre */}
+            {[0, 1, 2, 3, 4, 5].map((k) => (
+              <g key={k}>
+                <path d={both(`M ${104 + k * 2} ${f1(320 + k * 9)} Q ${f1(132 + k)} ${f1(330 + k * 8)} 160 ${f1(326 + k * 8)}`)} stroke={shade(c, -0.45)} strokeWidth="2.2" fill="none" opacity="0.45" />
+                <path d={both(`M ${104 + k * 2} ${f1(317 + k * 9)} Q ${f1(132 + k)} ${f1(327 + k * 8)} 160 ${f1(323 + k * 8)}`)} stroke="#FFF4C7" strokeWidth="1" fill="none" opacity="0.6" />
+              </g>
+            ))}
+            <path d="M 160 314 L 160 370" stroke={shade(c, -0.45)} strokeWidth="2" />
+          </Garment>
+          <path d={both('M 104 322 ' + top)} stroke="#FFF4C7" strokeWidth="0.9" fill="none" opacity="0.7" />
+          <Waistband kind="jeans" id={id} />
+        </g>
+      );
+    }
+
+    case 'jersey_top': {
+      // Oversized football jersey: V-neck collar, side panels, number on the chest
+      const c = '#0F8A4E';
+      const white = '#F8FAFC';
+      const neck = 'C 140 262, 150 276, 160 290';
+      const d = sym(sleevedHalf([132, 252], neck, 290));
+      return (
+        <g>
+          <Garment id={id} d={d} fabric={c} base={c}>
+            {/* sublimated chevrons */}
+            {[0, 1, 2, 3, 4].map((k) => (
+              <path key={k} d={both(`M 104 ${300 + k * 22} L 160 ${330 + k * 22}`)} stroke={shade(c, -0.15)} strokeWidth="8" fill="none" opacity="0.6" />
+            ))}
+            <BodyFolds c={c} />
+            {/* side panels and shoulder piping */}
+            <path d={both('M 103 314 C 101 350, 99 390, 99 420')} stroke={white} strokeWidth="5" fill="none" />
+            <path d={both('M 96 292 C 112 278, 124 266, 132 254')} stroke={white} strokeWidth="2" fill="none" />
+            <text x="160" y="362" fill={white} fontSize="34" fontWeight="900" textAnchor="middle" fontFamily="Arial Black, sans-serif" stroke={shade(c, -0.5)} strokeWidth="0.8">
+              10
+            </text>
+            <circle cx="186" cy="312" r="7" fill={white} />
+            <path d="M 182 312 L 186 308 L 190 312 L 186 316 Z" fill={c} />
+            <Seam c={c} d="M 66 410 L 160 412" o={0.5} />
+          </Garment>
+          <path d={both('M 132 252 ' + neck)} stroke={white} strokeWidth="4" fill="none" />
+          <path d={both('M 131 251 ' + neck)} stroke={shade(c, -0.4)} strokeWidth="0.8" fill="none" />
+        </g>
+      );
+    }
+
+    case 'halter_top': {
+      // Crochet halter top: granny squares, straps tied at the neck
+      const pid = `${id}_cro`;
+      const top = 'C 116 312, 128 298, 142 270 L 152 246 L 160 246';
+      const half = `M 160 372 L 104 372 C 104 356, 104 338, 104 324 ${top}`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <Midriff skin={skin} />
+          <defs>
+            <CrochetPattern id={pid} />
+          </defs>
+          <Garment id={id} d={sym(half)} fabric={`url(#${pid})`} base="#F7EBD7" edge="#B08D63">
+            <Folds c="#C9A27A" ds={['M 120 340 C 130 350, 144 354, 156 350']} o={0.7} />
+          </Garment>
+          {/* scalloped hem and tie */}
+          <path d={both('M 104 372 Q 111 378 118 372 Q 125 378 132 372 Q 139 378 146 372 Q 153 378 160 372')} fill="#F7EBD7" stroke="#B08D63" strokeWidth="0.8" />
+          <path d="M 152 246 C 150 238, 170 238, 168 246" stroke="#2E7D5B" strokeWidth="2.4" fill="none" />
+          <Waistband kind="skirt" id={id} />
+        </g>
+      );
+    }
+
+    case 'cardigan_set': {
+      // Cropped cable-knit cardigan, buttoned, with a matching mini skirt
+      const c = '#A7C7A1';
+      const pid = `${id}_cab`;
+      const neck = 'C 140 266, 150 286, 160 304';
+      const half = `M 160 382 L 104 382 C 104 366, 102 350, 101 336 L 82 344 C 76 330, 78 318, 84 306 C 94 284, 112 262, 130 254 ${neck} L 160 304`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <defs>
+            <CablePattern id={pid} base={c} />
+          </defs>
+          <Garment id={id} d={sym(half)} fabric={`url(#${pid})`} base={c}>
+            <BodyFolds c={c} sleeves={false} />
+          </Garment>
+          {/* rib bands: neckline, cuffs, hem */}
+          <path d={both('M 130 254 ' + neck)} stroke={shade(c, -0.18)} strokeWidth="5" fill="none" />
+          <path d={both('M 130 254 ' + neck)} stroke={shade(c, -0.4)} strokeWidth="4" strokeDasharray="0.8 1.4" fill="none" />
+          <path d={both('M 104 382 L 160 382')} stroke={shade(c, -0.18)} strokeWidth="6" />
+          <path d={both('M 82 344 L 101 336')} stroke={shade(c, -0.18)} strokeWidth="6" />
+          {[318, 342, 366].map((y) => (
+            <Button key={y} x={160} y={y} r={2.6} c="#FDF8EC" />
+          ))}
+          <Waistband kind="skirt" id={id} />
         </g>
       );
     }

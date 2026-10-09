@@ -75,7 +75,7 @@ const mirPt = (p: Pt): Pt => [320 - p[0], p[1]];
 const mirCubic = (c: Cubic): Cubic => c.map(mirPt) as Cubic;
 
 // ---------- gradients ----------
-const HairDefs: React.FC<{ id: string; ink: HairInk }> = ({ id, ink }) => {
+export const HairDefs: React.FC<{ id: string; ink: HairInk }> = ({ id, ink }) => {
   const fill = ink.ombre
     ? [[0, ink.base], [0.38, ink.base], [0.7, mix(ink.base, ink.light, 0.75)], [1, ink.light]]
     : [[0, ink.base], [1, shade(ink.base, -0.12)]];
@@ -225,6 +225,58 @@ function ShineRing({ strands, ink, seed, r0 = 0.8, r1 = 0.9 }: { strands: Cubic[
   );
 }
 
+
+/**
+ * Crown with strands flowing from the top of the head down to the hairline
+ * (pulled-back / fringe / pixie looks), or from a side part when partX is set.
+ */
+function FlowCap({ id, ink, seed = 13, partX, tight }: { id: string; ink: HairInk; seed?: number; partX?: number; tight?: boolean }) {
+  const r = rng(seed);
+  const strands: { c: Cubic; tone: number }[] = [];
+  const hl = sampleEvenly(HAIRLINE, 2.4);
+  if (partX === undefined) {
+    hl.forEach(({ p }, i) => {
+      const u = i / (hl.length - 1);
+      const start: Pt = [146 + u * 28 + (r() - 0.5) * 4, 22 + (r() - 0.5) * 4];
+      const dx = p[0] - 160;
+      const c: Cubic = [start, [start[0] + dx * 0.55, 30], [p[0] + dx * 0.25, p[1] - 46], p];
+      strands.push({ c, tone: r() });
+    });
+  } else {
+    // side part: the short side falls left, the heavy side sweeps right across the crown
+    for (let k = 0; k <= 30; k++) {
+      const u = k / 30;
+      const start: Pt = [partX - 0.8, 26 + u * 70];
+      const end: Pt = [84 + u * 34, 154 - u * 34];
+      strands.push({ c: [start, [start[0] - 24, start[1] - 2], [end[0] + 2, end[1] - 50 * (1 - u) - 12], end], tone: r() });
+    }
+    for (let k = 0; k <= 46; k++) {
+      const u = k / 46;
+      const start: Pt = [partX + 0.8, 24 + u * 80];
+      const end: Pt = [238 - u * 66, 156 - u * 40];
+      strands.push({ c: [start, [start[0] + 40, start[1] - 10 + u * 4], [end[0] - 8, end[1] - 70 * (1 - u) - 10], end], tone: r() });
+    }
+  }
+  return (
+    <g clipPath={`url(#${id}_${tight ? 'tcap' : 'cap'})`}>
+      <path d={tight ? CAP_TIGHT : CAP} fill={`url(#${id}_crown)`} />
+      {ink.ombre && <path d={CAP} fill={`url(#${id}_fill)`} opacity="0.5" />}
+      {strands.map(({ c, tone }, i) => (
+        <path
+          key={i}
+          d={cubicPath([c])}
+          fill="none"
+          stroke={tone < 0.5 ? ink.deep : ink.light}
+          strokeWidth={tone < 0.5 ? 0.9 : 0.55}
+          opacity={tone < 0.5 ? 0.4 : 0.32}
+        />
+      ))}
+      <ShineRing strands={strands.map((s) => s.c)} ink={ink} seed={seed + 5} r0={tight ? 0.62 : 0.8} r1={tight ? 0.72 : 0.9} />
+      {partX !== undefined && <path d={`M ${partX} 24 L ${partX + 1.2} 60 L ${partX} 100 L ${partX - 1.2} 60 Z`} fill={ink.scalp} opacity="0.9" />}
+    </g>
+  );
+}
+
 // ---------- falling panels (straight / wavy / bob) ----------
 interface PanelSpec {
   L: (y: number) => number;
@@ -334,7 +386,7 @@ function Panel({ id, ink, spec, k, dim }: { id: string; ink: HairInk; spec: Pane
 }
 
 // ---------- braids ----------
-function Braid({
+export function Braid({
   curves,
   w,
   ink,
@@ -400,7 +452,7 @@ function backBraids(side: 1 | -1, count: number, seed: number, x0 = 62, x1 = 112
 }
 
 // ---------- coils (afro, curls) ----------
-function coilMarks(seed: number, count: number, inside: (p: Pt) => boolean, box: [number, number, number, number], size: [number, number]) {
+export function coilMarks(seed: number, count: number, inside: (p: Pt) => boolean, box: [number, number, number, number], size: [number, number]) {
   const r = rng(seed);
   const dark: string[] = [];
   const lite: string[] = [];
@@ -628,6 +680,41 @@ export function HairBack({ style, ink, id }: HairProps) {
           <Panel id={id} ink={ink} k="b" dim spec={{ L: (y) => 84 - (y - 132) * 0.14, R: (y) => 236 + (y - 132) * 0.14, y0: 132, y1: 420, n: 22, seed: 91, amp: 7, len: 92 }} />
         </g>
       );
+    case 'bangs_wig':
+      return (
+        <g id="back_hair">
+          <HairDefs id={id} ink={ink} />
+          <Panel id={id} ink={ink} k="b" dim spec={{ L: (y) => 86 - (y - 132) * 0.1, R: (y) => 234 + (y - 132) * 0.1, y0: 132, y1: 420, n: 22, seed: 201, shineAt: [300], tipJitter: 6 }} />
+        </g>
+      );
+    case 'side_part_wig':
+      return (
+        <g id="back_hair">
+          <HairDefs id={id} ink={ink} />
+          <Panel id={id} ink={ink} k="b" dim spec={{ L: (y) => 86 - (y - 132) * 0.12, R: (y) => 236 + (y - 132) * 0.16, y0: 132, y1: 410, n: 22, seed: 211, amp: 3, len: 140, shineAt: [280] }} />
+        </g>
+      );
+    case 'water_wave_wig':
+      return (
+        <g id="back_hair">
+          <HairDefs id={id} ink={ink} />
+          <Panel id={id} ink={ink} k="b" dim spec={{ L: (y) => 82 - (y - 132) * 0.16, R: (y) => 238 + (y - 132) * 0.16, y0: 132, y1: 420, n: 24, seed: 221, amp: 6, len: 40 }} />
+        </g>
+      );
+    case 'genie_ponytail':
+      return (
+        <g id="back_hair">
+          <HairDefs id={id} ink={ink} />
+          {/* long sleek tail swinging out behind the right side of the head */}
+          <Panel id={id} ink={ink} k="b" spec={{ L: (y) => 146 + (y - 20) * 0.3, R: (y) => 192 + (y - 20) * 0.25, y0: 20, y1: 400, n: 12, seed: 231, amp: 4, len: 110, shineAt: [140, 280] }} />
+        </g>
+      );
+    case 'pixie_wig':
+      return (
+        <g id="back_hair">
+          <HairDefs id={id} ink={ink} />
+        </g>
+      );
     case 'deep_wave_wig':
       return (
         <g id="back_hair">
@@ -794,6 +881,84 @@ export function HairFront({ style, ink, id }: HairProps) {
           {edges}
         </g>
       );
+
+    case 'bangs_wig': {
+      return (
+        <g id="hair_bangs">
+          <defs>
+            <clipPath id={`${id}_fringe`}>
+              <path d={CAP} />
+              <rect x="100" y="60" width="120" height="76" />
+            </clipPath>
+          </defs>
+          <Panel id={id} ink={ink} k="l" spec={{ L: (y) => 82 - (y - 118) * 0.08, R: (y) => 103 - (y - 118) * 0.02, y0: 118, y1: 420, n: 7, seed: 241, shineAt: [300], tipJitter: 6 }} />
+          <Panel id={id} ink={ink} k="r" spec={{ L: (y) => 217 + (y - 118) * 0.02, R: (y) => 238 + (y - 118) * 0.08, y0: 118, y1: 420, n: 7, seed: 242, shineAt: [300], tipJitter: 6 }} />
+          <FlowCap id={id} ink={ink} seed={243} />
+          {/* blunt fringe sitting just above the brows */}
+          <g clipPath={`url(#${id}_fringe)`}>
+            <Panel id={id} ink={ink} k="f" spec={{ L: () => 92, R: () => 228, y0: 24, y1: 131, n: 22, seed: 244, tipJitter: 3, shineAt: [78] }} />
+          </g>
+        </g>
+      );
+    }
+
+    case 'side_part_wig':
+      return (
+        <g id="hair_side_part">
+          <Panel id={id} ink={ink} k="l" spec={{ L: (y) => 84 - (y - 118) * 0.06, R: (y) => 102 - (y - 118) * 0.01, y0: 118, y1: 400, n: 6, seed: 251, amp: 3, len: 140, shineAt: [250] }} />
+          <Panel id={id} ink={ink} k="r" spec={{ L: (y) => 214 + (y - 118) * 0.04, R: (y) => 242 + (y - 118) * 0.14, y0: 118, y1: 410, n: 10, seed: 252, amp: 3, len: 140, shineAt: [250] }} />
+          <FlowCap id={id} ink={ink} seed={253} partX={128} />
+          {edges}
+          {/* swoop over the right temple */}
+          <path d="M 150 104 C 176 106, 202 116, 214 134 C 218 142, 220 152, 219 162 L 230 160 C 230 130, 206 106, 166 98 Z" fill={`url(#${id}_crown)`} />
+          <path d="M 156 104 C 180 108, 202 118, 212 136 M 164 102 C 188 108, 208 120, 218 140" stroke={ink.shine} strokeWidth="0.9" opacity="0.55" fill="none" />
+        </g>
+      );
+
+    case 'water_wave_wig':
+      return (
+        <g id="hair_water_wave">
+          <Panel id={id} ink={ink} k="l" spec={{ L: (y) => 80 - (y - 118) * 0.14, R: (y) => 104 - (y - 118) * 0.02, y0: 118, y1: 420, n: 9, seed: 261, amp: 6, len: 40 }} />
+          <Panel id={id} ink={ink} k="r" spec={{ L: (y) => 216 + (y - 118) * 0.02, R: (y) => 240 + (y - 118) * 0.14, y0: 118, y1: 420, n: 9, seed: 262, amp: 6, len: 40 }} />
+          <CenterPartCap id={id} ink={ink} seed={263} />
+          {edges}
+        </g>
+      );
+
+    case 'genie_ponytail':
+      return (
+        <g id="hair_genie_ponytail">
+          <FlowCap id={id} ink={ink} seed={271} />
+          {edges}
+          {/* the pony's base, wrapped in a gold cuff, sitting high on the crown */}
+          <path d="M 138 30 C 136 6, 184 6, 182 30 C 176 36, 144 36, 138 30 Z" fill={`url(#${id}_crown)`} />
+          <path d="M 146 14 C 152 8, 166 8, 174 14" stroke={ink.shine} strokeWidth="1.2" fill="none" opacity="0.7" />
+          <rect x="146" y="26" width="28" height="7" rx="3" fill="#D4A72C" stroke="#8A6512" strokeWidth="0.8" />
+          <path d="M 150 29.5 H 170" stroke="#FFF1B8" strokeWidth="0.8" opacity="0.8" />
+        </g>
+      );
+
+    case 'pixie_wig': {
+      // big soft locks swept across the forehead from a short, tapered crown
+      const locks = [
+        'M 112 70 C 106 96, 106 116, 112 132 C 116 120, 124 112, 136 108 C 128 100, 122 86, 112 70 Z',
+        'M 128 52 C 118 80, 120 104, 134 122 C 140 110, 152 104, 166 104 C 152 94, 138 76, 128 52 Z',
+        'M 150 44 C 142 72, 146 96, 164 114 C 172 102, 186 98, 200 100 C 184 88, 162 70, 150 44 Z',
+        'M 176 50 C 172 76, 180 100, 200 116 C 204 108, 212 104, 220 106 C 206 92, 190 74, 176 50 Z',
+      ];
+      return (
+        <g id="hair_pixie">
+          <FlowCap id={id} ink={ink} seed={282} tight />
+          <EdgeFuzz ink={ink} seed={283} />
+          {locks.map((d, i) => (
+            <g key={i}>
+              <path d={d} fill={`url(#${id}_crown)`} stroke={ink.deep} strokeWidth="0.8" />
+              <path d={d} fill="none" stroke={ink.shine} strokeWidth="0.8" opacity="0.45" transform="translate(-1.2 -1.5) scale(1)" />
+            </g>
+          ))}
+        </g>
+      );
+    }
 
     case 'deep_wave_wig':
       return (

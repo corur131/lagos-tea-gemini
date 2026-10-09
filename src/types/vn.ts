@@ -55,7 +55,12 @@ export type HairstyleId =
   | 'body_wave_wig'
   | 'bob_wig'
   | 'curly_wig'
-  | 'deep_wave_wig';
+  | 'deep_wave_wig'
+  | 'bangs_wig'
+  | 'side_part_wig'
+  | 'water_wave_wig'
+  | 'genie_ponytail'
+  | 'pixie_wig';
 
 export type HairColorId =
   | 'jet_black'
@@ -114,7 +119,13 @@ export type OutfitId =
   | 'aso_oke'
   | 'denim_jacket'
   | 'corset_top'
-  | 'athleisure';
+  | 'athleisure'
+  | 'crop_top'
+  | 'baby_tee'
+  | 'tube_top'
+  | 'jersey_top'
+  | 'halter_top'
+  | 'cardigan_set';
 
 export type EarringsId = 'none' | 'studs' | 'hoops' | 'drops';
 

@@ -74,13 +74,18 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
     { id: 'bantu_knots', label: 'Bantu Knots' },
   ];
 
-  // Wigs (5)
+  // Wigs (10)
   const wigHairstyles: { id: HairstyleId; label: string }[] = [
     { id: 'long_straight_wig', label: 'Long Straight Wig' },
     { id: 'body_wave_wig', label: 'Body Wave Wig' },
     { id: 'bob_wig', label: 'Classic Bob Wig' },
     { id: 'curly_wig', label: 'Curly Wig' },
     { id: 'deep_wave_wig', label: 'Deep Wave Wig' },
+    { id: 'bangs_wig', label: 'Bone Straight + Bangs' },
+    { id: 'side_part_wig', label: 'Deep Side Part' },
+    { id: 'water_wave_wig', label: 'Water Wave Wig' },
+    { id: 'genie_ponytail', label: 'Genie Ponytail' },
+    { id: 'pixie_wig', label: 'Pixie Cut Wig' },
   ];
 
   const lashesList: { id: LashesId; label: string; desc: string }[] = [
@@ -109,6 +114,12 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
     { id: 'denim_jacket', label: 'Denim & Tank', desc: 'Washed denim jacket over a white tank' },
     { id: 'corset_top', label: 'Satin Corset', desc: 'Wine satin sweetheart corset' },
     { id: 'athleisure', label: 'Track Half-Zip', desc: 'Sporty half-zip with stripes' },
+    { id: 'crop_top', label: 'Rib Crop Top', desc: 'Lilac rib crop tee & high-waist jeans' },
+    { id: 'baby_tee', label: 'Baby Tee', desc: 'Butterfly ringer tee & low-rise cargos' },
+    { id: 'tube_top', label: 'Gold Tube Top', desc: 'Ruched satin tube & jeans' },
+    { id: 'jersey_top', label: 'Naija Jersey', desc: 'Oversized green football jersey' },
+    { id: 'halter_top', label: 'Crochet Halter', desc: 'Granny-square halter & mini skirt' },
+    { id: 'cardigan_set', label: 'Knit Cardigan Set', desc: 'Cropped cable cardigan & mini' },
   ];
 
   const earringsList: { id: EarringsId; label: string }[] = [
@@ -125,7 +136,12 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
   ];
 
   const handleConfirm = () => {
-    onSave(draft);
+    // Name is fixed by the story; department only chosen at the start
+    onSave({
+      ...draft,
+      name: customization.name,
+      department: isInitialSetup ? draft.department : customization.department,
+    });
     if (onClose) onClose();
   };
 
@@ -217,20 +233,21 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
               <label className="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1.5">
                 Heroine’s Name
               </label>
-              <input
-                type="text"
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                placeholder="Enter heroine name (e.g., Tiwa, Amaka, Zainab)"
-                maxLength={20}
-                className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-neutral-100 focus:outline-none focus:border-amber-500 transition-colors"
-              />
+              <div className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-neutral-200">
+                {draft.name}
+              </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1.5">
                 Department
               </label>
+              {!isInitialSetup ? (
+                <div className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-neutral-200">
+                  {draft.department}
+                  <span className="block text-[10px] text-neutral-500 mt-0.5">Your department is set for the semester.</span>
+                </div>
+              ) : (
               <div className="grid grid-cols-2 gap-2">
                 {departments.map((dept) => (
                   <button
@@ -247,6 +264,7 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
                   </button>
                 ))}
               </div>
+              )}
             </div>
           </div>
         )}
