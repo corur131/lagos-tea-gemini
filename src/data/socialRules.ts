@@ -112,6 +112,28 @@ export function isUnlocked(
   return true;
 }
 
+// What the story has "shown so far": a scene's posts, DMs and follower jumps only appear
+// once that scene has been played, so the feed never spoils what is about to happen.
+export function getRevealedProgress(episode: number, sceneIndex: number) {
+  if (sceneIndex > 0) return { episode, sceneIndex: sceneIndex - 1 };
+  if (episode > 1) return { episode: episode - 1, sceneIndex: 6 };
+  return { episode, sceneIndex: 0 };
+}
+
+export function getThreadTitle(
+  thread: DmThread,
+  episode: number,
+  sceneIndex: number,
+  flags: Record<string, boolean> = {}
+): string {
+  let title = thread.title;
+  thread.renames?.forEach((r) => {
+    const beat = thread.beats.find((b) => b.id === r.afterBeatId);
+    if (beat && isUnlocked(beat, episode, sceneIndex, flags)) title = r.title;
+  });
+  return title;
+}
+
 /* -------------------------------- Effects -------------------------------- */
 
 export function applyMeterChanges(meters: Meters, changes?: Partial<Meters>): Meters {
@@ -395,12 +417,34 @@ export function calculateAdaFollowers(
   return Math.max(100, Math.round(base + popGrowth + repBonus + circleBonus + bonus));
 }
 
+// Viral moments in the story that send thousands of strangers to Ada's page
+export function computeViralBonus(
+  episode: number,
+  sceneIndex: number,
+  flags: Record<string, boolean> = {}
+): number {
+  const reached = (ep: number, sc: number) => hasReached(episode, sceneIndex, ep, sc);
+  let bonus = 0;
+  // The @TheLagosTea leak: "Ajegunle Cinderella" reaches half a million people
+  if (reached(1, 6)) bonus += 4200;
+  if (reached(1, 6) && flags.demanded_leak_answers) bonus += 2600; // the confrontation clip spreads
+  if (reached(1, 6) && flags.kelvin_shield_exit) bonus += 1900; // Kelvin shielding her exit
+  if (reached(1, 6) && flags.chidi_archive_alliance) bonus += 900;
+  if (reached(2, 0) && flags.unbothered_walk) bonus += 2400; // the unbothered campus walk
+  if (reached(2, 4) && flags.drove_with_kelvin) bonus += 3100; // Porsche photo
+  if (reached(2, 4) && flags.refused_kelvin_ride) bonus += 1700; // turned down the Porsche
+  if (reached(2, 6) && (flags.accepted_pa_job || flags.negotiated_pa_terms)) bonus += 3800; // joins the Content House
+  if (reached(3, 5) && (flags.confronted_intruder || flags.held_breath_stealth)) bonus += 2200;
+  return bonus;
+}
+
 export function computeFollowers(
   meters: Meters,
   episode: number,
   sceneIndex: number,
   social: SocialState,
-  followedCount = 9
+  followedCount = 9,
+  flags: Record<string, boolean> = {}
 ) {
   const baseFollowers = calculateAdaFollowers(
     meters.popularity,
@@ -408,8 +452,7 @@ export function computeFollowers(
     followedCount,
     social.followerBonus
   );
-  // The midnight leak brings a sudden surge of curious onlookers
-  const infamy = (episode > 1 || sceneIndex >= 6) ? 220 : 0;
+  const infamy = computeViralBonus(episode, sceneIndex, flags);
   return baseFollowers + infamy;
 }
 
@@ -944,8 +987,8 @@ export function buildNotifications(
       if (!firstIncoming) return;
       const sender =
         thread.isGroup && firstIncoming.from in CAST_PROFILES
-          ? `${CAST_PROFILES[firstIncoming.from as CharacterId].name.split(' ')[0]} in ${thread.title}`
-          : thread.title;
+          ? `${CAST_PROFILES[firstIncoming.from as CharacterId].name.split(' ')[0]} in ${getThreadTitle(thread, episode, sceneIndex, flags)}`
+          : getThreadTitle(thread, episode, sceneIndex, flags);
       list.push({
         id: `dm:${beat.id}`,
         kind: 'dm',

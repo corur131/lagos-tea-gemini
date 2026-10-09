@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CharacterId, Meters, HeroineCustomization } from '../../types/vn';
+import { CharacterId, Meters, HeroineCustomization, RelationshipDeltas } from '../../types/vn';
 import {
   RELATIONSHIP_CHARACTERS,
   calculateRelationship,
@@ -24,6 +24,7 @@ interface RelationshipProfileProps {
   meters: Meters;
   flags: Record<string, boolean>;
   heroine: HeroineCustomization;
+  relationships?: RelationshipDeltas;
   onBackToClues?: () => void;
   onClose: () => void;
   soundEnabled?: boolean;
@@ -33,6 +34,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
   meters,
   flags,
   heroine,
+  relationships = {},
   onBackToClues,
   onClose,
 }) => {
@@ -40,7 +42,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
   const [filterMode, setFilterMode] = useState<'all' | 'romance' | 'squad'>('all');
 
   const selectedChar = RELATIONSHIP_CHARACTERS.find((c) => c.id === selectedCharId) || RELATIONSHIP_CHARACTERS[0];
-  const assessment = calculateRelationship(selectedChar.id, meters, flags, heroine);
+  const assessment = calculateRelationship(selectedChar.id, meters, flags, heroine, relationships);
 
   const filteredList = RELATIONSHIP_CHARACTERS.filter((c) => {
     if (filterMode === 'romance') return c.hasRomance;
@@ -146,7 +148,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
         {/* Left / Top Character Roster */}
         <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 p-2 md:p-3 gap-2">
           {filteredList.map((char) => {
-            const charAssessment = calculateRelationship(char.id, meters, flags, heroine);
+            const charAssessment = calculateRelationship(char.id, meters, flags, heroine, relationships);
             const isSelected = char.id === selectedChar.id;
 
             return (

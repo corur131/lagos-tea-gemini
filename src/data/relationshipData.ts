@@ -1,4 +1,4 @@
-import { CharacterId, Meters, HeroineCustomization } from '../types/vn';
+import { CharacterId, Meters, HeroineCustomization, RelationshipDeltas } from '../types/vn';
 
 export interface CharacterRelationshipInfo {
   id: CharacterId;
@@ -120,7 +120,8 @@ export function calculateRelationship(
   charId: CharacterId,
   meters: Meters,
   flags: Record<string, boolean>,
-  heroine: HeroineCustomization
+  heroine: HeroineCustomization,
+  choiceBonus: RelationshipDeltas = {}
 ): RelationshipAssessment {
   let trust = 50;
   let romance = 0;
@@ -343,6 +344,15 @@ export function calculateRelationship(
       break;
     }
   }
+
+  // Direct effect of the player's choices on this character
+  const choiceShift = choiceBonus[charId] || 0;
+  if (choiceShift >= 6) {
+    influences.unshift('Your recent choices have clearly won them over.');
+  } else if (choiceShift <= -6) {
+    influences.unshift('Your recent choices have hurt how they see you.');
+  }
+  trust += choiceShift;
 
   trust = Math.max(5, Math.min(100, trust));
   romance = Math.max(0, Math.min(100, romance));

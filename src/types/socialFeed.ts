@@ -198,6 +198,8 @@ export interface DmThread {
   avatarEmoji?: string;
   isGroup?: boolean;
   profileId?: CharacterId | 'lagos_tea';
+  // The thread's title changes once the named beat has unlocked
+  renames?: Array<{ afterBeatId: string; title: string }>;
   beats: DmBeat[];
 }
 
@@ -232,8 +234,8 @@ export interface SocialNotification {
 
 /* ------------------------------ Ada's posts ------------------------------ */
 
-export type AdaPostTone = 'humble' | 'shady' | 'flex';
-export type AdaPhotoKind = 'mirror_selfie' | 'location' | 'throwback';
+export type AdaPostTone = 'humble' | 'shady' | 'flex' | 'playful' | 'mystery';
+export type AdaPhotoKind = 'mirror_selfie' | 'location' | 'throwback' | 'story';
 
 export interface AdaPost {
   id: string;

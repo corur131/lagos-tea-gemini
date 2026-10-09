@@ -13,6 +13,7 @@ import {
   CulpritId,
   CulpritMotive,
   MysterySecret,
+  RelationshipDeltas,
 } from './types/vn';
 import { HeroineSvg } from './components/svg/HeroineSvg';
 import { NpcSvg, FEMALE_NPC_PRESETS } from './components/svg/NpcSvg';
@@ -24,7 +25,9 @@ import { EndingScreen } from './components/vn/EndingScreen';
 import { MusicPlayerModal } from './components/vn/MusicPlayerModal';
 import { SocialFeedOverlay } from './components/social/SocialFeedOverlay';
 import { CANONICAL_STORY, EPISODE_METAS } from './data/storyScript';
-import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
+import { CHOICE_REACTIONS } from './data/choiceReactions';
+import { RELATIONSHIP_CHARACTERS } from './data/relationshipData';
+import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges, getRevealedProgress } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
 import { countUnreadDms } from './components/social/DmInbox';
 import { playSound, bgmManager } from './utils/audio';
@@ -47,6 +50,7 @@ import {
   Coffee,
   CheckCircle2,
   MessageSquare,
+  Users,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'lagos_tea_vn_save_v1';
@@ -127,6 +131,7 @@ export default function App() {
           isCluesOpen: false,
           isLogOpen: false,
           isSocialFeedOpen: false,
+          relationships: parsed.relationships || {},
         };
       }
     } catch {
@@ -160,6 +165,7 @@ export default function App() {
       soundEnabled: true,
       ending: null,
       social: DEFAULT_SOCIAL_STATE,
+      relationships: {},
     };
   });
 
@@ -200,14 +206,17 @@ export default function App() {
   const [socialFeedInitialTab, setSocialFeedInitialTab] = useState<'for_you' | 'dms' | 'trending' | 'tea_leaks' | 'cast' | 'profile'>('for_you');
 
   // Total unread DMs count
+  // Feed content only unlocks once the scene that triggers it has been played (no spoilers)
+  const revealed = getRevealedProgress(gameState.currentEpisode, gameState.currentSceneIndex);
+
   const unreadDmCount = useMemo(() => {
     return countUnreadDms(DM_THREADS, {
-      episode: gameState.currentEpisode,
-      sceneIndex: gameState.currentSceneIndex,
+      episode: revealed.episode,
+      sceneIndex: revealed.sceneIndex,
       flags: gameState.flags,
       social: gameState.social,
     });
-  }, [gameState.currentEpisode, gameState.currentSceneIndex, gameState.flags, gameState.social]);
+  }, [revealed.episode, revealed.sceneIndex, gameState.flags, gameState.social]);
 
   // Dynamic Background Music state & modal
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
@@ -255,26 +264,25 @@ export default function App() {
     dynamicScenes[`${gameState.currentEpisode}_${gameState.currentSceneIndex}`] ||
     CANONICAL_STORY[0];
 
-  // Open the scene with a short narration of what the player's last choice led to
-  const currentScene: SceneData = useMemo(() => {
-    const sceneKey = `${gameState.currentEpisode}_${gameState.currentSceneIndex}`;
-    if (!lastChoice || lastChoice.sceneKey !== sceneKey || !lastChoice.consequenceText) {
-      return rawBaseScene;
-    }
+  const currentScene: SceneData = rawBaseScene;
 
-    const consequenceLine: DialogueLine = {
-      speaker: 'narrator',
-      text: lastChoice.consequenceText,
-    };
+  // After a choice, the story plays out its result (in the same scene) before moving on
+  const [reaction, setReaction] = useState<{
+    lines: DialogueLine[];
+    idx: number;
+    deltas: RelationshipDeltas;
+    commit: () => void;
+  } | null>(null);
+  const [relationshipsInitialOpen, setRelationshipsInitialOpen] = useState(false);
 
-    return {
-      ...rawBaseScene,
-      lines: [consequenceLine, ...rawBaseScene.lines],
-    };
-  }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex]);
-
-  const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
-  const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
+  const currentLine = reaction
+    ? reaction.lines[reaction.idx]
+    : currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
+  const isLastLineOfScene = reaction
+    ? reaction.idx >= reaction.lines.length - 1
+    : gameState.currentLineIndex >= currentScene.lines.length - 1;
+  const lineCount = reaction ? reaction.lines.length : currentScene.lines.length;
+  const lineNumber = reaction ? reaction.idx + 1 : gameState.currentLineIndex + 1;
 
   // Dynamic Background Music adaptation based on scene, dialog, twists, or endings
   useEffect(() => {
@@ -342,6 +350,7 @@ export default function App() {
         ending: gameState.ending,
         reachedEndOfContent: gameState.reachedEndOfContent,
         social: gameState.social,
+        relationships: gameState.relationships,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     } catch {
@@ -396,6 +405,7 @@ export default function App() {
     gameState.currentEpisode,
     gameState.currentSceneIndex,
     gameState.currentLineIndex,
+    reaction?.idx,
     currentLine?.text,
     currentLine?.sfx,
     gameState.soundEnabled,
@@ -407,6 +417,23 @@ export default function App() {
       if (typingTimerRef.current) clearInterval(typingTimerRef.current);
       setDisplayedText(currentLine.text);
       setIsTypingComplete(true);
+      return;
+    }
+
+    if (reaction) {
+      if (gameState.soundEnabled) playSound.click();
+      const speakerName = getSpeakerDisplayName(currentLine.speaker);
+      setGameState((prev) => ({
+        ...prev,
+        historyLog: [...prev.historyLog, { speaker: speakerName || 'Narrator', text: currentLine.text }],
+      }));
+      if (reaction.idx >= reaction.lines.length - 1) {
+        const finish = reaction.commit;
+        setReaction(null);
+        finish();
+      } else {
+        setReaction({ ...reaction, idx: reaction.idx + 1 });
+      }
       return;
     }
 
@@ -427,16 +454,18 @@ export default function App() {
     const choice = currentScene.choices.find((c) => c.id === choiceId);
     if (!choice) return;
 
-    // Apply meter modifications
+    const baseMeters = gameState.meters;
+    const changeMeter = (key: keyof typeof baseMeters) =>
+      Math.min(100, Math.max(0, baseMeters[key] + (choice.meterChanges?.[key] || 0)));
     const updatedMeters = {
-      popularity: Math.min(100, Math.max(0, gameState.meters.popularity + (choice.meterChanges?.popularity || 0))),
-      loyalty: Math.min(100, Math.max(0, gameState.meters.loyalty + (choice.meterChanges?.loyalty || 0))),
-      suspicion: Math.min(100, Math.max(0, gameState.meters.suspicion + (choice.meterChanges?.suspicion || 0))),
-      jealousy: Math.min(100, Math.max(0, gameState.meters.jealousy + (choice.meterChanges?.jealousy || 0))),
-      reputation: Math.min(100, Math.max(0, gameState.meters.reputation + (choice.meterChanges?.reputation || 0))),
-      romanceChidi: Math.min(100, Math.max(0, gameState.meters.romanceChidi + (choice.meterChanges?.romanceChidi || 0))),
-      romanceKelvin: Math.min(100, Math.max(0, gameState.meters.romanceKelvin + (choice.meterChanges?.romanceKelvin || 0))),
-      romanceDayo: Math.min(100, Math.max(0, gameState.meters.romanceDayo + (choice.meterChanges?.romanceDayo || 0))),
+      popularity: changeMeter('popularity'),
+      loyalty: changeMeter('loyalty'),
+      suspicion: changeMeter('suspicion'),
+      jealousy: changeMeter('jealousy'),
+      reputation: changeMeter('reputation'),
+      romanceChidi: changeMeter('romanceChidi'),
+      romanceKelvin: changeMeter('romanceKelvin'),
+      romanceDayo: changeMeter('romanceDayo'),
     };
 
     // Update flags
@@ -445,6 +474,21 @@ export default function App() {
       updatedFlags[choice.flagToSet] = true;
     }
 
+    // How this choice changes what each character thinks of Ada
+    const authored = CHOICE_REACTIONS[choice.id];
+    const deltas: RelationshipDeltas = { ...(choice.relChanges || authored?.rel || {}) };
+    if (!authored && !choice.relChanges) {
+      // Generated scenes: whoever is on stage reacts to how the choice landed
+      const mood = (choice.meterChanges?.loyalty || 0) + (choice.meterChanges?.reputation || 0) - (choice.meterChanges?.suspicion || 0) * 0.5;
+      const shift = Math.max(-4, Math.min(4, Math.round(mood / 5)));
+      if (shift !== 0) {
+        currentScene.charactersOnStage
+          .filter((c) => c !== 'heroine' && RELATIONSHIP_CHARACTERS.some((r) => r.id === c))
+          .forEach((c) => {
+            deltas[c] = shift;
+          });
+      }
+    }
     // Add inventory receipts/clues based on episode milestones
     const updatedInventory = [...gameState.inventory];
     if (gameState.currentEpisode === 1 && currentScene.sceneIndex === 6 && !updatedInventory.some((i) => i.id === 'tea_post_1')) {
@@ -478,70 +522,87 @@ export default function App() {
       bgmManager.setMood(choice.musicMood);
     }
 
-    // Check if this scene has an episode twist
-    if (currentScene.twistMoment) {
-      setActiveTwistModal({
-        title: currentScene.twistMoment.title,
-        description: currentScene.twistMoment.description,
-      });
-      if (gameState.soundEnabled) {
-        playSound.suspenseSting();
-        bgmManager.playStingThenMood('reveal', 'mystery_climax');
-      }
-    }
+    const playerLine: DialogueLine = /^[“"‘']/.test(choice.text)
+      ? { speaker: 'heroine', text: choice.text, expression: 'neutral' }
+      : { speaker: 'narrator', text: choice.text };
+    const reactionLines: DialogueLine[] = [
+      playerLine,
+      ...(choice.reactionLines || authored?.lines || (choice.consequenceText ? [{ speaker: 'narrator', text: choice.consequenceText } as DialogueLine] : [])),
+    ];
 
-    // Progress to next scene or next episode
-    let nextEpisode = gameState.currentEpisode;
-    let nextSceneIndex = gameState.currentSceneIndex + 1;
-
-    if (nextSceneIndex >= getSceneCount(gameState.currentEpisode)) {
-      if (nextEpisode >= LAST_EPISODE) {
-        // No more episodes written yet: stop here instead of looping back to Episode 1
-        setGameState((prev) => ({
-          ...prev,
-          meters: updatedMeters,
-          flags: updatedFlags,
-          inventory: updatedInventory,
-          historyLog: [...prev.historyLog, { speaker: gameState.heroine.name, text: choice.text }],
-          reachedEndOfContent: true,
-        }));
-        return;
-      }
-      nextEpisode += 1;
-      nextSceneIndex = 0;
-      setShowRecapModal(true);
-    }
-
-    // Save exact choice for next scene's opening line and character reaction
-    const nextSceneKey = `${nextEpisode}_${nextSceneIndex}`;
-    const newLastChoice = {
-      text: choice.text,
-      consequenceText: choice.consequenceText,
-      sceneKey: nextSceneKey,
-    };
-    setLastChoice(newLastChoice);
-    try {
-      localStorage.setItem('lagos_tea_last_choice', JSON.stringify(newLastChoice));
-    } catch {}
-
-    setGameState((prev) => ({
-      ...prev,
-      currentEpisode: nextEpisode,
-      currentSceneIndex: nextSceneIndex,
-      currentLineIndex: 0,
-      meters: updatedMeters,
-      flags: updatedFlags,
-      inventory: updatedInventory,
-      historyLog: [
-        ...prev.historyLog,
-        { speaker: gameState.heroine.name, text: choice.text },
+    // Merge the choice into the latest state (the player may have used the feed meanwhile)
+    const applyChoice = (prev: GameState) => ({
+      meters: applyMeterChanges(prev.meters, choice.meterChanges),
+      flags: choice.flagToSet ? { ...prev.flags, [choice.flagToSet]: true } : prev.flags,
+      inventory: [
+        ...prev.inventory,
+        ...updatedInventory.filter((i) => !prev.inventory.some((p) => p.id === i.id)),
       ],
-    }));
+      relationships: (Object.keys(deltas) as CharacterId[]).reduce<RelationshipDeltas>(
+        (acc, c) => ({ ...acc, [c]: Math.max(-40, Math.min(40, (acc[c] || 0) + (deltas[c] || 0))) }),
+        { ...(prev.relationships || {}) }
+      ),
+    });
 
-    // Only ask Gemini for scenes that have no hand-written version
-    if (!findCanonicalScene(nextEpisode, nextSceneIndex)) {
-      triggerGeminiGeneration(nextEpisode, nextSceneIndex, choice.text, updatedMeters, updatedFlags);
-    }
+    const commit = () => {
+      // Check if this scene has an episode twist
+      if (currentScene.twistMoment) {
+        setActiveTwistModal({
+          title: currentScene.twistMoment.title,
+          description: currentScene.twistMoment.description,
+        });
+        if (gameState.soundEnabled) {
+          playSound.suspenseSting();
+          bgmManager.playStingThenMood('reveal', 'mystery_climax');
+        }
+      }
+
+      // Progress to next scene or next episode
+      let nextEpisode = gameState.currentEpisode;
+      let nextSceneIndex = gameState.currentSceneIndex + 1;
+
+      if (nextSceneIndex >= getSceneCount(gameState.currentEpisode)) {
+        if (nextEpisode >= LAST_EPISODE) {
+          // No more episodes written yet: stop here instead of looping back to Episode 1
+          setGameState((prev) => ({
+            ...prev,
+            ...applyChoice(prev),
+            reachedEndOfContent: true,
+          }));
+          return;
+        }
+        nextEpisode += 1;
+        nextSceneIndex = 0;
+        setShowRecapModal(true);
+      }
+
+      // Save exact choice for next scene's opening line and character reaction
+      const nextSceneKey = `${nextEpisode}_${nextSceneIndex}`;
+      const newLastChoice = {
+        text: choice.text,
+        consequenceText: choice.consequenceText,
+        sceneKey: nextSceneKey,
+      };
+      setLastChoice(newLastChoice);
+      try {
+        localStorage.setItem('lagos_tea_last_choice', JSON.stringify(newLastChoice));
+      } catch {}
+
+      setGameState((prev) => ({
+        ...prev,
+        currentEpisode: nextEpisode,
+        currentSceneIndex: nextSceneIndex,
+        currentLineIndex: 0,
+        ...applyChoice(prev),
+      }));
+
+      // Only ask Gemini for scenes that have no hand-written version
+      if (!findCanonicalScene(nextEpisode, nextSceneIndex)) {
+        triggerGeminiGeneration(nextEpisode, nextSceneIndex, choice.text, updatedMeters, updatedFlags);
+      }
+    };
+
+    setReaction({ lines: reactionLines, idx: 0, deltas, commit });
   };
 
   // Dedicated Gemini Generation caller with Retry support
@@ -661,7 +722,9 @@ export default function App() {
       soundEnabled: true,
       ending: null,
       social: DEFAULT_SOCIAL_STATE,
+      relationships: {},
     };
+    setReaction(null);
     setGameState(freshState);
     setLastChoice(null);
     setDynamicScenes({});
@@ -680,7 +743,11 @@ export default function App() {
   const speakerId = currentLine.speaker as CharacterId;
 
   // Characters on stage to display
-  const stageNpcs = currentScene.charactersOnStage?.filter((c) => c !== 'heroine') || [];
+  const stageNpcsAll = (currentScene.charactersOnStage?.filter((c) => c !== 'heroine') || []) as Exclude<CharacterId, 'heroine'>[];
+  // Show whoever is speaking, otherwise the first person in the scene
+  const stageNpcs = stageNpcsAll.includes(currentLine.speaker as Exclude<CharacterId, 'heroine'>)
+    ? [currentLine.speaker as Exclude<CharacterId, 'heroine'>, ...stageNpcsAll.filter((c) => c !== currentLine.speaker)]
+    : stageNpcsAll;
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-neutral-950 font-sans flex flex-col justify-between select-none">
@@ -763,7 +830,7 @@ export default function App() {
             <Sparkles className="w-3.5 h-3.5 text-pink-400" />
             <span className="hidden sm:inline font-bold text-pink-200">Feed</span>
             {/* Live notification badge for viral leaks / updates */}
-            {(gameState.currentSceneIndex >= 6 || gameState.currentEpisode > 1) && (
+            {(revealed.episode > 1 || revealed.sceneIndex >= 6) && (
               <span className="w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-0.5 animate-pulse" />
             )}
           </button>
@@ -797,9 +864,26 @@ export default function App() {
             <span className="hidden sm:inline">Look</span>
           </button>
 
+          {/* Relationships with every character */}
+          <button
+            onClick={() => {
+              setRelationshipsInitialOpen(true);
+              setGameState((prev) => ({ ...prev, isCluesOpen: true }));
+              if (gameState.soundEnabled) playSound.click();
+            }}
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1 transition-all"
+            title="Relationships with everyone"
+          >
+            <Users className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">People</span>
+          </button>
+
           {/* Clue Board */}
           <button
-            onClick={() => setGameState((prev) => ({ ...prev, isCluesOpen: true }))}
+            onClick={() => {
+              setRelationshipsInitialOpen(false);
+              setGameState((prev) => ({ ...prev, isCluesOpen: true }));
+            }}
             className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1 transition-all relative"
             title="Clue Board & Dossier"
           >
@@ -895,6 +979,7 @@ export default function App() {
           >
             <NpcSvg
               characterId={stageNpcs[0]}
+              episode={gameState.currentEpisode}
               expression={
                 currentLine.speaker === stageNpcs[0]
                   ? currentLine.expression || 'neutral'
@@ -949,7 +1034,7 @@ export default function App() {
 
               {/* Progress counter */}
               <span className="text-[11px] font-mono text-neutral-500">
-                {gameState.currentLineIndex + 1} / {currentScene.lines.length}
+                {lineNumber} / {lineCount}
               </span>
             </div>
           )}
@@ -960,7 +1045,7 @@ export default function App() {
                 • NARRATION •
               </span>
               <span className="text-[11px] font-mono text-neutral-500">
-                {gameState.currentLineIndex + 1} / {currentScene.lines.length}
+                {lineNumber} / {lineCount}
               </span>
             </div>
           )}
@@ -984,7 +1069,7 @@ export default function App() {
             </p>
 
             {/* Advance Prompt Hint */}
-            {!isLastLineOfScene && isTypingComplete && (
+            {(reaction || !isLastLineOfScene) && isTypingComplete && (
               <div className="self-end mt-2 flex items-center gap-1 text-[11px] text-amber-400/80 font-medium animate-pulse">
                 <span>Tap to continue</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -992,8 +1077,29 @@ export default function App() {
             )}
           </div>
 
+          {/* How the choice changed relationships (shown on the last reaction line) */}
+          {reaction && isLastLineOfScene && isTypingComplete && Object.keys(reaction.deltas).length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {(Object.entries(reaction.deltas) as Array<[CharacterId, number]>)
+                .filter(([, v]) => v)
+                .map(([c, v]) => (
+                  <span
+                    key={c}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                      v > 0
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                        : 'bg-rose-500/15 text-rose-300 border-rose-500/40'
+                    }`}
+                  >
+                    {getSpeakerDisplayName(c).split(' ')[0].replace(/[“”"]/g, '')} {v > 0 ? '+' : ''}
+                    {v} trust
+                  </span>
+                ))}
+            </div>
+          )}
+
           {/* Choice Selection Grid (Appears on last line of the scene) */}
-          {isLastLineOfScene && isTypingComplete && (
+          {!reaction && isLastLineOfScene && isTypingComplete && (
             <div className="mt-4 pt-3.5 border-t border-neutral-800/80 space-y-2.5 animate-in fade-in duration-200">
               <span className="text-[10px] font-mono tracking-widest uppercase text-amber-400/90 block font-bold">
                 CHOOSE YOUR MOVE:
@@ -1120,6 +1226,8 @@ export default function App() {
           meters={gameState.meters}
           flags={gameState.flags}
           heroine={gameState.heroine}
+          relationships={gameState.relationships}
+          initialTab={relationshipsInitialOpen ? 'relationships' : 'clues'}
           soundEnabled={gameState.soundEnabled}
           onClose={() => setGameState((prev) => ({ ...prev, isCluesOpen: false }))}
         />
@@ -1136,8 +1244,9 @@ export default function App() {
       {/* 11. SOCIAL FEED (GIDIGRAM) OVERLAY */}
       {gameState.isSocialFeedOpen && (
         <SocialFeedOverlay
-          currentEpisode={gameState.currentEpisode}
-          currentSceneIndex={gameState.currentSceneIndex}
+          currentEpisode={revealed.episode}
+          currentSceneIndex={revealed.sceneIndex}
+          location={currentScene.location}
           heroineCustomization={gameState.heroine}
           meters={gameState.meters}
           inventory={gameState.inventory}

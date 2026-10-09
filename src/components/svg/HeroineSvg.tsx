@@ -12,6 +12,14 @@ import {
   BLUSH_COLORS,
 } from './palettes';
 
+const HEAD_PATHS: Record<string, string> = {
+  oval: 'M 106 120 C 106 75, 126 58, 160 58 C 194 58, 214 75, 214 120 C 214 165, 208 194, 186 218 C 174 231, 166 235, 160 235 C 154 235, 146 231, 134 218 C 112 194, 106 165, 106 120 Z',
+  round: 'M 102 128 C 100 80, 124 58, 160 58 C 196 58, 220 80, 218 128 C 218 182, 200 222, 160 232 C 120 222, 102 182, 102 128 Z',
+  heart: 'M 104 112 C 104 72, 128 58, 160 58 C 192 58, 216 72, 216 112 C 216 160, 200 196, 180 220 C 170 232, 164 238, 160 240 C 156 238, 150 232, 140 220 C 120 196, 104 160, 104 112 Z',
+  square: 'M 104 116 C 104 76, 126 60, 160 60 C 194 60, 216 76, 216 116 C 218 170, 216 202, 198 222 C 186 232, 172 234, 160 234 C 148 234, 134 232, 122 222 C 104 202, 102 170, 104 116 Z',
+  long: 'M 110 118 C 110 72, 130 54, 160 54 C 190 54, 210 72, 210 118 C 210 170, 204 204, 184 228 C 174 240, 166 244, 160 244 C 154 244, 146 240, 136 228 C 116 204, 110 170, 110 118 Z',
+};
+
 interface HeroineSvgProps {
   customization: HeroineCustomization;
   expression?: Expression;
@@ -1033,11 +1041,12 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       <ellipse cx="102" cy="168" rx="7.5" ry="12.5" fill={skin.baseColor} />
       <ellipse cx="218" cy="168" rx="7.5" ry="12.5" fill={skin.baseColor} />
 
-      {/* Enlarged Head (20% larger): soft oval, sculpted cheekbones, pointed chin */}
+      {/* Head: shape varies per character */}
       <path
-        d="M 106 120 C 106 75, 126 58, 160 58 C 194 58, 214 75, 214 120 C 214 165, 208 194, 186 218 C 174 231, 166 235, 160 235 C 154 235, 146 231, 134 218 C 112 194, 106 165, 106 120 Z"
+        d={HEAD_PATHS[customization.faceShape || 'oval']}
         fill={`url(#${uniqueId}_skin)`}
       />
+      {customization.beautyMark && <circle cx="188" cy="205" r="1.6" fill="#2A1A14" opacity="0.8" />}
 
       {/* Soft Cheek Blush (smooth fade-in when blushing) */}
       {(blush.opacity > 0 || isBlushing) && (
@@ -1069,6 +1078,13 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       {/* Eyes & Eyebrows */}
       {renderEyes()}
       {renderEyebrows()}
+      {customization.glasses && (
+        <g fill="none" stroke="#1F1A1C" strokeWidth="2.4">
+          <rect x="100" y="148" width="46" height="36" rx="12" fill="#BAE6FD" fillOpacity="0.12" />
+          <rect x="174" y="148" width="46" height="36" rx="12" fill="#BAE6FD" fillOpacity="0.12" />
+          <path d="M 146 162 Q 160 156 174 162" />
+        </g>
+      )}
 
       {/* Plump Glossy Lips (animated on speech) */}
       {renderLips()}

@@ -7,7 +7,7 @@ import {
   AdaPost,
   AdaPostTone,
 } from '../../types/socialFeed';
-import { HeroineCustomization, Meters, InventoryItem, CharacterId } from '../../types/vn';
+import { HeroineCustomization, Meters, InventoryItem, CharacterId, LocationType } from '../../types/vn';
 import { INITIAL_POSTS, INITIAL_STORIES } from '../../data/socialFeedData';
 import { SocialPostCard } from './SocialPostCard';
 import { SocialAvatar } from './SocialAvatar';
@@ -19,7 +19,8 @@ import { TrendingView } from './TrendingView';
 import { GIDIGRAM_TRENDS, GidiGramTrend } from '../../data/trendData';
 import {
   PhotoOption,
-  TONE_INFO,
+  CaptionOption,
+  getPostEffect,
   computeReach,
   buildFallbackComments,
   adaPostToSocialPost,
@@ -63,6 +64,7 @@ import { DmThread, DmBeat, DmReplyOption } from '../../types/socialFeed';
 interface SocialFeedOverlayProps {
   currentEpisode: number;
   currentSceneIndex: number;
+  location?: LocationType;
   heroineCustomization: HeroineCustomization;
   meters: Meters;
   inventory: InventoryItem[];
@@ -187,6 +189,7 @@ const CAST_DIRECTORY: Array<{
 export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   currentEpisode,
   currentSceneIndex,
+  location = 'banana_island_mansion',
   heroineCustomization,
   meters,
   inventory,
@@ -553,12 +556,14 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   };
 
   // Handle posting a full Ada feed post (influenced by Popularity & followed NPCs)
-  const handlePostAda = (photo: PhotoOption, tone: AdaPostTone, caption: string) => {
+  const handlePostAda = (photo: PhotoOption, tone: AdaPostTone, captionOpt: CaptionOption) => {
+    const caption = captionOpt.text;
     setIsPostingAda(true);
     setTimeout(() => {
       const newPostId = `ada_post_${Date.now()}`;
       // Reach and likes are dynamically amplified by Popularity AND followed NPCs
-      const reach = computeReach(tone, meters.popularity, unfollowed);
+      const reach = computeReach(tone, meters.popularity, unfollowed, photo, captionOpt, currentEpisode);
+      const postEffect = getPostEffect(tone, photo, captionOpt, { episode: currentEpisode, sceneIndex: currentSceneIndex, flags, meters });
       // Comments are tailored based on who is followed vs unfollowed and player's story choices
       const comments = buildFallbackComments(tone, meters, flags, newPostId, unfollowed);
 
@@ -592,15 +597,15 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         }));
       }
 
-      const toneEffect = TONE_INFO[tone].effect;
-      if (onUpdateMeters && toneEffect.meterChanges) {
-        onUpdateMeters(toneEffect.meterChanges);
+      if (onUpdateMeters && postEffect.meterChanges) {
+        onUpdateMeters(postEffect.meterChanges);
       }
 
       setIsPostingAda(false);
       setShowPostComposerModal(false);
       if (soundEnabled) playSound.phoneChime();
-      showToast(`Post published! ~${formatCount(reach.likesCount)} likes & ${comments.length} comments rolling in! 📸✨`);
+      if (reach.isViral) showToast(`🚀 IT WENT VIRAL! +${formatCount(reach.followerGain)} followers overnight!`);
+      else showToast(`Post published! ~${formatCount(reach.likesCount)} likes & ${comments.length} comments rolling in! 📸✨`);
     }, 450);
   };
 
@@ -1078,7 +1083,8 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
                   currentEpisode,
                   currentSceneIndex,
                   social || DEFAULT_SOCIAL_STATE,
-                  followedNpcCount
+                  followedNpcCount,
+                  flags
                 )}
                 followingCount={18 + followedNpcCount}
                 adaPosts={visiblePosts.filter((p) => p.authorId === 'heroine')}
@@ -1267,8 +1273,10 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
               <AdaPostComposer
                 heroine={heroineCustomization}
                 meters={meters}
-                location="banana_island_mansion"
+                location={location}
                 episode={currentEpisode}
+                sceneIndex={currentSceneIndex}
+                flags={flags}
                 alreadyPostedThisEpisode={false}
                 isPosting={isPostingAda}
                 soundEnabled={soundEnabled}

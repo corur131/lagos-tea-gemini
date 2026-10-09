@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DmBeat, DmReplyOption, DmThread, SocialState } from '../../types/socialFeed';
 import { CharacterId, HeroineCustomization } from '../../types/vn';
-import { CAST_PROFILES, isUnlocked } from '../../data/socialRules';
+import { CAST_PROFILES, isUnlocked, getThreadTitle } from '../../data/socialRules';
 import { SocialAvatar } from './SocialAvatar';
 import { ArrowLeft, Send } from 'lucide-react';
 import { playSound } from '../../utils/audio';
@@ -149,7 +149,7 @@ export const DmInbox: React.FC<DmInboxProps> = (props) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
               <span className={`text-sm truncate ${unread ? 'font-bold text-neutral-50' : 'font-medium text-neutral-200'}`}>
-                {thread.title}
+                {getThreadTitle(thread, props.episode, props.sceneIndex, props.flags)}
               </span>
               {awaitingReply && (
                 <span className="text-[10px] font-bold text-pink-400 shrink-0">Reply needed</span>
@@ -241,7 +241,7 @@ const ThreadView: React.FC<DmInboxProps & { thread: DmThread }> = ({
         >
           <ThreadAvatar thread={thread} heroine={heroine} size="sm" />
           <div className="min-w-0">
-            <div className="text-sm font-bold text-neutral-100 truncate">{thread.title}</div>
+            <div className="text-sm font-bold text-neutral-100 truncate">{getThreadTitle(thread, progress.episode, progress.sceneIndex, progress.flags)}</div>
             <div className="text-[10px] text-neutral-500 truncate">{thread.handle}</div>
           </div>
         </button>

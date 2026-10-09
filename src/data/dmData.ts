@@ -975,6 +975,7 @@ export const DM_THREADS: DmThread[] = [
     handle: 'Zee, Tamara, Chi, Bisola, Hauwa',
     avatarEmoji: '💅',
     isGroup: true,
+    renames: [{ afterBeatId: 'group_4', title: 'Content House 🏡' }],
     beats: [
       {
         id: 'group_1',

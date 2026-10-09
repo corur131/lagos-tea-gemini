@@ -131,7 +131,13 @@ export interface HeroineCustomization {
   outfit: OutfitId;
   earrings: EarringsId;
   necklace: NecklaceId;
+  // Optional features used to give NPCs distinct faces
+  faceShape?: FaceShapeId;
+  glasses?: boolean;
+  beautyMark?: boolean;
 }
+
+export type FaceShapeId = 'oval' | 'round' | 'heart' | 'square' | 'long';
 
 export type CharacterId =
   | 'heroine'
@@ -195,6 +201,8 @@ export interface DialogueLine {
   musicMood?: MusicMood;
 }
 
+export type RelationshipDeltas = Partial<Record<CharacterId, number>>;
+
 export interface Meters {
   popularity: number;
   loyalty: number;
@@ -214,6 +222,10 @@ export interface ChoiceOption {
   flagToSet?: string;
   conditionFlag?: string;
   musicMood?: MusicMood;
+  // Lines that play out the choice before the story moves on
+  reactionLines?: DialogueLine[];
+  // Trust change with each character caused by this choice
+  relChanges?: RelationshipDeltas;
 }
 
 export interface SceneData {
@@ -286,4 +298,6 @@ export interface GameState {
   ending: EndingType | null;
   reachedEndOfContent?: boolean;
   social: SocialState;
+  // Accumulated trust change per character from the player's choices
+  relationships?: RelationshipDeltas;
 }

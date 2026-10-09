@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InventoryItem, Meters, HeroineCustomization } from '../../types/vn';
+import { InventoryItem, Meters, HeroineCustomization, RelationshipDeltas } from '../../types/vn';
 import { RelationshipProfile } from './RelationshipProfile';
 import {
   Camera,
@@ -18,6 +18,7 @@ interface ClueBoardProps {
   meters: Meters;
   flags: Record<string, boolean>;
   heroine: HeroineCustomization;
+  relationships?: RelationshipDeltas;
   soundEnabled?: boolean;
   onClose: () => void;
   initialTab?: 'clues' | 'relationships';
@@ -28,6 +29,7 @@ export const ClueBoard: React.FC<ClueBoardProps> = ({
   meters,
   flags,
   heroine,
+  relationships,
   soundEnabled = true,
   onClose,
   initialTab = 'clues',
@@ -114,6 +116,7 @@ export const ClueBoard: React.FC<ClueBoardProps> = ({
               meters={meters}
               flags={flags}
               heroine={heroine}
+              relationships={relationships}
               onBackToClues={() => setActiveTab('clues')}
               onClose={onClose}
               soundEnabled={soundEnabled}

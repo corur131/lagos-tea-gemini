@@ -44,34 +44,137 @@ const OUTFIT_LABELS: Record<OutfitId, string> = {
 
 export interface PhotoOption {
   kind: AdaPhotoKind;
+  id: string;
   label: string;
   bgGradient: string;
+  reachMult: number;
+  hint: string;
+  effect?: SocialEffect;
 }
 
-export function getPhotoOptions(heroine: HeroineCustomization, location: LocationType): PhotoOption[] {
-  return [
+export interface PostProgress {
+  episode: number;
+  sceneIndex: number;
+  flags: Record<string, boolean>;
+  meters: Meters;
+}
+
+const LOCATION_REACH: Record<LocationType, number> = {
+  ajegunle_apartment: 0.8,
+  banana_island_mansion: 1.25,
+  rooftop_party: 1.3,
+  mall: 1.1,
+  university_campus: 1.0,
+  beach_house: 1.25,
+  photoshoot_studio: 1.1,
+  night_street: 1.05,
+};
+
+// Photo choices follow the story: what has happened so far decides what Ada has to post about
+export function getPhotoOptions(
+  heroine: HeroineCustomization,
+  location: LocationType,
+  episode = 1,
+  sceneIndex = 0,
+  flags: Record<string, boolean> = {}
+): PhotoOption[] {
+  const here = (ep: number, sc: number) => episode > ep || (episode === ep && sceneIndex >= sc);
+
+  const core: PhotoOption[] = [
     {
       kind: 'mirror_selfie',
+      id: 'mirror',
       label: `Mirror selfie in my ${OUTFIT_LABELS[heroine.outfit]} fit`,
       bgGradient: 'from-pink-500 via-purple-700 to-neutral-950',
+      reachMult: 1.0,
+      hint: 'Safe and steady',
     },
     {
       kind: 'location',
+      id: 'location',
       label: `A moment at ${LOCATION_LABELS[location]}`,
       bgGradient: LOCATION_GRADIENTS[location],
-    },
-    {
-      kind: 'throwback',
-      label: 'Ajegunle throwback, baby photo 💛',
-      bgGradient: 'from-amber-700 via-orange-900 to-neutral-950',
+      reachMult: LOCATION_REACH[location],
+      hint: location === 'ajegunle_apartment' ? 'Real, but small' : 'Shows where you are now',
     },
   ];
+
+  // Latest story moments first
+  const story: PhotoOption[] = [];
+  const add = (o: Omit<PhotoOption, 'kind'>) => story.push({ kind: 'story', ...o });
+
+  if (here(3, 3) && flags.chidi_romantic_moment) {
+    add({ id: 'ilashe_golden', label: 'Golden hour on the Ilashe deck 🌅', bgGradient: 'from-orange-400 via-rose-600 to-neutral-950', reachMult: 1.5, hint: 'Chidi will notice', effect: { meterChanges: { romanceChidi: 2 } } });
+  }
+  if (here(3, 1)) {
+    add({ id: 'content_house', label: 'Ring lights and chaos at the Content House 💡', bgGradient: 'from-fuchsia-500 via-indigo-800 to-neutral-950', reachMult: 1.45, hint: 'Villa life is trending', effect: { meterChanges: { jealousy: 1 } } });
+  }
+  if (here(3, 0) && (flags.accepted_pa_job || flags.negotiated_pa_terms)) {
+    add({ id: 'pa_first_day', label: 'First day as Zee’s assistant, calendar in hand 📅', bgGradient: 'from-amber-400 via-yellow-700 to-neutral-950', reachMult: 1.3, hint: 'Zee may repost', effect: { meterChanges: { loyalty: 1 } } });
+  }
+  if (here(2, 4) && flags.drove_with_kelvin) {
+    add({ id: 'porsche_seat', label: 'Passenger seat of a very expensive Porsche 🏎️', bgGradient: 'from-sky-400 via-slate-700 to-neutral-950', reachMult: 1.7, hint: 'Everyone will talk', effect: { meterChanges: { romanceKelvin: 2, jealousy: 3 } } });
+  } else if (here(2, 3) && flags.refused_kelvin_ride) {
+    add({ id: 'shuttle', label: 'Campus shuttle, proudly 🚌', bgGradient: 'from-lime-500 via-emerald-800 to-neutral-950', reachMult: 1.3, hint: 'Relatable', effect: { meterChanges: { reputation: 2 } } });
+  }
+  if (here(2, 0)) {
+    add({ id: 'unbothered', label: 'Walking to class like the screenshot never happened 💅', bgGradient: 'from-teal-400 via-cyan-800 to-neutral-950', reachMult: flags.unbothered_walk ? 1.55 : 1.3, hint: 'Pure resilience', effect: { meterChanges: { reputation: 2 } } });
+  }
+  if (here(1, 5) && (flags.challenged_kelvin || flags.locked_eyes_kelvin || flags.kept_kelvin_at_bay)) {
+    add({ id: 'terrace_flutes', label: 'Champagne on the terrace 🥂', bgGradient: 'from-amber-300 via-rose-700 to-neutral-950', reachMult: 1.4, hint: 'Kelvin might comment', effect: { meterChanges: { romanceKelvin: 2, jealousy: 2 } } });
+  }
+  if (here(1, 4) && (flags.flirted_with_chidi || flags.bantered_with_chidi || flags.confided_chidi_incognito)) {
+    add({ id: 'pool_candid', label: 'Candid by the infinity pool (Chidi’s lens) 📸', bgGradient: 'from-blue-400 via-indigo-800 to-neutral-950', reachMult: 1.35, hint: 'Photographer approved', effect: { meterChanges: { romanceChidi: 2 } } });
+  }
+  if (here(1, 3)) {
+    if (flags.borrowed_emerald_dress) {
+      add({ id: 'emerald', label: 'The emerald gown entrance 💚', bgGradient: 'from-emerald-400 via-green-800 to-neutral-950', reachMult: 1.5, hint: 'Tamara’s couture', effect: { meterChanges: { jealousy: 2 } } });
+    } else if (flags.vintage_style_dress) {
+      add({ id: 'thrift', label: 'Thrifted black shift, zero apologies 🖤', bgGradient: 'from-neutral-400 via-neutral-700 to-neutral-950', reachMult: 1.3, hint: 'Authentic', effect: { meterChanges: { reputation: 2 } } });
+    } else if (flags.dragged_dress) {
+      add({ id: 'dragged', label: 'Getting dragged into couture 😂', bgGradient: 'from-pink-400 via-rose-700 to-neutral-950', reachMult: 1.2, hint: 'Funny and warm', effect: { meterChanges: { loyalty: 1 } } });
+    }
+  }
+
+  const throwback: PhotoOption = {
+    kind: 'throwback',
+    id: 'throwback',
+    label: here(2, 0) ? 'Ajegunle throwback, since you all want to know 💛' : 'Ajegunle throwback, baby photo 💛',
+    bgGradient: 'from-amber-700 via-orange-900 to-neutral-950',
+    reachMult: here(2, 0) ? 1.15 : 0.9,
+    hint: 'Humble and sentimental',
+    effect: { meterChanges: { reputation: 1 } },
+  };
+  const fillers: PhotoOption[] = [
+    throwback,
+    { kind: 'story', id: 'desk', label: 'Study desk flatlay, laptop and cold coffee ☕', bgGradient: 'from-stone-400 via-stone-700 to-neutral-950', reachMult: 0.95, hint: 'Scholarship grind' },
+    { kind: 'story', id: 'golden', label: 'Golden hour portrait ✨', bgGradient: 'from-yellow-300 via-orange-600 to-neutral-950', reachMult: 1.05, hint: 'Always works' },
+  ];
+
+  const picks = [...core, ...story.slice(0, 3)];
+  for (const f of fillers) {
+    if (picks.length >= 5) break;
+    if (!picks.some((p) => p.id === f.id)) picks.push(f);
+  }
+  return picks.slice(0, 5);
 }
 
-export const TONE_INFO: Record<
-  AdaPostTone,
-  { label: string; description: string; effect: SocialEffect; followerBase: number; captions: string[]; badge: string }
-> = {
+export interface CaptionOption {
+  text: string;
+  reach: number;
+  effect?: SocialEffect;
+}
+
+export interface ToneInfo {
+  label: string;
+  description: string;
+  effect: SocialEffect;
+  followerBase: number;
+  captions: CaptionOption[];
+  badge: string;
+}
+
+export const TONE_INFO: Record<AdaPostTone, ToneInfo> = {
   humble: {
     label: 'Humble 🙏',
     description: 'Wins respect. Small follower bump.',
@@ -79,9 +182,11 @@ export const TONE_INFO: Record<
     followerBase: 500,
     badge: '🙏 GRATEFUL',
     captions: [
-      'Grateful for every room I walk into, even the ones that didn’t want me there 🙏✨',
-      'Scholarship girl. Big dreams, small room. Still here 💛📚',
-      'Not where I want to be, but so far from where I started 🙏',
+      { text: 'Grateful for every room I walk into, even the ones that didn’t want me there 🙏✨', reach: 1.0 },
+      { text: 'Scholarship girl. Big dreams, small room. Still here 💛📚', reach: 1.1, effect: { meterChanges: { reputation: 1 } } },
+      { text: 'Not where I want to be, but so far from where I started 🙏', reach: 0.95 },
+      { text: 'Mummy, if you’re reading this: I’m eating, I’m studying, I’m fine 😭💛', reach: 1.2, effect: { meterChanges: { loyalty: 1 } } },
+      { text: 'Nobody sees the 5am buses and the borrowed textbooks. I do. And I’m proud 🚌📖', reach: 0.9, effect: { meterChanges: { reputation: 2 } } },
     ],
   },
   shady: {
@@ -91,9 +196,11 @@ export const TONE_INFO: Record<
     followerBase: 1800,
     badge: '💅 NO NAMES',
     captions: [
-      'Some people’s “tea” is just tap water with a filter 💅🫖',
-      'Imagine leaking someone’s address and still being irrelevant 🥱',
-      'Smile for the camera, babe. I know you’re watching 👀',
+      { text: 'Some people’s “tea” is just tap water with a filter 💅🫖', reach: 1.1 },
+      { text: 'Imagine leaking someone’s address and still being irrelevant 🥱', reach: 1.25, effect: { meterChanges: { suspicion: 1 } } },
+      { text: 'Smile for the camera, babe. I know you’re watching 👀', reach: 1.2, effect: { meterChanges: { loyalty: -1 } } },
+      { text: 'Funny how the loudest people in the group chat are the quietest on the facts 🤫', reach: 1.0, effect: { meterChanges: { reputation: 1 } } },
+      { text: 'I don’t do subtweets. But if the shoe fits, lace it up 👠', reach: 0.9, effect: { meterChanges: { jealousy: 1 } } },
     ],
   },
   flex: {
@@ -103,26 +210,118 @@ export const TONE_INFO: Record<
     followerBase: 1100,
     badge: '👑 MAIN CHARACTER',
     captions: [
-      'Ajegunle to Banana Island. Same girl, new view 💅🌴',
-      'Main character energy. Borrowed or not 👑',
-      'They said I didn’t belong. The algorithm disagrees 📈✨',
+      { text: 'Ajegunle to Banana Island. Same girl, new view 💅🌴', reach: 1.15 },
+      { text: 'Main character energy. Borrowed or not 👑', reach: 1.0 },
+      { text: 'They said I didn’t belong. The algorithm disagrees 📈✨', reach: 1.25, effect: { meterChanges: { jealousy: 1 } } },
+      { text: 'Rent-free in your head, and in a very nice house 🏡', reach: 1.05 },
+      { text: 'Tuition paid. Receipts kept. Next question? 🧾💅', reach: 1.2, effect: { meterChanges: { reputation: 1 } } },
+    ],
+  },
+  playful: {
+    label: 'Playful 😜',
+    description: 'Light and funny. Friends engage, nobody gets hurt.',
+    effect: { meterChanges: { popularity: 3, loyalty: 1 } },
+    followerBase: 800,
+    badge: '😜 CHAOS',
+    captions: [
+      { text: 'Me pretending I’m not checking who viewed my story 🙈', reach: 1.1 },
+      { text: 'POV: you survived the group chat today 😭🫡', reach: 1.2, effect: { meterChanges: { loyalty: 1 } } },
+      { text: 'Lagos traffic, Lagos gist, Lagos me. Send help and suya 🍢', reach: 1.0 },
+      { text: 'Is it a fit check if the fit is just vibes and prayer? 🙏😂', reach: 0.95 },
+      { text: 'Tag the friend who’s going to screenshot this 👇😂', reach: 1.15, effect: { meterChanges: { popularity: 1 } } },
+    ],
+  },
+  mystery: {
+    label: 'Mysterious 🕶️',
+    description: 'Cryptic. Gets people talking, and @TheLagosTea watching.',
+    effect: { meterChanges: { popularity: 2, suspicion: 2, reputation: 1 } },
+    followerBase: 900,
+    badge: '🕶️ CLASSIFIED',
+    captions: [
+      { text: 'Some stories get told. Some get kept 🕶️', reach: 1.0 },
+      { text: 'I know more than I post. Remember that 👁️', reach: 1.2, effect: { meterChanges: { suspicion: 1 } } },
+      { text: 'Everyone has a camera. Not everyone has the full picture 📷', reach: 1.1 },
+      { text: 'Whoever you are, I’m getting closer 🔍', reach: 1.25, effect: { meterChanges: { suspicion: 2, reputation: 1 } } },
+      { text: 'Quiet isn’t the same as clueless 🤍', reach: 0.9 },
     ],
   },
 };
 
+export const ALL_TONES: AdaPostTone[] = ['humble', 'shady', 'flex', 'playful', 'mystery'];
+
+// The effect of a post depends on vibe, photo, caption and where the story is
+export function getPostEffect(
+  tone: AdaPostTone,
+  photo: PhotoOption | undefined,
+  caption: CaptionOption | undefined,
+  progress: PostProgress
+): SocialEffect {
+  const { episode, meters, flags } = progress;
+  const stage = Math.min(Math.max(episode, 1), 3) - 1;
+  const total: Partial<Record<keyof Meters, number>> = {};
+  const put = (m?: Partial<Meters>, scale = 1) => {
+    if (!m) return;
+    (Object.keys(m) as Array<keyof Meters>).forEach((k) => {
+      total[k] = (total[k] || 0) + (m[k] || 0) * scale;
+    });
+  };
+
+  const base = TONE_INFO[tone].effect.meterChanges || {};
+  switch (tone) {
+    case 'shady':
+      // Early on the page is a joke; later the girls take it personally
+      put(base, 0.7 + stage * 0.35);
+      if (stage >= 2) total.reputation = (total.reputation || 0) - 2;
+      if (flags.accused_group) total.loyalty = (total.loyalty || 0) - 1;
+      break;
+    case 'flex':
+      put(base, 1);
+      // At first an underdog flexing is inspiring, later it looks suspicious
+      total.reputation = stage === 0 ? 1 : (total.reputation || 0);
+      total.jealousy = (total.jealousy || 0) + stage;
+      break;
+    case 'humble':
+      put(base, 1);
+      total.reputation = meters.reputation < 50 ? 5 : 2;
+      break;
+    case 'playful':
+      put(base, 1);
+      if (stage >= 2) total.loyalty = (total.loyalty || 0) + 1;
+      break;
+    case 'mystery':
+      put(base, 1);
+      if (stage >= 2) total.suspicion = (total.suspicion || 0) + 2;
+      if (flags.photographed_tea_phone || flags.inspected_burner_phone) total.suspicion = (total.suspicion || 0) + 1;
+      break;
+  }
+
+  put(photo?.effect?.meterChanges);
+  put(caption?.effect?.meterChanges);
+
+  const out: Partial<Meters> = {};
+  (Object.keys(total) as Array<keyof Meters>).forEach((k) => {
+    let v = Math.round(total[k] || 0);
+    // Diminishing returns on meters that are already high
+    if (v > 0 && meters[k] >= 80) v = Math.ceil(v / 2);
+    if (v !== 0) out[k] = v;
+  });
+  return { meterChanges: out };
+}
+
 export function computeReach(
   tone: AdaPostTone,
   popularity: number,
-  unfollowed?: Record<string, boolean>
+  unfollowed?: Record<string, boolean>,
+  photo?: PhotoOption,
+  caption?: CaptionOption,
+  episode = 1
 ) {
-  // Underdog scaling: At low popularity (12%), Ada starts small (~25-45 followers gained per post, ~18-35 likes)
-  // As she grinds her way up and expands her network, reach scales exponentially to thousands!
-  const basePotential = TONE_INFO[tone].followerBase;
+  // Underdog scaling: At low popularity Ada starts small; reach grows as she climbs
+  const basePotential = TONE_INFO[tone].followerBase * (1 + 0.35 * (Math.min(Math.max(episode, 1), 3) - 1));
   const underdogFactor = 0.08 + Math.pow(Math.max(0, popularity) / 100, 1.8) * 0.92;
   const baseFollowerGain = Math.round(basePotential * underdogFactor);
 
-  // High society influence calculation:
-  // Each followed NPC expands Ada's explore-feed footprint and recommendation algorithm
+  // Each followed NPC expands Ada's explore-feed footprint
   const allNpcs: Array<CharacterId | 'lagos_tea'> = [
     'zee',
     'tamara',
@@ -135,23 +334,25 @@ export function computeReach(
     'lagos_tea',
   ];
   const followedCount = allNpcs.filter((id) => !unfollowed?.[id]).length;
-  
-  // Influencer network multiplier:
+
   const networkMultiplier = 0.4 + (followedCount / allNpcs.length) * 0.9;
   const zeeBoost = !unfollowed?.zee ? 1.25 : 0.8;
   const tamaraBoost = !unfollowed?.tamara ? 1.2 : 0.85;
   const kelvinBoost = !unfollowed?.kelvin ? 1.15 : 0.9;
-  const totalMultiplier = networkMultiplier * ((zeeBoost * tamaraBoost * kelvinBoost) / (1.25 * 1.2 * 1.15));
+  const networkTotal = networkMultiplier * ((zeeBoost * tamaraBoost * kelvinBoost) / (1.25 * 1.2 * 1.15));
 
-  const followerGain = Math.max(15, Math.round(baseFollowerGain * totalMultiplier));
-  // Likes start authentic to an aspiring unknown creator:
-  // At 12% Popularity: ~24-35 likes! Real humble beginnings!
-  // At 50% Popularity: ~320 likes!
-  // At 90% Popularity: ~2,400 likes!
-  const baseLikes = 15 + followerGain * 0.5 + Math.pow(popularity, 1.6) * 0.7;
-  const likesCount = Math.max(12, Math.round(baseLikes * totalMultiplier));
+  // Photo and caption both shape how far the post travels
+  const contentMult = (photo?.reachMult ?? 1) * (caption?.reach ?? 1);
+  // A story-relevant photo with a strong caption can break out of the bubble
+  const isViral = contentMult >= 1.7;
+  const viralMult = isViral ? 6 : 1;
+  const totalMultiplier = networkTotal * contentMult;
 
-  return { followerGain, likesCount, networkMultiplier: totalMultiplier, followedCount };
+  const followerGain = Math.max(15, Math.round(baseFollowerGain * totalMultiplier * viralMult));
+  const baseLikes = 15 + baseFollowerGain * 0.5 + Math.pow(popularity, 1.6) * 0.7;
+  const likesCount = Math.max(12, Math.round(baseLikes * totalMultiplier * (isViral ? 4 : 1)));
+
+  return { followerGain, likesCount, networkMultiplier: networkTotal, contentMultiplier: contentMult, followedCount, isViral };
 }
 
 const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
@@ -166,6 +367,18 @@ const FAN_COMMENTS: Record<AdaPostTone, Array<[string, string]>> = {
     ['@island_tattle', 'Tea is shaking rn 🫖😂'],
     ['@lekkibabe99', 'She’s not playing with anybody this year 💀'],
     ['@gidi_pulse', 'Direct hit! Tag the culprit already 😂🍿'],
+  ],
+  playful: [
+    ['@lekkibabe99', 'The caption 😭😭😭'],
+    ['@mainland_queen', 'Why is this so relatable 😂'],
+    ['@gidi_pulse', 'Ada is funny?? Say less 😂🍿'],
+    ['@style_gidi', 'Okay chaos queen, we see you 😜'],
+  ],
+  mystery: [
+    ['@island_tattle', 'Who is she talking to?? 👀👀'],
+    ['@vi_gist', 'This is a message. I just don’t know for who 🕵️‍♀️'],
+    ['@gidi_pulse', 'Ada knows something, mark my words 🫖'],
+    ['@lekkibabe99', 'Cryptic queen. I’m scared and intrigued 😭'],
   ],
   flex: [
     ['@ajegunle_pride', 'Ajegunle stand up!! 🔥🔥'],
@@ -356,7 +569,7 @@ export function buildFallbackComments(
   // 2. TONE-BASED AND RELATIONSHIP COMMENTS:
   if (!comments.some((c) => c.authorId === 'tamara') && !unfollowed?.tamara) {
     if (flags.questioned_tamara_dm) add('tamara', '😐');
-    else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑' }[tone]);
+    else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑', playful: 'I cannot breathe 😭😭💚', mystery: 'Ada… what do you know?? 👀' }[tone]);
   }
 
   if (!comments.some((c) => c.authorId === 'chidi') && !unfollowed?.chidi && meters.romanceChidi >= 25) {
@@ -364,6 +577,8 @@ export function buildFallbackComments(
       humble: '📸👏',
       shady: 'Remind me never to get on your bad side 😅',
       flex: 'Better than any shot I took tonight 🔥',
+      playful: 'You’re too funny. Keep posting 😂📸',
+      mystery: 'Careful what you hint at. I’m with you 🔍',
     }[tone]);
   }
 
@@ -372,6 +587,8 @@ export function buildFallbackComments(
       humble: 'Humble looks good on you.',
       shady: 'Dangerous. I like it 🥃',
       flex: 'Told you. Main character. 🥃',
+      playful: 'Didn’t know you were this funny 😏',
+      mystery: 'Now I’m curious 🥃',
     }[tone]);
   }
 
@@ -709,6 +926,22 @@ export function buildAdaTrollWar(tone: AdaPostTone, postId: string): CommentWar 
         { id: 'clapback', label: 'Clap back 💅', replyText: 'Let them try. I’ve got nothing left to leak 💅', effect: { meterChanges: { popularity: 4, suspicion: 1 } }, followerDelta: 500, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'island_tattle', authorHandle: '@island_tattle', avatarType: 'fan', text: 'NOTHING LEFT TO LEAK 😭 iconic' }] },
         { id: 'classy', label: 'Stay classy 🙏', replyText: 'I’m not scared of anonymous pages 🙂', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
         { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { reputation: 1 } }, followerDelta: 0, aftermath: [] },
+      ],
+    },
+    playful: {
+      troll: { authorId: 'lekki_insider', authorName: 'Lekki Insider', authorHandle: '@lekki_insider', avatarType: 'fan', text: 'Funny girl now? Last week you were crying in the comments 😂' },
+      options: [
+        { id: 'clapback', label: 'Clap back 💅', replyText: 'Crying and slaying are not mutually exclusive, babe 💅', effect: { meterChanges: { popularity: 3 } }, followerDelta: 350, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'lekkibabe99', authorHandle: '@lekkibabe99', avatarType: 'fan', text: 'NOT BOTH AT ONCE 😭😭' }] },
+        { id: 'classy', label: 'Stay classy 🙏', replyText: 'Laughing is how I heal. Join me 🙏😂', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
+        { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { reputation: 1 } }, followerDelta: 0, aftermath: [] },
+      ],
+    },
+    mystery: {
+      troll: { authorId: 'gidi_paparazzi', authorName: 'gidi_paparazzi', authorHandle: '@gidi_paparazzi', avatarType: 'fan', text: 'Is Ada the Tea? Why all the riddles? 🤔' },
+      options: [
+        { id: 'clapback', label: 'Clap back 💅', replyText: 'If I were the Tea, you’d be the first headline 🫖', effect: { meterChanges: { popularity: 4, suspicion: 2 } }, followerDelta: 450, aftermath: [{ authorId: 'gidi_paparazzi', authorName: 'island_tattle', authorHandle: '@island_tattle', avatarType: 'fan', text: 'THE FIRST HEADLINE 💀' }] },
+        { id: 'classy', label: 'Stay classy 🙏', replyText: 'Just a girl with a good caption 🙂', effect: { meterChanges: { reputation: 3 } }, followerDelta: 150, aftermath: [] },
+        { id: 'ignore', label: 'Ignore 🙈', effect: { meterChanges: { suspicion: -1 } }, followerDelta: 0, aftermath: [] },
       ],
     },
     flex: {

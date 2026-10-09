@@ -20,6 +20,8 @@ export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'h
     outfit: 'party_dress',
     earrings: 'drops',
     necklace: 'pendant',
+    faceShape: 'heart',
+    beautyMark: true,
   },
   tamara: {
     name: 'Tamara Okonkwo-Reid',
@@ -38,6 +40,7 @@ export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'h
     outfit: 'ankara',
     earrings: 'hoops',
     necklace: 'thin_chain',
+    faceShape: 'round',
   },
   chi: {
     name: 'Chioma "Chi" Eze',
@@ -56,6 +59,8 @@ export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'h
     outfit: 'corporate',
     earrings: 'studs',
     necklace: 'thin_chain',
+    faceShape: 'square',
+    glasses: true,
   },
   bisola: {
     name: 'Bisola Adeyemi',
@@ -74,6 +79,8 @@ export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'h
     outfit: 'casual',
     earrings: 'hoops',
     necklace: 'thin_chain',
+    faceShape: 'oval',
+    beautyMark: true,
   },
   hauwa: {
     name: 'Hauwa Musa',
@@ -92,8 +99,43 @@ export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'h
     outfit: 'native_lace',
     earrings: 'studs',
     necklace: 'thin_chain',
+    faceShape: 'long',
   },
 };
+
+type FemaleNpcId = keyof typeof FEMALE_NPC_PRESETS;
+
+// How each girl's look changes as the story moves on (episode 1 uses the base preset)
+const NPC_EPISODE_LOOKS: Record<FemaleNpcId, Record<number, Partial<HeroineCustomization>>> = {
+  zee: {
+    2: { outfit: 'corporate', hairstyle: 'long_straight_wig', eyeshadow: 'bronze', lashes: 'volume' },
+    3: { outfit: 'hoodie', hairstyle: 'body_wave_wig', hairColor: 'burgundy', lipColor: 'berry', necklace: 'none' },
+  },
+  tamara: {
+    2: { outfit: 'casual', hairstyle: 'box_braids', hairColor: 'copper', eyeshadow: 'gold' },
+    3: { outfit: 'party_dress', hairstyle: 'curly_wig', hairColor: 'honey_blonde', earrings: 'drops' },
+  },
+  chi: {
+    2: { outfit: 'corporate', hairstyle: 'bob_wig', hairColor: 'burgundy', lipColor: 'classic_red' },
+    3: { outfit: 'native_lace', hairstyle: 'deep_wave_wig', hairColor: 'jet_black', earrings: 'hoops' },
+  },
+  bisola: {
+    2: { outfit: 'party_dress', hairstyle: 'body_wave_wig', hairColor: 'rose_pink', eyeshadow: 'purple' },
+    3: { outfit: 'hoodie', hairstyle: 'curly_wig', hairColor: 'ombre_blonde', lashes: 'dramatic' },
+  },
+  hauwa: {
+    2: { outfit: 'casual', hairstyle: 'natural_afro', hairColor: 'dark_brown' },
+    3: { outfit: 'ankara', hairstyle: 'knotless_braids', hairColor: 'jet_black', lipColor: 'soft_pink' },
+  },
+};
+
+export function getNpcLook(id: FemaleNpcId, episode = 1): HeroineCustomization {
+  const base = FEMALE_NPC_PRESETS[id];
+  const stage = Math.min(Math.max(episode, 1), 3);
+  const overrides = NPC_EPISODE_LOOKS[id][stage] || {};
+  return { ...base, ...overrides };
+}
+
 
 interface NpcSvgProps {
   characterId: CharacterId;
@@ -102,6 +144,7 @@ interface NpcSvgProps {
   isBlushing?: boolean;
   lookDirection?: 'left' | 'right' | 'center' | 'away';
   reduceMotion?: boolean;
+  episode?: number;
   className?: string;
 }
 
@@ -112,6 +155,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
   isBlushing = false,
   lookDirection = 'center',
   reduceMotion = false,
+  episode = 1,
   className = 'w-full h-full object-contain',
 }) => {
   // Blinking hook for NPC (random 3.2s to 5.2s interval)
@@ -162,7 +206,7 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
 
   // Female NPCs rendered via parametric HeroineSvg with fixed presets
   if (characterId in FEMALE_NPC_PRESETS) {
-    const preset = FEMALE_NPC_PRESETS[characterId as keyof typeof FEMALE_NPC_PRESETS];
+    const preset = getNpcLook(characterId as FemaleNpcId, episode);
     return (
       <HeroineSvg
         customization={preset}
