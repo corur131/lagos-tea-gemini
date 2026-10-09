@@ -54,7 +54,7 @@ export const ClueBoard: React.FC<ClueBoardProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col h-[90vh] sm:h-[85vh] overflow-hidden">
+      <div className="relative w-full max-w-5xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col h-[92vh] sm:h-[88vh] overflow-hidden">
         {/* Main Header with Navigation Tabs */}
         <div className="px-5 py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-950/80 shrink-0">
           <div className="flex items-center gap-3">

@@ -81,7 +81,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
   return (
     <div className="flex flex-col h-full bg-neutral-950 text-neutral-100 select-none">
       {/* Top Bar inside Clue Board Modal */}
-      <div className="px-5 py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/90 backdrop-blur-md shrink-0">
+      <div className="px-4 sm:px-6 py-2.5 sm:py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/90 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-2.5">
           {onBackToClues && (
             <button
@@ -94,18 +94,18 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
             </button>
           )}
           <div>
-            <h3 className="text-sm sm:text-base font-serif font-bold text-neutral-100 flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-500 fill-rose-500/30" />
-              Relationship Profiles
+            <h3 className="text-xs sm:text-sm font-serif font-bold text-neutral-100 flex items-center gap-1.5 sm:gap-2">
+              <Heart className="w-4 h-4 text-rose-500 fill-rose-500/30 shrink-0" />
+              <span>Relationship Profiles & Standing</span>
             </h3>
-            <p className="text-[11px] text-neutral-400">
+            <p className="text-[10px] sm:text-[11px] text-neutral-400">
               Live Trust & Romance standings shaped by Ada’s choices
             </p>
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 bg-neutral-950 p-1 rounded-xl border border-neutral-800 text-xs">
+        <div className="flex items-center gap-1 bg-neutral-950 p-1 rounded-xl border border-neutral-800 text-xs shrink-0">
           <button
             onClick={() => setFilterMode('all')}
             className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
@@ -114,7 +114,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
                 : 'text-neutral-400 hover:text-neutral-200'
             }`}
           >
-            All (8)
+            All ({RELATIONSHIP_CHARACTERS.length})
           </button>
           <button
             onClick={() => setFilterMode('romance')}
@@ -144,7 +144,7 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
       {/* Main Body: Two-column layout (List + Detailed Dossier) */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Left / Top Character Roster */}
-        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 p-2 md:p-3 gap-2">
+        <div className="w-full md:w-72 lg:w-80 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/40 flex md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 p-2 sm:p-3 gap-2 scrollbar-thin scrollbar-thumb-neutral-800">
           {filteredList.map((char) => {
             const charAssessment = calculateRelationship(char.id, meters, flags, heroine);
             const isSelected = char.id === selectedChar.id;
@@ -153,44 +153,60 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
               <button
                 key={char.id}
                 onClick={() => setSelectedCharId(char.id)}
-                className={`flex items-center gap-2.5 p-2 rounded-xl text-left transition-all shrink-0 md:shrink border w-full ${
+                className={`flex items-start gap-3 p-2.5 rounded-xl text-left transition-all shrink-0 md:shrink border w-64 sm:w-72 md:w-full ${
                   isSelected
-                    ? 'bg-neutral-800/90 border-neutral-600 shadow-md ring-1 ring-white/10'
-                    : 'bg-neutral-950/40 border-neutral-800/80 hover:bg-neutral-800/50 hover:border-neutral-700'
+                    ? 'bg-neutral-800/95 border-rose-500/40 shadow-lg ring-1 ring-rose-500/20'
+                    : 'bg-neutral-950/60 border-neutral-800/80 hover:bg-neutral-800/50 hover:border-neutral-700'
                 }`}
               >
-                <SocialAvatar
-                  avatarType={char.id}
-                  size="md"
-                  hasStoryRing={isSelected}
-                  hasUnseenStory={isSelected}
-                />
-                <div className="flex-1 min-w-0 pr-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-bold text-neutral-200 truncate">
-                      {char.name.split(' ')[0]}
+                <div className="relative shrink-0 pt-0.5">
+                  <SocialAvatar
+                    avatarType={char.id}
+                    size="md"
+                    hasStoryRing={isSelected}
+                    hasUnseenStory={isSelected}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  {/* Row 1: Full Character Name + Romance Pill */}
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className="text-xs sm:text-sm font-bold text-neutral-100 font-serif leading-tight">
+                      {char.name}
                     </span>
                     {char.hasRomance && (
-                      <span className="text-[10px] text-rose-400 font-mono font-bold flex items-center gap-0.5">
-                        <Heart className="w-2.5 h-2.5 fill-rose-500/50" />
-                        {charAssessment.romance}
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-md bg-rose-950/70 text-rose-300 border border-rose-800/40 font-mono font-bold flex items-center gap-1 shadow-xs">
+                        <Heart className="w-2.5 h-2.5 fill-rose-500 text-rose-500" />
+                        {charAssessment.romance}%
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center justify-between gap-1 mt-0.5">
-                    <span className="text-[10px] text-neutral-400 truncate">
+
+                  {/* Row 2: Role & Trust Status */}
+                  <div className="flex items-center justify-between gap-1 mt-1 text-[11px]">
+                    <span className="text-neutral-400 font-medium line-clamp-1">
                       {char.role}
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400">
-                      {charAssessment.trust}%
+                    <span className="shrink-0 text-[10px] font-mono font-semibold text-emerald-400">
+                      Trust {charAssessment.trust}%
                     </span>
                   </div>
-                  {/* Miniature trust bar */}
-                  <div className="w-full h-1 bg-neutral-800 rounded-full mt-1.5 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300"
-                      style={{ width: `${charAssessment.trust}%` }}
-                    />
+
+                  {/* Row 3: Trust & Romance Progress Bars */}
+                  <div className="space-y-1 mt-1.5">
+                    <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800/60">
+                      <div
+                        className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(100, Math.max(2, charAssessment.trust))}%` }}
+                      />
+                    </div>
+                    {char.hasRomance && (
+                      <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800/60">
+                        <div
+                          className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, Math.max(2, charAssessment.romance))}%` }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </button>
@@ -199,67 +215,86 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
         </div>
 
         {/* Right / Main Detailed Dossier View */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-950 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-950 space-y-4 sm:space-y-5 scrollbar-thin scrollbar-thumb-neutral-800">
           {/* Header Card with Character Portrait, Tagline & Follower Badge */}
           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800/90 relative overflow-hidden shadow-xl shrink-0">
             {/* Ambient Background Accent Glow */}
             <div
-              className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${selectedChar.accentColor} opacity-10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16`}
+              className={`absolute top-0 right-0 w-72 h-72 bg-gradient-to-br ${selectedChar.accentColor} opacity-15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20`}
             />
 
-            <div className="flex flex-row items-start gap-4 relative z-10">
-              {/* Large Character Avatar / Interactive Portrait */}
-              <div className="relative group shrink-0">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-neutral-950 border-2 border-neutral-700 shadow-xl relative flex items-center justify-center">
-                  <div className="w-full h-full flex items-center justify-center scale-[1.7] origin-[50%_35%]">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 relative z-10">
+              {/* Character Portrait Stage - Full Portrait, No Cropping */}
+              <div className="relative shrink-0">
+                <div className="w-28 sm:w-32 md:w-36 h-36 sm:h-44 md:h-48 rounded-2xl overflow-hidden bg-gradient-to-b from-neutral-900 via-neutral-950 to-neutral-950 border-2 border-neutral-700/80 shadow-2xl relative flex items-end justify-center">
+                  {/* Subtle color backdrop */}
+                  <div className={`absolute inset-0 bg-gradient-to-t ${selectedChar.accentColor} opacity-20`} />
+
+                  {/* Full SVG Character rendering with proper positioning so head/hair are never cut off */}
+                  <div className="relative w-full h-full flex items-end justify-center pt-2">
                     <NpcSvg
                       characterId={selectedChar.id}
                       expression="neutral"
                       lookDirection="center"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain object-bottom"
                     />
                   </div>
-                </div>
-                <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-neutral-900 border border-neutral-700 text-[10px] font-mono text-neutral-300 shadow">
-                  {selectedChar.followers}
+
+                  {/* Followers pill */}
+                  <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-mono text-neutral-300 shadow">
+                    {selectedChar.followers}
+                  </div>
+
+                  {/* Romance indicator pill if applicable */}
+                  {selectedChar.hasRomance && (
+                    <div className="absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full bg-rose-950/80 border border-rose-500/50 text-[10px] font-mono font-bold text-rose-300 flex items-center gap-1 shadow-md">
+                      <Flame className="w-3 h-3 text-rose-400" />
+                      {assessment.romance}%
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Title & Core Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h2 className="text-lg sm:text-xl font-serif font-bold text-neutral-100">
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1.5">
+                  <h2 className="text-xl sm:text-2xl font-serif font-black text-neutral-100 tracking-tight">
                     {selectedChar.name}
                   </h2>
                   <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getTrustBadgeColor(
+                    className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${getTrustBadgeColor(
                       assessment.trustTier
                     )}`}
                   >
-                    Trust: {assessment.trustTier}
+                    Trust: {assessment.trustTier} ({assessment.trust}%)
                   </span>
                   {selectedChar.hasRomance && (
                     <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border flex items-center gap-1 ${getRomanceBadgeColor(
+                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${getRomanceBadgeColor(
                         assessment.romanceTier
                       )}`}
                     >
-                      <Flame className="w-2.5 h-2.5" />
+                      <Flame className="w-3 h-3" />
                       Romance: {assessment.romanceTier} ({assessment.romance}%)
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-neutral-300 font-medium">
-                  {selectedChar.role}
-                </p>
-                <p className="text-xs italic text-amber-200/90 mt-1 font-serif">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-neutral-300 font-medium">
+                  <span className="px-2.5 py-0.5 rounded-md bg-neutral-800/90 text-amber-300 font-bold border border-amber-500/30 text-[11px]">
+                    {selectedChar.role}
+                  </span>
+                  <span className="text-neutral-500">•</span>
+                  <span className="text-neutral-400">{selectedChar.followers} Followers</span>
+                </div>
+
+                <p className="text-xs sm:text-sm italic text-amber-200/90 mt-2 font-serif bg-neutral-950/50 p-2.5 rounded-xl border border-neutral-800/60 leading-relaxed text-left">
                   “{selectedChar.tagline}”
                 </p>
 
-                <div className="mt-2 text-[11px] text-neutral-400 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
-                  <span>{selectedChar.vibe}</span>
+                <div className="mt-2.5 text-xs text-neutral-400 flex items-center justify-center sm:justify-start gap-1.5">
+                  <Compass className="w-4 h-4 text-neutral-500 shrink-0" />
+                  <span><strong className="text-neutral-300 font-semibold">Social Circle:</strong> {selectedChar.vibe}</span>
                 </div>
               </div>
             </div>

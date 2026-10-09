@@ -90,13 +90,20 @@ const INITIAL_INVENTORY: InventoryItem[] = [];
 const LAST_EPISODE = Math.max(...EPISODE_METAS.map((m) => m.episode));
 const GENERATED_EPISODE_LENGTH = 7;
 
-function findCanonicalScene(episode: number, sceneIndex: number): SceneData | undefined {
+function findCanonicalScene(episode: number, sceneIndex: number, sceneId?: string): SceneData | undefined {
+  if (sceneId) {
+    const byId = CANONICAL_STORY.find((s) => s.id === sceneId);
+    if (byId) return byId;
+  }
   return CANONICAL_STORY.find((s) => s.episode === episode && s.sceneIndex === sceneIndex);
 }
 
-// Hand-written episodes use their own length; Gemini-only episodes use a fixed length
+// Hand-written episodes use their own primary length (7 scenes); Gemini-only episodes use a fixed length
 function getSceneCount(episode: number): number {
-  return CANONICAL_STORY.filter((s) => s.episode === episode).length || GENERATED_EPISODE_LENGTH;
+  const scenesForEp = CANONICAL_STORY.filter((s) => s.episode === episode);
+  if (scenesForEp.length === 0) return GENERATED_EPISODE_LENGTH;
+  const uniqueIndices = new Set(scenesForEp.map((s) => s.sceneIndex));
+  return uniqueIndices.size || GENERATED_EPISODE_LENGTH;
 }
 
 export default function App() {
@@ -115,6 +122,7 @@ export default function App() {
         };
         return {
           ...parsed,
+          currentSceneId: parsed.currentSceneId,
           heroine: {
             ...DEFAULT_HEROINE,
             ...parsed.heroine,
@@ -136,6 +144,7 @@ export default function App() {
     return {
       currentEpisode: 1,
       currentSceneIndex: 0,
+      currentSceneId: 'ep1_sc0',
       currentLineIndex: 0,
       heroine: DEFAULT_HEROINE,
       meters: {
@@ -251,13 +260,14 @@ export default function App() {
 
   // Current Scene: hand-written scenes always win; Gemini scenes only fill episodes/scenes with no hand-written version
   const rawBaseScene: SceneData =
-    findCanonicalScene(gameState.currentEpisode, gameState.currentSceneIndex) ||
+    findCanonicalScene(gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId) ||
+    (gameState.currentSceneId ? dynamicScenes[gameState.currentSceneId] : undefined) ||
     dynamicScenes[`${gameState.currentEpisode}_${gameState.currentSceneIndex}`] ||
     CANONICAL_STORY[0];
 
   // Open the scene with a short narration of what the player's last choice led to
   const currentScene: SceneData = useMemo(() => {
-    const sceneKey = `${gameState.currentEpisode}_${gameState.currentSceneIndex}`;
+    const sceneKey = gameState.currentSceneId || `${gameState.currentEpisode}_${gameState.currentSceneIndex}`;
     if (!lastChoice || lastChoice.sceneKey !== sceneKey || !lastChoice.consequenceText) {
       return rawBaseScene;
     }
@@ -271,7 +281,7 @@ export default function App() {
       ...rawBaseScene,
       lines: [consequenceLine, ...rawBaseScene.lines],
     };
-  }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex]);
+  }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId]);
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
@@ -331,6 +341,7 @@ export default function App() {
       const stateToSave = {
         currentEpisode: gameState.currentEpisode,
         currentSceneIndex: gameState.currentSceneIndex,
+        currentSceneId: gameState.currentSceneId,
         currentLineIndex: gameState.currentLineIndex,
         heroine: gameState.heroine,
         meters: gameState.meters,
@@ -490,11 +501,18 @@ export default function App() {
       }
     }
 
-    // Progress to next scene or next episode
+    // Determine target destination: explicit nextSceneId / nextSceneIndex vs sequential progression
     let nextEpisode = gameState.currentEpisode;
     let nextSceneIndex = gameState.currentSceneIndex + 1;
+    let nextSceneId: string | undefined = undefined;
 
-    if (nextSceneIndex >= getSceneCount(gameState.currentEpisode)) {
+    // Check if current scene is an episode finale
+    const isEpisodeFinale =
+      currentScene.id === 'ep1_sc6' ||
+      currentScene.id === 'ep2_sc6' ||
+      currentScene.id === 'ep3_sc6';
+
+    if (isEpisodeFinale) {
       if (nextEpisode >= LAST_EPISODE) {
         // No more episodes written yet: stop here instead of looping back to Episode 1
         setGameState((prev) => ({
@@ -509,11 +527,56 @@ export default function App() {
       }
       nextEpisode += 1;
       nextSceneIndex = 0;
+      nextSceneId = `ep${nextEpisode}_sc0`;
       setShowRecapModal(true);
+    } else if (choice.nextSceneId) {
+      // 1. Explicit scene destination by ID
+      const targetScene = CANONICAL_STORY.find((s) => s.id === choice.nextSceneId);
+      if (targetScene) {
+        nextEpisode = targetScene.episode;
+        nextSceneIndex = targetScene.sceneIndex;
+        nextSceneId = targetScene.id;
+      } else {
+        nextSceneId = choice.nextSceneId;
+      }
+    } else if (choice.nextSceneIndex !== undefined) {
+      // 2. Explicit scene destination by index
+      nextSceneIndex = choice.nextSceneIndex;
+      nextEpisode = choice.nextEpisode ?? gameState.currentEpisode;
+      const targetScene = CANONICAL_STORY.find(
+        (s) => s.episode === nextEpisode && s.sceneIndex === nextSceneIndex
+      );
+      nextSceneId = targetScene?.id;
+    } else {
+      // 3. Sequential progression: advance to next sequential scene in episode
+      nextEpisode = gameState.currentEpisode;
+      nextSceneIndex = gameState.currentSceneIndex + 1;
+      const targetScene = CANONICAL_STORY.find(
+        (s) => s.episode === nextEpisode && s.sceneIndex === nextSceneIndex
+      );
+      if (targetScene) {
+        nextSceneId = targetScene.id;
+      } else if (nextSceneIndex >= getSceneCount(nextEpisode)) {
+        if (nextEpisode >= LAST_EPISODE) {
+          setGameState((prev) => ({
+            ...prev,
+            meters: updatedMeters,
+            flags: updatedFlags,
+            inventory: updatedInventory,
+            historyLog: [...prev.historyLog, { speaker: gameState.heroine.name, text: choice.text }],
+            reachedEndOfContent: true,
+          }));
+          return;
+        }
+        nextEpisode += 1;
+        nextSceneIndex = 0;
+        nextSceneId = `ep${nextEpisode}_sc0`;
+        setShowRecapModal(true);
+      }
     }
 
     // Save exact choice for next scene's opening line and character reaction
-    const nextSceneKey = `${nextEpisode}_${nextSceneIndex}`;
+    const nextSceneKey = nextSceneId || `${nextEpisode}_${nextSceneIndex}`;
     const newLastChoice = {
       text: choice.text,
       consequenceText: choice.consequenceText,
@@ -528,6 +591,7 @@ export default function App() {
       ...prev,
       currentEpisode: nextEpisode,
       currentSceneIndex: nextSceneIndex,
+      currentSceneId: nextSceneId,
       currentLineIndex: 0,
       meters: updatedMeters,
       flags: updatedFlags,
@@ -539,7 +603,7 @@ export default function App() {
     }));
 
     // Only ask Gemini for scenes that have no hand-written version
-    if (!findCanonicalScene(nextEpisode, nextSceneIndex)) {
+    if (!findCanonicalScene(nextEpisode, nextSceneIndex, nextSceneId)) {
       triggerGeminiGeneration(nextEpisode, nextSceneIndex, choice.text, updatedMeters, updatedFlags);
     }
   };
@@ -637,6 +701,7 @@ export default function App() {
     const freshState: GameState = {
       currentEpisode: 1,
       currentSceneIndex: 0,
+      currentSceneId: 'ep1_sc0',
       currentLineIndex: 0,
       heroine: resetCustomization ? DEFAULT_HEROINE : gameState.heroine,
       meters: {

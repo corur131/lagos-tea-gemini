@@ -214,6 +214,9 @@ export interface ChoiceOption {
   flagToSet?: string;
   conditionFlag?: string;
   musicMood?: MusicMood;
+  nextSceneId?: string;
+  nextSceneIndex?: number;
+  nextEpisode?: number;
 }
 
 export interface SceneData {
@@ -270,6 +273,7 @@ export interface EpisodeMeta {
 export interface GameState {
   currentEpisode: number;
   currentSceneIndex: number;
+  currentSceneId?: string;
   currentLineIndex: number;
   heroine: HeroineCustomization;
   meters: Meters;
