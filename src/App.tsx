@@ -38,6 +38,8 @@ import { DM_THREADS } from './data/dmData';
 import { countUnreadDms, getVisibleBeats, resolveThreadIdentity } from './components/social/DmInbox';
 import { DmToast, DmToastItem, describeBeat } from './components/social/DmToast';
 import { ViralToast } from './components/social/ViralToast';
+import { RelationshipPing, RelationshipPingItem } from './components/vn/RelationshipPing';
+import { RELATIONSHIP_IMPACTS, scaledTrust } from './data/choiceRelationships';
 import { getViralMoments, ViralMoment } from './data/viralMoments';
 import { playSound, bgmManager } from './utils/audio';
 import {
@@ -80,6 +82,17 @@ const DEFAULT_HEROINE: HeroineCustomization = {
   outfit: 'casual',
   earrings: 'none',
   necklace: 'none',
+};
+
+const SHORT_NAMES: Record<string, string> = {
+  zee: 'Zee',
+  tamara: 'Tamara',
+  chi: 'Chioma',
+  bisola: 'Bisola',
+  hauwa: 'Hauwa',
+  chidi: 'Chidi',
+  kelvin: 'Kelvin',
+  dayo: 'Dayo',
 };
 
 const CULPRIT_CANDIDATES: CulpritId[] = ['zee', 'tamara', 'chi', 'bisola', 'hauwa'];
@@ -326,6 +339,28 @@ export default function App() {
     setSocialFeedInitialTab('profile');
     setSocialFeedInitialThread(null);
     setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
+  };
+
+  /* ---------------- Relationship feedback after a choice ---------------- */
+  const [relationshipPing, setRelationshipPing] = useState<{ id: number; items: RelationshipPingItem[] } | null>(null);
+  const clearRelationshipPing = useCallback(() => setRelationshipPing(null), []);
+
+  const showRelationshipPing = (choice: ChoiceOption) => {
+    const items: RelationshipPingItem[] = [];
+    const impact = choice.flagToSet ? RELATIONSHIP_IMPACTS[choice.flagToSet] : undefined;
+    Object.entries(impact?.trust || {}).forEach(([id, delta]) => {
+      const shown = scaledTrust(delta);
+      if (shown) items.push({ name: SHORT_NAMES[id] || id, kind: 'trust', delta: shown });
+    });
+    const romance: Array<[string, number | undefined]> = [
+      ['Chidi', choice.meterChanges?.romanceChidi],
+      ['Kelvin', choice.meterChanges?.romanceKelvin],
+      ['Dayo', choice.meterChanges?.romanceDayo],
+    ];
+    romance.forEach(([name, delta]) => {
+      if (delta) items.push({ name, kind: 'romance', delta });
+    });
+    if (items.length > 0) setRelationshipPing({ id: Date.now(), items });
   };
 
   const activeDmToast = dmToastQueue[0];
@@ -639,6 +674,7 @@ export default function App() {
     }
 
     const historyEntry = { speaker: gameState.heroine.name, text: choice.text };
+    showRelationshipPing(choice);
 
     // 1. The choice has its own follow-up beat: play it in this scene before moving on
     const followUpScene = getFollowUpLines(choice) ? buildFollowUpScene(currentScene, choice) : undefined;
@@ -1315,6 +1351,11 @@ export default function App() {
       )}
 
       {/* 7. FIRST LAUNCH WELCOME & CUSTOMIZER */}
+      {/* WHO LIKED THAT CHOICE */}
+      {relationshipPing && !gameState.isSocialFeedOpen && (
+        <RelationshipPing pingId={relationshipPing.id} items={relationshipPing.items} onDone={clearRelationshipPing} />
+      )}
+
       {/* VIRAL MOMENT BANNER (waits while the phone is open or during character creation) */}
       {activeViral && !gameState.isSocialFeedOpen && !isFirstLaunch && (
         <ViralToast moment={activeViral} onOpen={openProfileFromViral} onDismiss={dismissViral} />
