@@ -405,13 +405,25 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
       }
 
       if (activeTab === 'cast') {
-        if (selectedCastMember !== 'all' && post.authorId !== selectedCastMember) {
-          return false;
+        const ELIGIBLE_CAST_AUTHORS = ['zee', 'tamara', 'kelvin', 'dayo', 'chi', 'bisola', 'hauwa', 'chidi'];
+        if (selectedCastMember === 'all') {
+          // All Cast must only show posts authored by eligible cast accounts, excluding heroine and lagos_tea
+          if (!ELIGIBLE_CAST_AUTHORS.includes(post.authorId)) {
+            return false;
+          }
+        } else {
+          // Specific cast member selected (e.g. zee, tamara, or lagos_tea if explicitly clicked)
+          if (post.authorId !== selectedCastMember) {
+            return false;
+          }
         }
       }
 
       // 3. Hashtag Filter
-      if (activeHashtag && !post.hashtags.includes(activeHashtag)) {
+      if (
+        activeHashtag &&
+        !post.hashtags.some((h) => h.toLowerCase() === activeHashtag.toLowerCase())
+      ) {
         return false;
       }
 

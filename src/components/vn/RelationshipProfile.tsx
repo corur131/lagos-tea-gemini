@@ -199,19 +199,19 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
         </div>
 
         {/* Right / Main Detailed Dossier View */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-950 flex flex-col space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-950 space-y-4">
           {/* Header Card with Character Portrait, Tagline & Follower Badge */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800/90 relative overflow-hidden shadow-xl">
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800/90 relative overflow-hidden shadow-xl shrink-0">
             {/* Ambient Background Accent Glow */}
             <div
               className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${selectedChar.accentColor} opacity-10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16`}
             />
 
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 relative z-10">
+            <div className="flex flex-row items-start gap-4 relative z-10">
               {/* Large Character Avatar / Interactive Portrait */}
               <div className="relative group shrink-0">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-neutral-950 border-2 border-neutral-700 shadow-xl relative flex items-center justify-center">
-                  <div className="scale-[1.7] translate-y-3 w-full h-full flex items-center justify-center">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-neutral-950 border-2 border-neutral-700 shadow-xl relative flex items-center justify-center">
+                  <div className="w-full h-full flex items-center justify-center scale-[1.7] origin-[50%_35%]">
                     <NpcSvg
                       characterId={selectedChar.id}
                       expression="neutral"
@@ -226,8 +226,8 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
               </div>
 
               {/* Title & Core Details */}
-              <div className="flex-1 text-center sm:text-left min-w-0">
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h2 className="text-lg sm:text-xl font-serif font-bold text-neutral-100">
                     {selectedChar.name}
                   </h2>
@@ -245,20 +245,20 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
                       )}`}
                     >
                       <Flame className="w-2.5 h-2.5" />
-                      Romance: {assessment.romanceTier}
+                      Romance: {assessment.romanceTier} ({assessment.romance}%)
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs text-neutral-400 font-medium">
+                <p className="text-xs text-neutral-300 font-medium">
                   {selectedChar.role}
                 </p>
-                <p className="text-xs italic text-neutral-300 mt-1.5 font-serif">
+                <p className="text-xs italic text-amber-200/90 mt-1 font-serif">
                   “{selectedChar.tagline}”
                 </p>
 
-                <div className="mt-2 text-[11px] text-neutral-400 flex items-center justify-center sm:justify-start gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-neutral-500" />
+                <div className="mt-2 text-[11px] text-neutral-400 flex items-center gap-1.5">
+                  <Compass className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
                   <span>{selectedChar.vibe}</span>
                 </div>
               </div>
