@@ -103,6 +103,8 @@ function renderSceneLocation(
       return renderPhotoshootStudio(isNight);
     case 'night_street':
       return renderNightStreet(isNight);
+    case 'event_hall':
+      return renderEventHall(isNight);
     default:
       return renderAjegunleApartment(isNight, isBlackout);
   }
@@ -470,6 +472,86 @@ function renderNightStreet(isNight: boolean) {
       <rect x="60" y="270" width="70" height="35" rx="4" fill="#EAB308" stroke="#000000" strokeWidth="2" />
       <rect x="65" y="275" width="20" height="12" fill="#93C5FD" />
       <rect x="90" y="275" width="20" height="12" fill="#93C5FD" />
+    </g>
+  );
+}
+
+
+/* 9. EVENT HALL (Owambe at the Civic Centre) */
+function renderEventHall(isNight: boolean) {
+  const wall = isNight ? '#2A1A0A' : '#3A2410';
+  return (
+    <g id="bg_event_hall">
+      <defs>
+        <linearGradient id="hall_drape" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F5C24A" />
+          <stop offset="0.55" stopColor="#C8901C" />
+          <stop offset="1" stopColor="#7A5208" />
+        </linearGradient>
+        <radialGradient id="hall_glow" cx="50%" cy="20%" r="70%">
+          <stop offset="0" stopColor="#FFE8A3" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#FFE8A3" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="600" height="450" fill={wall} />
+      {/* draped gold ceiling swags */}
+      {[0, 1, 2, 3, 4, 5].map((k) => (
+        <path key={`swag_${k}`} d={`M ${k * 100} 0 Q ${k * 100 + 50} 70 ${k * 100 + 100} 0 Z`} fill="url(#hall_drape)" opacity="0.95" />
+      ))}
+      {/* side curtains with folds */}
+      {[0, 1].map((side) => (
+        <g key={`curtain_${side}`} transform={side ? 'translate(600 0) scale(-1 1)' : undefined}>
+          <path d="M 0 0 L 70 0 C 60 120, 80 260, 50 340 L 0 340 Z" fill="url(#hall_drape)" />
+          {[12, 26, 40, 54].map((x) => (
+            <path key={x} d={`M ${x} 0 C ${x - 4} 120, ${x + 6} 240, ${x - 6} 340`} stroke="#7A5208" strokeWidth="2" fill="none" opacity="0.45" />
+          ))}
+        </g>
+      ))}
+      {/* LED screen behind the high table */}
+      <rect x="190" y="70" width="220" height="124" rx="4" fill="#0B0B12" stroke="#F5C24A" strokeWidth="3" />
+      <rect x="198" y="78" width="204" height="108" fill={isNight ? '#3B0A1E' : '#4A0E28'} />
+      <text x="300" y="122" textAnchor="middle" fontSize="20" fontWeight="800" fill="#F5C24A" fontFamily="Georgia, serif">BELLO @ 60</text>
+      <text x="300" y="146" textAnchor="middle" fontSize="10" fill="#FDE7A8" letterSpacing="3">CELEBRATING A QUEEN</text>
+      <path d="M 270 160 Q 300 172 330 160" stroke="#F5C24A" strokeWidth="1.5" fill="none" />
+      {/* chandeliers */}
+      {[110, 490].map((x) => (
+        <g key={`ch_${x}`}>
+          <line x1={x} y1="0" x2={x} y2="36" stroke="#F5C24A" strokeWidth="1.5" />
+          <ellipse cx={x} cy="44" rx="34" ry="10" fill="#FFF3C4" opacity="0.9" />
+          {[-24, -12, 0, 12, 24].map((d) => (
+            <line key={d} x1={x + d} y1="48" x2={x + d * 0.9} y2="66" stroke="#FFF8DC" strokeWidth="1.6" opacity="0.8" />
+          ))}
+          <circle cx={x} cy="44" r="60" fill="url(#hall_glow)" />
+        </g>
+      ))}
+      {/* high table with gold skirt and flowers */}
+      <rect x="150" y="214" width="300" height="30" fill="#F8F3E6" />
+      <path d="M 150 244 L 450 244 L 446 300 L 154 300 Z" fill="url(#hall_drape)" />
+      {[175, 225, 275, 325, 375, 425].map((x) => (
+        <path key={`pleat_${x}`} d={`M ${x} 244 L ${x - 3} 300`} stroke="#7A5208" strokeWidth="2" opacity="0.5" />
+      ))}
+      {[200, 300, 400].map((x) => (
+        <g key={`flowers_${x}`}>
+          <circle cx={x} cy="206" r="12" fill="#B91C1C" />
+          <circle cx={x - 9} cy="210" r="8" fill="#F5C24A" />
+          <circle cx={x + 9} cy="210" r="8" fill="#FDE7A8" />
+        </g>
+      ))}
+      {/* dance floor and round guest tables */}
+      <polygon points="0,300 600,300 600,450 0,450" fill={isNight ? '#1A1209' : '#24180B'} />
+      <polygon points="120,330 480,330 560,450 40,450" fill="#3A2A12" opacity="0.6" />
+      {[[60, 360], [540, 360], [120, 420], [480, 420]].map(([x, y], i) => (
+        <g key={`table_${i}`}>
+          <ellipse cx={x} cy={y} rx="48" ry="14" fill="#F8F3E6" />
+          <path d={`M ${x - 48} ${y} L ${x - 44} ${y + 30} L ${x + 44} ${y + 30} L ${x + 48} ${y} Z`} fill="#E9DFC6" />
+          <circle cx={x} cy={y - 10} r="8" fill="#F5C24A" />
+        </g>
+      ))}
+      {/* scattered sprayed naira notes on the floor */}
+      {[[220, 360, 12], [260, 392, -20], [330, 372, 30], [380, 410, -8], [170, 418, 40], [430, 380, 18]].map(([x, y, r], i) => (
+        <rect key={`note_${i}`} x={x} y={y} width="16" height="8" rx="1" fill="#A3B18A" stroke="#5F6F4A" strokeWidth="0.6" transform={`rotate(${r} ${x} ${y})`} opacity="0.9" />
+      ))}
+      <rect width="600" height="450" fill="url(#hall_glow)" />
     </g>
   );
 }

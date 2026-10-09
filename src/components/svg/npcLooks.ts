@@ -78,9 +78,10 @@ export interface StoryMoment {
 }
 
 /** The kind of scene a location is, for wardrobe and makeup */
-type Vibe = 'party' | 'campus' | 'mall' | 'beach' | 'home' | 'night' | 'studio' | 'everyday';
+type Vibe = 'party' | 'owambe' | 'campus' | 'mall' | 'beach' | 'home' | 'night' | 'studio' | 'everyday';
 
 function vibeOf(loc: LocationType | undefined, episode: number): Vibe {
+  if (loc === 'event_hall') return 'owambe';
   if ((loc === 'banana_island_mansion' && episode === 1) || loc === 'rooftop_party') return 'party';
   if (loc === 'university_campus') return 'campus';
   if (loc === 'mall') return 'mall';
@@ -99,6 +100,7 @@ type LookChange = Partial<HeroineCustomization> & { headwrap?: string };
  */
 const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
   zee: {
+    owambe: { outfit: 'aso_ebi', lashes: 'dramatic', eyeshadow: 'gold', lipColor: 'classic_red', lipFinish: 'gloss', earrings: 'drops', necklace: 'pendant' },
     party: { outfit: 'party_dress', lashes: 'dramatic', eyeshadow: 'gold', lipColor: 'classic_red', lipFinish: 'gloss', earrings: 'drops', necklace: 'pendant' },
     campus: { outfit: 'corporate', lipColor: 'berry', lipFinish: 'matte', eyeshadow: 'bronze', lashes: 'classic', earrings: 'studs', necklace: 'thin_chain' },
     mall: { outfit: 'corset_top', lipColor: 'soft_pink', lipFinish: 'gloss', eyeshadow: 'rose', lashes: 'volume', earrings: 'hoops', necklace: 'thin_chain' },
@@ -108,6 +110,7 @@ const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
     studio: { outfit: 'corset_top', hairstyle: 'bangs_wig', lipColor: 'gold', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
   },
   tamara: {
+    owambe: { outfit: 'aso_ebi', lashes: 'volume', eyeshadow: 'gold', lipColor: 'coral', lipFinish: 'gloss', earrings: 'drops', necklace: 'thin_chain' },
     party: { outfit: 'tube_top', lipColor: 'berry', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
     campus: { outfit: 'adire_shirt', lipColor: 'nude', lipFinish: 'gloss', eyeshadow: 'none', lashes: 'natural', earrings: 'hoops' },
     mall: { outfit: 'crop_top', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'bronze', lashes: 'volume', earrings: 'hoops' },
@@ -117,6 +120,7 @@ const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
     studio: { outfit: 'aso_oke', hairstyle: 'water_wave_wig', lipColor: 'gold', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'dramatic', earrings: 'drops' },
   },
   chi: {
+    owambe: { outfit: 'aso_ebi', lashes: 'classic', eyeshadow: 'bronze', lipColor: 'plum', lipFinish: 'matte', earrings: 'studs', necklace: 'pendant' },
     party: { outfit: 'party_dress', hairstyle: 'side_part_wig', lipColor: 'classic_red', lipFinish: 'matte', eyeshadow: 'smoky_black', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
     campus: { outfit: 'corporate' },
     mall: { outfit: 'denim_jacket', lipColor: 'berry', eyeshadow: 'bronze', earrings: 'hoops' },
@@ -126,6 +130,7 @@ const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
     studio: { outfit: 'cardigan_set', hairstyle: 'side_part_wig', lipColor: 'chocolate_brown', eyeshadow: 'bronze', lashes: 'classic' },
   },
   bisola: {
+    owambe: { outfit: 'aso_ebi', lashes: 'dramatic', eyeshadow: 'gold', lipColor: 'coral', lipFinish: 'gloss', earrings: 'hoops' },
     party: { outfit: 'halter_top', lipColor: 'coral', lipFinish: 'gloss', eyeshadow: 'purple', lashes: 'dramatic', earrings: 'drops', necklace: 'pendant' },
     campus: { outfit: 'baby_tee', hairstyle: 'pixie_wig' },
     mall: { outfit: 'jersey_top', hairstyle: 'bangs_wig', eyeshadow: 'teal' },
@@ -135,6 +140,7 @@ const SCENE_LOOKS: Record<GirlId, Partial<Record<Vibe, LookChange>>> = {
     studio: { outfit: 'baby_tee', hairstyle: 'genie_ponytail', lipColor: 'berry', eyeshadow: 'purple', lashes: 'dramatic' },
   },
   hauwa: {
+    owambe: { outfit: 'aso_ebi', lashes: 'classic', eyeshadow: 'gold', lipColor: 'chocolate_brown', lipFinish: 'gloss', earrings: 'drops', headwrap: '#C9971F' },
     party: { outfit: 'native_lace', lipColor: 'chocolate_brown', lipFinish: 'gloss', eyeshadow: 'gold', lashes: 'classic', earrings: 'drops', headwrap: '#B7791F' },
     campus: { outfit: 'bubu_kaftan' },
     mall: { outfit: 'cardigan_set', headwrap: '#9D174D' },

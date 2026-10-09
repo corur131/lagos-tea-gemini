@@ -87,7 +87,14 @@ export function getMaleLook(id: MaleId, moment: { episode?: number; location?: L
 
   const isParty = (loc === 'banana_island_mansion' && ep === 1) || loc === 'rooftop_party';
   const pick = <T,>(m: Record<MaleId, T>) => m[id];
-  if (isParty) {
+  if (loc === 'event_hall') {
+    // Owambe: the photographer working in senator, Kelvin in defiant black, Dayo in a gold-trimmed agbada
+    Object.assign(look, pick({
+      chidi: { outfit: 'senator', color: '#E8E2D4' },
+      kelvin: { outfit: 'suit', color: '#0B0B0D' },
+      dayo: { outfit: 'agbada', color: '#E9DDB8' },
+    }));
+  } else if (isParty) {
     Object.assign(look, pick({
       chidi: { outfit: 'senator', color: '#2B3A55' },
       kelvin: { outfit: 'suit', color: '#111114' },

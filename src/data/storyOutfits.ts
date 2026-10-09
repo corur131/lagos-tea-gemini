@@ -22,7 +22,15 @@ export interface DressCode {
 const PARTY: OutfitId[] = ['party_dress', 'corset_top', 'tube_top', 'thrift_dress', 'native_lace', 'halter_top', 'aso_oke', 'bubu_kaftan'];
 const WORK: OutfitId[] = ['corporate', 'adire_shirt', 'cardigan_set', 'denim_jacket'];
 
+const NIGHT_OUT: OutfitId[] = ['hoodie', 'athleisure', 'denim_jacket', 'casual', 'jersey_top'];
+
 const code = (label: string, wear: OutfitId, allowed: OutfitId[] = [wear]): DressCode => ({ label, wear, allowed });
+
+/** Mama Bello's 60th: gold aso-ebi, or the red look Kelvin suggested */
+function owambeLook(flags: Record<string, boolean>): DressCode {
+  if (flags.wore_red) return code('Owambe night, in red', 'corset_top');
+  return code('Owambe night, gold aso-ebi', 'aso_ebi');
+}
 
 /** The gown Ada chose (or was dragged into) for Zee's 21st */
 function partyDressFromChoice(flags: Record<string, boolean>): DressCode | undefined {
@@ -52,6 +60,35 @@ const SCENE_CODES: Record<string, (flags: Record<string, boolean>) => DressCode 
   ep4_sc7: () => code('Late night in Tamara’s room: pyjamas', 'silk_pajamas'),
   ep4_sc8: () => code('3 AM: pyjamas', 'silk_pajamas'),
   ep4_sc10: () => code('Trying on the aso-ebi', 'aso_ebi'),
+  /* Episode 5: Mama Bello's 60th, from the hall to the rides home */
+  ep5_sc1: owambeLook,
+  ep5_sc2: owambeLook,
+  ep5_sc2b: owambeLook,
+  ep5_sc3: owambeLook,
+  ep5_sc4: owambeLook,
+  ep5_sc4b: owambeLook,
+  ep5_sc5: owambeLook,
+  ep5_sc6: owambeLook,
+  ep5_sc7: owambeLook,
+  ep5_sc8_dayo: owambeLook,
+  ep5_sc8_kelvin: owambeLook,
+  ep5_sc8_chidi: owambeLook,
+  ep5_sc8_tamara: owambeLook,
+  ep5_sc9: () => code('2 AM: pyjamas', 'silk_pajamas'),
+  ep5_sc10: () => code('3 AM: pyjamas', 'silk_pajamas'),
+  /* Episode 6 */
+  ep6_sc0: () => code('Monday, 7 AM: pyjamas', 'silk_pajamas'),
+  ep6_sc5: () => code('Scholarship hearing, formal', 'corporate', WORK),
+  ep6_sc5b: () => code('Scholarship hearing, formal', 'corporate', WORK),
+  /* Episode 7 */
+  ep7_sc1: (f) => (f.partner_kelvin ? code('Something boring, for the bankers', 'corporate', WORK) : undefined),
+  ep7_sc1b: (f) => (f.partner_kelvin ? code('Something boring, for the bankers', 'corporate', WORK) : undefined),
+  ep7_sc3b: () => code('Night stake-out', 'hoodie', NIGHT_OUT),
+  ep7_sc4: () => code('Night stake-out', 'hoodie', NIGHT_OUT),
+  ep7_sc7: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
+  ep7_sc8: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
+  ep7_sc9: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
+  ep7_sc10: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
 };
 
 /** The dress code for a scene (choice follow-ups share their scene's code) */

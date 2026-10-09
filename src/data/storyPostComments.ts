@@ -180,4 +180,108 @@ export const STORY_POST_COMMENTS: Record<string, CommentChoice[]> = {
     c('report', 'Report it 🚫', 'Reported. Everyone who cares about decency, report this too 🚫', { m: { reputation: 6, loyalty: 3 } }, [['ronke_adewale', 'Done ✅'], ['kene_okoli', 'Reported. This is criminal.']]),
     c('silent', 'Say nothing 🤐', '…', { m: { reputation: 2 } }, [['tamara', 'I’m here. Whenever you’re ready 💚']]),
   ],
+
+  /* ---------------------------- Episode 5 ---------------------------- */
+  post_bisola_asoebi_ep5: [
+    c('gold', 'Hype the gold ✨', 'Six queens, one gele artist down. Worth it ✨👑', { m: { popularity: 4 }, t: { bisola: 5, zee: 2 } }, [['bisola', 'QUEEN ADA HAS SPOKEN 👑'], ['simi_solanke', 'The squad is serving']]),
+    c('tamara_gele', 'Credit Tamara 💅', 'Tamara tied my gele and I look like royalty. Since primary school she’s been doing this 💚', { m: { loyalty: 3 }, t: { tamara: 6 }, mem: { tamara: 'You credited her gele work on Bisola’s vlog.' } }, [['tamara', 'A FASHIONABLE broken fan, back then 😂💚']]),
+    c('gloves', 'Notice the gloves 🧤', 'Not me noticing the lace gloves too 👀🧤 Very royal wedding.', { m: { suspicion: 5 }, t: { chi: -2, tamara: -2 } }, [['chi', 'Court habit. I explained this.'], ['tamara', 'MANICURE PROTECTION, Ada 😭']]),
+    c('nervous', 'Nervous joke 😅', 'If I fall in this gele tonight, please edit it out 😅', { m: { popularity: 3 } }, [['bisola', 'I will NOT. Content is content 😂'], ['kene_okoli', 'We’re watching for the fall now 😭']]),
+    c('heart', 'Just a heart 💛', '💛', { m: { popularity: 1 } }, [['bisola', '💛💛💛']]),
+  ],
+  post_dayo_booth_ep5: [
+    c('me', 'It was me 🎧', 'Somebody in gold says the thirty seconds were perfect 🎧', { m: { romanceDayo: 6, popularity: 4, jealousy: 3 }, t: { dayo: 6 }, mem: { dayo: 'You told everyone you were the somebody in gold.' } }, [['dayo', 'Somebody in gold has good taste.'], ['keji_balogun', 'THE CONFIRMATION 😭😭']]),
+    c('three_d', 'Three dimensions 😏', 'He exists in three dimensions, everyone. I checked 😏', { m: { romanceDayo: 4, popularity: 3 }, t: { dayo: 4 } }, [['dayo', 'Disappointed?'], ['femi_ajayi', 'NOT THE INSPECTION 😭']]),
+    c('play_it', 'Play it now 🔥', 'Drop it already. Six hundred people are waiting 🔥', { m: { romanceDayo: 2, popularity: 2 } }, [['dayo', 'Patience 🙂']]),
+    c('careful', 'Keep it low-key 🤐', 'Low-key is a thing, Dayo 🤐', { m: { reputation: 2, romanceDayo: -2 } }, [['dayo', 'Noted. Deleting nothing.']]),
+    c('chidi', 'Shout out Chidi 📸', 'Best producer and best photographer in one hall tonight 📸🎧 @chidi_captures', { m: { loyalty: 2, jealousy: 2 }, t: { chidi: 4, dayo: -1 } }, [['chidi', 'Appreciated.'], ['dayo', 'Fair.']]),
+  ],
+  post_tea_owambe_ep5: [
+    c('ilashe', 'Remember Ilashe 🛶', 'The families matter more than the party. But this was done to hurt, not to help.', { m: { reputation: 8 }, t: { kelvin: 6, zee: 2 }, mem: { kelvin: 'You said the Ilashe families matter more than the party.' } }, [['chinedu_ubah', 'Balanced and correct'], ['kelvin', 'Thank you.']]),
+    c('mama_bello', 'Defend Mama Bello 🙏🏾', 'She blessed me tonight in front of six hundred people. Whatever was signed, she didn’t deserve this on her birthday 🙏🏾', { m: { loyalty: 6 }, t: { zee: 8 }, mem: { zee: 'You defended her mother under the Owambe leak.' } }, [['zee', '🤍'], ['grace_okeke', 'Ajegunle girl with manners']]),
+    c('who_slide', 'Who delivered it? 🔎', 'Someone walked a flash drive into that AV booth in gold aso-ebi and lace gloves. The AV boy remembers 🔎', { m: { suspicion: 8, popularity: 3 } }, [['miriam_chukwu', 'LACE GLOVES 😳'], ['lagos_tea', '🫖']], { if: 'ran_to_av_booth' }),
+    c('coward', 'Call it cowardly 🔥', 'Hiding behind a screen at an old woman’s birthday. Brave 🔥', { m: { reputation: 4, popularity: 4 } }, [['lagos_tea', 'Says the girl hiding behind a gele 🫖'], ['kene_okoli', 'THE PAGE REPLIED 😳']]),
+    c('silent', 'Stay out of it 🤐', '…', { m: { reputation: 1 } }, [['zee', 'Thank you for not adding to it.']]),
+  ],
+  post_paparazzi_barefoot_ep5: [
+    c('shoes', 'Shoes were hurting 👠', 'Heels and car parks don’t mix. That’s the whole story 👠', { m: { reputation: 3, popularity: 3 } }, [['kola_fashola', 'Not the whole story but okay 😭']]),
+    c('takedown', 'Ask them to delete 🚫', 'Please take this down. I’m fine. I just want to go home.', { m: { reputation: 4 }, t: { chidi: 2 } }, [['gidi_paparazzi', 'Respect, deleting in 24h 🙏'], ['grace_okeke', 'Leave her alone 🤍']]),
+    c('chidi', 'Thank Chidi 📸', '@chidi_captures thank you for asking them to take it down.', { m: { romanceChidi: 4 }, t: { chidi: 6 } }, [['chidi', 'Always.']]),
+    c('levelb', 'Tease Level B 😏', 'What happened on Level B stays on Level B 😏', { m: { popularity: 5, suspicion: 2 } }, [['prisca_nwa', 'THE AURA 😭'], ['lagos_tea', 'Does it? 🫖']]),
+    c('ignore', 'Ignore it 🤐', '🤐', { m: { reputation: 1 } }, [['kene_okoli', 'The silence is LOUD']]),
+  ],
+  post_tea_teaser_ep5: [
+    c('come', 'Come and post it 🔥', 'Post it. I’m not hiding from where I come from 🔥', { m: { reputation: 8, popularity: 6 }, t: { hauwa: 3, chi: 2 } }, [['grace_okeke', 'That’s how you do it 👏🏾'], ['lagos_tea', 'Monday 🫖']]),
+    c('legal', 'Mention lawyers ⚖️', 'Publishing a minor’s scholarship form without consent. My lawyer has screenshots ⚖️', { m: { reputation: 6, suspicion: 3 }, t: { chi: 6 }, mem: { chi: 'You called her your lawyer under the page’s teaser.' } }, [['chi', 'She does.'], ['miriam_chukwu', 'LAWYERED UP 😳']], { if: 'called_chi_3am' }),
+    c('how', 'Ask how 🔎', 'That form never left my mother’s house. So how do you have it? 🔎', { m: { suspicion: 8 } }, [['miriam_chukwu', 'EXACTLY my question'], ['lagos_tea', 'I have my ways 🫖']]),
+    c('mama', 'Leave Mama out 🙏🏾', 'Do what you want to me. Leave my mother out of it 🙏🏾', { m: { loyalty: 4, reputation: 4 }, t: { tamara: 3, dayo: 3 } }, [['blessing_alabi', 'We’re with you'], ['tamara', '💚']]),
+    c('sleep', 'Go to sleep 😴', 'Some of us have class in the morning. Go to sleep 😴', { m: { popularity: 4 } }, [['kene_okoli', 'NOT THE BEDTIME 😭'], ['tolu_adebayo', 'She’s too calm, I’m scared']]),
+  ],
+
+  /* ---------------------------- Episode 6 ---------------------------- */
+  post_tea_debt_ep6: [
+    c('truth', 'Tell the truth 📝', 'My father died. My mother borrowed to bury him. I was 17 and I lied on one box. Now you know everything. I’m still here.', { m: { reputation: 10, popularity: 6 }, t: { chi: 4, hauwa: 4, bisola: 3 } }, [['grace_okeke', 'We see you 🤍'], ['blessing_alabi', 'Ajegunle is proud of you']]),
+    c('stain', 'Point at the stain ☕', 'That coffee stain is mine. That’s my personal copy, from my mother’s house. Somebody went into her house to get this ☕', { m: { suspicion: 10, reputation: 4 } }, [['miriam_chukwu', 'TOLD YOU 😳'], ['lagos_tea', '🫖']], { if: 'studied_debt_leak' }),
+    c('loanshark', 'Name the loan shark 🦈', '20% a month. Look that up. Then ask who the real criminal is 🦈', { m: { reputation: 6, popularity: 4 } }, [['chinedu_ubah', 'Say it louder'], ['demola_shonowo', '…okay that’s fair actually']]),
+    c('demola', 'Answer Demola 🙂', '@demola_shonowo rules are rules. I hope you never have to choose between a funeral and a future 🙂', { m: { popularity: 5, reputation: 3 } }, [['demola_shonowo', 'I didn’t think about it like that. Sorry.'], ['kene_okoli', 'Respectfully cooked 😭']]),
+    c('silent', 'Say nothing 🤐', '…', { m: { reputation: 2 } }, [['tamara', 'I’m here 💚'], ['dayo', 'Sofa bed’s still free.']]),
+  ],
+  post_zee_restructure_ep6: [
+    c('grace', 'Wish her well 🤍', 'Thank you for the job, Zee. Good luck with the vote 🤍', { m: { reputation: 8 }, t: { zee: 8 }, mem: { zee: 'You wished her well publicly the day she fired you.' } }, [['zee', '🤍'], ['grace_okeke', 'Classy. Very classy.']]),
+    c('personal', 'It felt personal 😐', '“Never personal.” Felt pretty personal from the driveway 😐', { m: { popularity: 6, reputation: -2 }, t: { zee: -6 }, mem: { zee: 'You mocked her restructuring post.' } }, [['kene_okoli', 'THE DRIVEWAY 😭'], ['zee', 'Ada.']]),
+    c('light', 'Light back ✨', 'Light to you too ✨ I’ll be fine. People like me always are.', { m: { reputation: 5 }, t: { zee: 3 } }, [['zee', 'I know.']]),
+    c('vote', 'Mention the Guild 🗳️', 'Hope the Guild appreciates how hard you’re working to look spotless 🗳️', { m: { suspicion: 4, popularity: 3 }, t: { zee: -4, chi: 2 } }, [['chi', '👀'], ['zee', 'Noted.']]),
+    c('skip', 'Scroll past 🤐', '🤐', { m: { reputation: 1 } }, [['bisola', '🤍']]),
+  ],
+  post_tamara_sleepover_ep6: [
+    c('sister', 'Sister forever 💚', 'Since the mango tree. Thank you for the room, the Milo and the rubbish films 💚', { m: { loyalty: 6 }, t: { tamara: 8 }, mem: { tamara: 'You thanked her publicly for taking you in.' } }, [['tamara', 'Forever 💚'], ['simi_solanke', 'I’m crying at a sleepover post 😭']]),
+    c('chef', 'Ask about the chef 👨🏾‍🍳', 'Where is this famous chef you promised me? 😂👨🏾‍🍳', { m: { popularity: 3, suspicion: 2 }, t: { tamara: -1 } }, [['tamara', 'On leave!! Don’t expose me 😭']]),
+    c('nnamdi', 'Defend the décor 🖼️', '@nnamdi_oraekwe minimalism is very in. Ask anyone 🖼️', { m: { loyalty: 3 }, t: { tamara: 4 } }, [['tamara', 'THANK you 💅']]),
+    c('envelopes', 'Hint at the notices 📮', 'Lagos is hard on everyone. Even Ikoyi. Hold on 📮', { m: { suspicion: 5 }, t: { tamara: -4 }, mem: { tamara: 'You hinted at her family’s money troubles in public.' } }, [['tamara', 'What does that mean, Ada?']], { if: 'asked_tamara_phone' }),
+    c('heart', 'Just a heart 💚', '💚', { m: { popularity: 1 } }, [['tamara', '💚💚']]),
+  ],
+  post_dayo_wifi_ep6: [
+    c('sheets', 'Thank him for the sheets 🛏️', 'The sheets still have the shop creases. Nobody has ever bought me sheets before 🛏️', { m: { romanceDayo: 8 }, t: { dayo: 8 }, mem: { dayo: 'You thanked him in public for the new sheets.' } }, [['dayo', 'First of many.'], ['keji_balogun', 'I’M SCREAMING 😭😭']]),
+    c('password', 'Tease the password 😏', 'Your Wi-Fi password is very well chosen 😏', { m: { romanceDayo: 6, popularity: 3 }, t: { dayo: 5 } }, [['dayo', 'It was a big upgrade.'], ['femi_ajayi', 'WHAT IS THE PASSWORD 😭']]),
+    c('song', 'Ask for the song 🎹', 'Finished? Then I’m hearing it tonight 🎹', { m: { romanceDayo: 4 }, t: { dayo: 4 } }, [['dayo', 'Front row seat.']]),
+    c('upstairs', 'Mention upstairs 👀', 'Tell your upstairs neighbour to stop beeping at 1 AM 👀', { m: { suspicion: 6 }, t: { dayo: 1 } }, [['dayo', 'Delete this.'], ['nnamdi_oraekwe', 'Upstairs neighbour?? 😳']], { if: 'saw_woman_upstairs' }),
+    c('heart', 'Just a heart 🎧', '🎧', { m: { romanceDayo: 1 } }, [['dayo', '🎹']]),
+  ],
+  post_chi_due_process_ep6: [
+    c('thanks', 'Thank her ⚖️', 'Thank you for standing next to me today, Barrister ⚖️', { m: { loyalty: 4, reputation: 4 }, t: { chi: 8 }, mem: { chi: 'You thanked her publicly after the scholarship hearing.' } }, [['chi', 'You did the hard part.'], ['omowunmi_p', 'Confirmed: Chioma is her lawyer 😳']], { if: 'chi_counsel' }),
+    c('prepped', 'Credit the prep 📚', 'Two days of practice questions with the scariest lawyer in Lagos. Worth every minute 📚', { m: { reputation: 4 }, t: { chi: 6 } }, [['chi', 'Scariest is a compliment. I’ll take it.']], { ifNot: 'chi_counsel' }),
+    c('heard', 'Agree 🙏🏾', 'Being heard before you’re judged. That’s all anyone wants 🙏🏾', { m: { reputation: 4 } }, [['grace_okeke', 'Amen']]),
+    c('daniel', 'Answer Daniel 🙂', '@daniel_okafor she’s my friend first. Lawyer second 🙂', { m: { loyalty: 3, popularity: 2 }, t: { chi: 4 } }, [['chi', 'Third: the one who makes the coffee.']]),
+    c('quiet', 'Stay quiet 🤐', '🤐', { m: { reputation: 1 } }, [['chi', 'Smart.']]),
+  ],
+  post_hauwa_count_ep6: [
+    c('counting', 'I’m counting 🔢', 'Counting. It’s a very small number 🔢', { m: { suspicion: 6 }, t: { hauwa: 6 }, mem: { hauwa: 'You told her you were counting, under her post.' } }, [['hauwa', 'Keep going.']]),
+    c('just_say', 'Just say it 😩', 'Hauwa, with respect, sometimes you can just SAY the thing 😩', { m: { popularity: 4 }, t: { hauwa: -2 } }, [['hauwa', 'Not this time.'], ['nnamdi_oraekwe', 'ADA SPEAKS FOR ALL OF US 😭']]),
+    c('hurts', 'It hurts 🌿', 'It hurts more than I thought it would 🌿', { m: { reputation: 3 }, t: { hauwa: 4 } }, [['hauwa', 'That’s how you know it’s honest.']]),
+    c('envelope', 'Thank her for the envelope ✉️', 'Thank you for the transport money. And the note. Mostly the note ✉️', { m: { loyalty: 3 }, t: { hauwa: 5 } }, [['hauwa', 'Read it twice.']]),
+    c('ifeoma', 'Answer Ifeoma 😂', '@ifeoma_anyanwu sheep, ma. To fall asleep 😂', { m: { popularity: 4 } }, [['ifeoma_anyanwu', 'LMAOOO 😭'], ['hauwa', '🌿']]),
+  ],
+
+  /* ---------------------------- Episode 7 ---------------------------- */
+  post_chidi_kite_ep7: [
+    c('kite', 'Hold on 🪁', 'It only flies because someone is holding on 🪁', { m: { romanceChidi: 6 }, t: { chidi: 8 }, mem: { chidi: 'You quoted his kite line back to him in public.' } }, [['chidi', 'You remembered.']], { ifNot: 'ended_chidi' }),
+    c('caption', 'Read the caption 😶', 'Some photos you wish you never took. Yes. I know which ones 😶', { m: { suspicion: 4, reputation: 2 }, t: { chidi: -3 } }, [['chidi', 'I deserve that.'], ['prisca_nwa', 'WAIT WHAT 😳']]),
+    c('beautiful', 'Say it’s beautiful 📸', 'This is the Lagos I grew up in. Beautiful 📸', { m: { loyalty: 3 }, t: { chidi: 4 } }, [['chidi', 'Thank you.'], ['grace_okeke', 'Agreed 🙏🏾']]),
+    c('done', 'Leave it on seen 🙂', '🙂', { m: { reputation: 2 }, t: { chidi: -2 } }, [['prisca_nwa', 'The smiley is SO cold 😭']], { if: 'ended_chidi' }),
+    c('prisca', 'Answer Prisca 🤐', '@prisca_nwa some captions are just captions 🤐', { m: { loyalty: 2 }, t: { chidi: 3 } }, [['prisca_nwa', 'Sure, Jan 👀']]),
+  ],
+  post_kelvin_ilashe_ep7: [
+    c('brave', 'Call it brave 🛶', 'The bravest thing I’ve seen a rich man do. And the old fisherman agrees 🛶', { m: { romanceKelvin: 8, reputation: 4 }, t: { kelvin: 8 }, mem: { kelvin: 'You called the Ilashe return brave, in public.' } }, [['kelvin', 'You made me do it fast.'], ['chinedu_ubah', 'Power couple behaviour??']]),
+    c('names', 'Ask for the names 📝', 'Now publish the names of every family. Let them tell the story themselves 📝', { m: { reputation: 6 }, t: { kelvin: 4, hauwa: 4 } }, [['kelvin', 'With their permission, yes.']]),
+    c('halima', 'Answer Halima 🙂', '@halima_bello I was there. The canoes were real. So were the tears 🙂', { m: { reputation: 4, popularity: 3 }, t: { kelvin: 4, zee: 2 } }, [['halima_bello', 'Okay. Respect to them then.']]),
+    c('zee', 'Hype Zee too 🤍', 'And @zeebello stood in the sun with no ring light for two hours. Growth 🤍', { m: { loyalty: 4 }, t: { zee: 6 } }, [['zee', 'Don’t tell people I can exist without a ring light.']]),
+    c('heart', 'Just a heart 🤍', '🤍', { m: { romanceKelvin: 1 } }, [['kelvin', '🤍']]),
+  ],
+  post_tea_office_ep7: [
+    c('stand_by', 'Stand by Hauwa 🤍', 'She was trying to stop you. That’s the only thing this post proves 🤍', { m: { loyalty: 6, reputation: 6 }, t: { hauwa: 12 }, mem: { hauwa: 'You stood by her publicly the night the page exposed her.' } }, [['hauwa', 'Thank you, Ada.'], ['grace_okeke', 'Facts 🤍']]),
+    c('camera', 'Point at the camera 📹', 'Who puts a hidden camera in their own office? Someone very scared of being caught 📹', { m: { suspicion: 8, popularity: 4 } }, [['miriam_chukwu', 'EXACTLY'], ['lagos_tea', '🫖']]),
+    c('coming', 'We’re coming 🔥', 'You moved your office? Fine. We’ll find the next one too 🔥', { m: { reputation: 6, popularity: 6 } }, [['lagos_tea', 'Good luck, Cinderella 🫖'], ['kene_okoli', 'CHILLS 😭']]),
+    c('betrayed', 'Feel betrayed 💔', 'Two years writing about all of us. I don’t know what to feel 💔', { m: { reputation: 2 }, t: { hauwa: -6 }, mem: { hauwa: 'You said publicly you felt betrayed by her.' } }, [['hauwa', 'I understand.'], ['bisola', 'SAME 💔']], { if: 'called_out_hauwa' }),
+    c('silent', 'Say nothing 🤐', '…', { m: { reputation: 2, suspicion: 2 } }, [['chi', 'Correct. Nothing in writing.']]),
+  ],
 };

@@ -39,6 +39,7 @@ export const LOCATION_LABELS: Record<LocationType, string> = {
   beach_house: 'Ilashe beach house',
   photoshoot_studio: 'the photo studio',
   night_street: 'Lagos at night',
+  event_hall: 'the Owambe at the Civic Centre',
 };
 
 export const LOCATION_GRADIENTS: Record<LocationType, string> = {
@@ -50,6 +51,7 @@ export const LOCATION_GRADIENTS: Record<LocationType, string> = {
   beach_house: 'from-cyan-400 via-teal-700 to-neutral-950',
   photoshoot_studio: 'from-neutral-300 via-neutral-600 to-neutral-950',
   night_street: 'from-violet-900 via-neutral-900 to-black',
+  event_hall: 'from-yellow-500 via-amber-800 to-neutral-950',
 };
 
 const OUTFIT_LABELS: Record<OutfitId, string> = {
@@ -85,6 +87,7 @@ const LOCATION_TAGS: Record<LocationType, PhotoTag[]> = {
   beach_house: ['glam', 'luxury'],
   photoshoot_studio: ['glam', 'hustle'],
   night_street: ['mystery', 'authentic'],
+  event_hall: ['glam', 'luxury'],
 };
 
 export const STORY_PHOTOS: StoryPhoto[] = [

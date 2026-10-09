@@ -1,5 +1,8 @@
 import { SceneData, EpisodeMeta } from '../types/vn';
 import { EPISODE_4_META, EPISODE_4_SCENES } from './episode4';
+import { EPISODE_5_META, EPISODE_5_SCENES } from './episode5';
+import { EPISODE_6_META, EPISODE_6_SCENES } from './episode6';
+import { EPISODE_7_META, EPISODE_7_SCENES } from './episode7';
 
 export const EPISODE_METAS: EpisodeMeta[] = [
   {
@@ -27,6 +30,9 @@ export const EPISODE_METAS: EpisodeMeta[] = [
     twistTitle: 'The Locked Drawer',
   },
   EPISODE_4_META,
+  EPISODE_5_META,
+  EPISODE_6_META,
+  EPISODE_7_META,
 ];
 
 /* =========================================================================
@@ -1580,4 +1586,7 @@ export const CANONICAL_STORY: SceneData[] = [
   ...EPISODE_2_SCENES,
   ...EPISODE_3_SCENES,
   ...EPISODE_4_SCENES,
+  ...EPISODE_5_SCENES,
+  ...EPISODE_6_SCENES,
+  ...EPISODE_7_SCENES,
 ];

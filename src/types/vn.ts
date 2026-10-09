@@ -184,7 +184,8 @@ export type LocationType =
   | 'university_campus'
   | 'beach_house'
   | 'photoshoot_studio'
-  | 'night_street';
+  | 'night_street'
+  | 'event_hall';
 
 export type TimeModifier = 'day' | 'night' | 'blackout_generator';
 
