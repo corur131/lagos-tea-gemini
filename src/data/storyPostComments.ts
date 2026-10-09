@@ -284,4 +284,64 @@ export const STORY_POST_COMMENTS: Record<string, CommentChoice[]> = {
     c('betrayed', 'Feel betrayed 💔', 'Two years writing about all of us. I don’t know what to feel 💔', { m: { reputation: 2 }, t: { hauwa: -6 }, mem: { hauwa: 'You said publicly you felt betrayed by her.' } }, [['hauwa', 'I understand.'], ['bisola', 'SAME 💔']], { if: 'called_out_hauwa' }),
     c('silent', 'Say nothing 🤐', '…', { m: { reputation: 2, suspicion: 2 } }, [['chi', 'Correct. Nothing in writing.']]),
   ],
+
+  /* ---------------------------- Episode 8 ---------------------------- */
+  post_zee_gown_ep8: [
+    c('light', 'Back her ✨', 'Stand in her light? She can’t even stand in her own 😌✨', { m: { popularity: 6, loyalty: 4 }, t: { zee: 8 }, mem: { zee: 'You backed her publicly before the gala.' } }, [['zee', 'This is why we’re partners.'], ['kene_okoli', 'ADA CAME OUT SWINGING 😭']]),
+    c('vest', 'Wear the vest 🙏🏾', 'Respectfully… maybe wear the vest 🙏🏾', { m: { popularity: 4 }, t: { zee: 2 } }, [['zee', 'Absolutely not.'], ['simi_solanke', 'Ada is the only sane person in that house']]),
+    c('tea_reply', 'Answer the page 🫖', '@TheLagosTea Saturday. Don’t be late.', { m: { suspicion: 6, popularity: 6 } }, [['lagos_tea', 'Never 🫖'], ['miriam_chukwu', 'SHE REPLIED TO THE PAGE 😳']]),
+    c('gown', 'Hype the gown 🤍', 'That gown deserves its own security detail 🤍', { m: { popularity: 2 }, t: { zee: 4 } }, [['zee', 'It has one. His name is Emeka.']]),
+    c('quiet', 'Stay quiet 🤐', '🤐', { m: { reputation: 1 } }, [['zee', 'Smart.']]),
+  ],
+  post_bisola_ring_ep8: [
+    c('delete', 'Tell her to delete 😭', 'Bisola. BISOLA. Delete this 😭', { m: { popularity: 4 }, t: { bisola: 2 } }, [['bisola', 'I CAN’T, IT HAS 40K LIKES 😭'], ['jenny_okoro', 'The panic is so real']]),
+    c('play_along', 'Play along 💍', 'Some people can’t keep a secret for one hour and I love them anyway 💍', { m: { popularity: 4, suspicion: 2 }, t: { bisola: 4 } }, [['bisola', 'IT WAS 47 MINUTES, I TIMED IT'], ['femi_ajayi', 'So it IS Kelvin 😭']]),
+    c('noted', 'Take note 🔎', 'Interesting. The page hasn’t posted this. Only you did 🔎', { m: { suspicion: 8 } }, [['bisola', 'Is that… a compliment??'], ['solomon_ekong', 'Wait. WAIT. That’s actually a clue']]),
+    c('kelvin', 'Tease Kelvin 😏', '@kelvin_wright your grandmother sends her regards 😏', { m: { romanceKelvin: 4, popularity: 3 }, t: { kelvin: 4 } }, [['kelvin', 'She’s delighted. She’s also been dead since 2011.'], ['femi_ajayi', 'I’m deleting my account']]),
+    c('heart', 'Just a ring 💍', '💍', { m: { popularity: 1 } }, [['bisola', '💍💍💍 (I SAID NOTHING)']]),
+  ],
+  post_tea_teacup_ep8: [
+    c('cup', 'Teacup back ☕', '☕', { m: { popularity: 5, suspicion: 2 } }, [['kene_okoli', 'The coffee cup reply 😭'], ['lagos_tea', 'Cute 🫖']]),
+    c('waiting', 'I’m waiting 🕰️', 'Waiting too. Take your time 🕰️', { m: { suspicion: 5 } }, [['miriam_chukwu', 'Why does this feel like a chess game']]),
+    c('sleep', 'Go to sleep 😴', 'It’s midnight. Go to sleep, Tea Lady 😴', { m: { popularity: 4 } }, [['tolu_adebayo', 'She’s not scared anymore and I love it']]),
+    c('ignore', 'Ignore 🤐', '…', { m: { reputation: 2 } }, [['hauwa', 'Good. Be bored.']]),
+    c('report', 'Report it 🚫', 'Reported for being a threat with no caption 🚫', { m: { popularity: 3, reputation: 2 } }, [['grace_okeke', 'Reported too 😂']]),
+  ],
+  post_tea_bait_ep8: [
+    c('laugh', 'Laugh it off 😂', 'Sunday reads the weather beautifully, thank you 😂', { m: { popularity: 8, reputation: 4 }, t: { kelvin: 4 } }, [['kelvin', 'Sunday says thank you.'], ['kene_okoli', 'SHE IS UNBOTHERED 😭']]),
+    c('trap', 'Hint at the trap 🪤', 'Funny how fast that travelled. I only told one person 🪤', { m: { suspicion: 10 }, t: { chi: -6 } }, [['miriam_chukwu', 'IT WAS A TRAP 😳'], ['solomon_ekong', 'Told you']]),
+    c('defend_chi', 'Protect Chi ⚖️', 'Before anyone starts: leaks travel through rooms, not just people. Leave my lawyer alone ⚖️', { m: { reputation: 6, loyalty: 6 }, t: { chi: 10 }, mem: { chi: 'You defended her publicly the night the bait came back.' } }, [['chi', 'Thank you.'], ['grace_okeke', 'Loyalty 🤍']]),
+    c('tamara', 'Thank Tamara 💚', '@tamara_reid 💚', { m: { loyalty: 3 }, t: { tamara: 4 } }, [['tamara', 'Always 💚']]),
+    c('silent', 'Say nothing 🤐', '🤐', { m: { reputation: 2 } }, [['hauwa', 'Good.']]),
+  ],
+  post_tea_gala_ep8: [
+    c('accept', 'Accept 🔥', 'Saturday. 9 PM. I’ll be there. Will you? 🔥', { m: { popularity: 10, reputation: 6 } }, [['lagos_tea', 'Front row 🫖'], ['kene_okoli', 'I HAVE CHILLS']]),
+    c('innocent', 'Promise care 🤍', 'I won’t say a name I can’t prove. That’s the difference between you and me 🤍', { m: { reputation: 10 }, t: { hauwa: 6, chi: 4 } }, [['grace_okeke', 'That’s the right answer'], ['hauwa', 'Exactly.']]),
+    c('zee', 'Back Zee 🤍', '@zeebello your gala, your rules. See you Saturday 🤍', { m: { loyalty: 4 }, t: { zee: 6 } }, [['zee', 'Wear something that isn’t gold.']]),
+    c('popcorn', 'Popcorn 🍿', 'Bringing popcorn. For you, when it’s over 🍿', { m: { popularity: 6, suspicion: 3 } }, [['lagos_tea', '🫖'], ['tolu_adebayo', 'NOT THE POPCORN 😭']]),
+    c('silent', 'Stay quiet 🤐', '…', { m: { reputation: 2 } }, [['chi', 'Correct. Nothing in writing.']]),
+  ],
+
+  /* ---------------------------- Episode 9 ---------------------------- */
+  post_zee_live_ep9: [
+    c('ajegunle', 'Greet Ajegunle 🙏🏾', '@blessing_alabi greet everybody at the kiosk. Tell Mama I’m wearing my pride 🙏🏾', { m: { loyalty: 6, popularity: 6 } }, [['blessing_alabi', 'The whole street is screaming 😭'], ['zee', 'Ajegunle is in the building ✨']]),
+    c('behave', 'Behave 😌', 'You heard her. Behave 😌', { m: { popularity: 4 }, t: { zee: 4 } }, [['zee', 'Thank you, partner.']]),
+    c('receipts', 'Mention receipts 🧾', 'Receipts are in my bag. Every single one 🧾', { m: { suspicion: 6, popularity: 6 } }, [['halima_bello', 'LET’S GOOO'], ['lagos_tea', 'We’ll see 🫖']]),
+    c('nervous', 'Admit nerves 😮‍💨', 'Not going to lie, my hands are shaking 😮‍💨', { m: { reputation: 4 } }, [['grace_okeke', 'Shaking hands still do brave things 🤍'], ['dayo', 'I’m right here.']]),
+    c('quiet', 'Stay focused 🤐', '🤐', { m: { reputation: 2 } }, [['hauwa', 'Focus.']]),
+  ],
+  post_chidi_brave_ep9: [
+    c('thanks', 'Thank him 📸', 'Thank you for this one 📸', { m: { romanceChidi: 6 }, t: { chidi: 8 }, mem: { chidi: 'You thanked him for the “Brave” photo.' } }, [['chidi', 'You did the hard part. I just pressed a button.']]),
+    c('prisca', 'Answer Prisca 😏', '@prisca_nwa he can write essays later. Tonight, one word is enough 😏', { m: { popularity: 4, romanceChidi: 3 } }, [['prisca_nwa', 'I’M SCREAMING'], ['chidi', '…']]),
+    c('free', 'Agree with Grace 🤍', 'I felt free. For three minutes, I really did 🤍', { m: { reputation: 4 } }, [['grace_okeke', 'Hold on to that 🤍']]),
+    c('laugh', 'Laughing emoji 😂', 'I didn’t even know I was laughing 😂', { m: { popularity: 2 }, t: { chidi: 3 } }, [['chidi', 'That’s why it’s a good photo.']]),
+    c('heart', 'Just a heart 🤍', '🤍', { m: { romanceChidi: 1 } }, [['chidi', '🤍']]),
+  ],
+  post_tea_tomorrow_ep9: [
+    c('not_over', 'Not over 🔥', 'Tomorrow, then. And the day after. I’m not going anywhere either 🔥', { m: { reputation: 6, popularity: 4 } }, [['solomon_ekong', 'Don’t give up, Ada'], ['lagos_tea', 'We’ll see 🫖']]),
+    c('sorry', 'Apologise 💔', 'To the girl I named: I’m sorry. You didn’t deserve tonight 💔', { m: { reputation: 8 } }, [['grace_okeke', 'That took courage'], ['halima_bello', 'Accountability. Respect.']]),
+    c('solomon', 'Answer Solomon 🔎', '@solomon_ekong I’m thinking. I haven’t stopped thinking 🔎', { m: { suspicion: 8 } }, [['solomon_ekong', 'Good.']]),
+    c('tamara', 'Reply to Tamara 💚', '@tamara_reid 💚', { m: { loyalty: 2 }, t: { tamara: 4 } }, [['tamara', 'Milo’s ready 💚']]),
+    c('logoff', 'Log off 📵', 'Logging off. For real this time 📵', { m: { reputation: 4 } }, [['blessing_alabi', 'Come home, Ada 🤍']]),
+  ],
 };

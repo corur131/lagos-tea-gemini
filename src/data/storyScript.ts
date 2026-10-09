@@ -3,6 +3,8 @@ import { EPISODE_4_META, EPISODE_4_SCENES } from './episode4';
 import { EPISODE_5_META, EPISODE_5_SCENES } from './episode5';
 import { EPISODE_6_META, EPISODE_6_SCENES } from './episode6';
 import { EPISODE_7_META, EPISODE_7_SCENES } from './episode7';
+import { EPISODE_8_META, EPISODE_8_SCENES } from './episode8';
+import { EPISODE_9_META, EPISODE_9_SCENES } from './episode9';
 
 export const EPISODE_METAS: EpisodeMeta[] = [
   {
@@ -33,6 +35,8 @@ export const EPISODE_METAS: EpisodeMeta[] = [
   EPISODE_5_META,
   EPISODE_6_META,
   EPISODE_7_META,
+  EPISODE_8_META,
+  EPISODE_9_META,
 ];
 
 /* =========================================================================
@@ -1589,4 +1593,6 @@ export const CANONICAL_STORY: SceneData[] = [
   ...EPISODE_5_SCENES,
   ...EPISODE_6_SCENES,
   ...EPISODE_7_SCENES,
+  ...EPISODE_8_SCENES,
+  ...EPISODE_9_SCENES,
 ];

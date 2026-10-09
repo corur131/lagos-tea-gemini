@@ -40,6 +40,7 @@ export const LOCATION_LABELS: Record<LocationType, string> = {
   photoshoot_studio: 'the photo studio',
   night_street: 'Lagos at night',
   event_hall: 'the Owambe at the Civic Centre',
+  gala_ballroom: 'the Guild Gala at the Federal Palace',
 };
 
 export const LOCATION_GRADIENTS: Record<LocationType, string> = {
@@ -52,6 +53,7 @@ export const LOCATION_GRADIENTS: Record<LocationType, string> = {
   photoshoot_studio: 'from-neutral-300 via-neutral-600 to-neutral-950',
   night_street: 'from-violet-900 via-neutral-900 to-black',
   event_hall: 'from-yellow-500 via-amber-800 to-neutral-950',
+  gala_ballroom: 'from-slate-200 via-slate-600 to-neutral-950',
 };
 
 const OUTFIT_LABELS: Record<OutfitId, string> = {
@@ -88,6 +90,7 @@ const LOCATION_TAGS: Record<LocationType, PhotoTag[]> = {
   photoshoot_studio: ['glam', 'hustle'],
   night_street: ['mystery', 'authentic'],
   event_hall: ['glam', 'luxury'],
+  gala_ballroom: ['glam', 'luxury'],
 };
 
 export const STORY_PHOTOS: StoryPhoto[] = [

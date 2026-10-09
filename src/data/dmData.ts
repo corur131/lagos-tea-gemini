@@ -1,5 +1,6 @@
 import { EP4_DM_BEATS } from './dmEpisode4';
 import { EP5_7_DM_BEATS } from './dmEpisodes5to7';
+import { EP8_9_DM_BEATS } from './dmEpisodes8to9';
 import { DmThread } from '../types/socialFeed';
 
 /*
@@ -2000,5 +2001,10 @@ Object.entries(EP4_DM_BEATS).forEach(([threadId, beats]) => {
 
 // Episodes 5–7 messages
 Object.entries(EP5_7_DM_BEATS).forEach(([threadId, beats]) => {
+  DM_THREADS.find((t) => t.id === threadId)?.beats.push(...beats);
+});
+
+// Episodes 8–9 messages
+Object.entries(EP8_9_DM_BEATS).forEach(([threadId, beats]) => {
   DM_THREADS.find((t) => t.id === threadId)?.beats.push(...beats);
 });

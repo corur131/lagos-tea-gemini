@@ -185,7 +185,8 @@ export type LocationType =
   | 'beach_house'
   | 'photoshoot_studio'
   | 'night_street'
-  | 'event_hall';
+  | 'event_hall'
+  | 'gala_ballroom';
 
 export type TimeModifier = 'day' | 'night' | 'blackout_generator';
 
@@ -250,6 +251,8 @@ export interface ChoiceOption {
   hiddenIfFlag?: string;
   /** Evidence this choice adds to the Clues board */
   addsClue?: { id: string; name: string; description: string; tag: InventoryItem['tag'] };
+  /** Ends the game here; good or bad version depends on whether the culprit was unmasked */
+  ending?: RomanceEnding;
 }
 
 export interface SceneData {
@@ -294,7 +297,9 @@ export interface InventoryItem {
   tag: 'Photo' | 'Chat' | 'Audio' | 'Personal' | 'Document' | 'Key';
 }
 
-export type EndingType = 'chidi' | 'kelvin' | 'dayo' | 'independent' | 'bad';
+export type RomanceEnding = 'chidi' | 'kelvin' | 'dayo' | 'independent';
+/** Good endings use the partner's name; a `_bad` ending means @TheLagosTea was never unmasked */
+export type EndingType = RomanceEnding | 'chidi_bad' | 'kelvin_bad' | 'dayo_bad' | 'independent_bad' | 'bad';
 
 export interface EpisodeMeta {
   episode: number;

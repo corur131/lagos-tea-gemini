@@ -94,6 +94,13 @@ export function getMaleLook(id: MaleId, moment: { episode?: number; location?: L
       kelvin: { outfit: 'suit', color: '#0B0B0D' },
       dayo: { outfit: 'agbada', color: '#E9DDB8' },
     }));
+  } else if (loc === 'gala_ballroom') {
+    // Guild Gala: Chidi working in a dark senator, Kelvin in navy (not black this time), Dayo in a cream agbada
+    Object.assign(look, pick({
+      chidi: { outfit: 'senator', color: '#1F2433' },
+      kelvin: { outfit: 'suit', color: '#1B2A4A' },
+      dayo: { outfit: 'agbada', color: '#EFE6CF' },
+    }));
   } else if (isParty) {
     Object.assign(look, pick({
       chidi: { outfit: 'senator', color: '#2B3A55' },

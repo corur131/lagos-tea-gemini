@@ -82,7 +82,7 @@ type Vibe = 'party' | 'owambe' | 'campus' | 'mall' | 'beach' | 'home' | 'night' 
 
 function vibeOf(loc: LocationType | undefined, episode: number): Vibe {
   if (loc === 'event_hall') return 'owambe';
-  if ((loc === 'banana_island_mansion' && episode === 1) || loc === 'rooftop_party') return 'party';
+  if ((loc === 'banana_island_mansion' && episode === 1) || loc === 'rooftop_party' || loc === 'gala_ballroom') return 'party';
   if (loc === 'university_campus') return 'campus';
   if (loc === 'mall') return 'mall';
   if (loc === 'beach_house') return 'beach';

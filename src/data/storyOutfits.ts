@@ -89,6 +89,26 @@ const SCENE_CODES: Record<string, (flags: Record<string, boolean>) => DressCode 
   ep7_sc8: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
   ep7_sc9: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
   ep7_sc10: () => code('Dark clothes for the third floor', 'hoodie', NIGHT_OUT),
+  /* Episode 8 */
+  ep8_sc4: () => code('Late night at Tamara’s: pyjamas', 'silk_pajamas', ['silk_pajamas', 'hoodie', 'casual', 'athleisure']),
+  ep8_sc9: () => code('11 PM: pyjamas', 'silk_pajamas'),
+  /* Episode 9: the Guild Gala */
+  ep9_sc2: () => code('Getting ready for the gala', 'party_dress', PARTY),
+  ep9_sc2b: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc3: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc4: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc4_dayo: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc4_kelvin: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc4_chidi: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc5: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc6: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc7_proof: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc7_wrong: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc8_proof: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc8_fail: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc8_wrong: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc9_good: () => code('Gala night', 'party_dress', PARTY),
+  ep9_sc9_bad: () => code('Gala night', 'party_dress', PARTY),
 };
 
 /** The dress code for a scene (choice follow-ups share their scene's code) */

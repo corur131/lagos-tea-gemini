@@ -105,6 +105,8 @@ function renderSceneLocation(
       return renderNightStreet(isNight);
     case 'event_hall':
       return renderEventHall(isNight);
+    case 'gala_ballroom':
+      return renderEventHall(isNight, true);
     default:
       return renderAjegunleApartment(isNight, isBlackout);
   }
@@ -478,15 +480,18 @@ function renderNightStreet(isNight: boolean) {
 
 
 /* 9. EVENT HALL (Owambe at the Civic Centre) */
-function renderEventHall(isNight: boolean) {
-  const wall = isNight ? '#2A1A0A' : '#3A2410';
+function renderEventHall(isNight: boolean, gala = false) {
+  // The same hall, dressed two ways: gold for the Owambe, silver and white for the Guild Gala
+  const wall = gala ? (isNight ? '#0E1220' : '#1A2033') : isNight ? '#2A1A0A' : '#3A2410';
+  const drapeId = gala ? 'gala_drape' : 'hall_drape';
+  const stops = gala ? ['#F4F6FA', '#B9C2D3', '#5E6A82'] : ['#F5C24A', '#C8901C', '#7A5208'];
   return (
-    <g id="bg_event_hall">
+    <g id={gala ? 'bg_gala_ballroom' : 'bg_event_hall'}>
       <defs>
-        <linearGradient id="hall_drape" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#F5C24A" />
-          <stop offset="0.55" stopColor="#C8901C" />
-          <stop offset="1" stopColor="#7A5208" />
+        <linearGradient id={drapeId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={stops[0]} />
+          <stop offset="0.55" stopColor={stops[1]} />
+          <stop offset="1" stopColor={stops[2]} />
         </linearGradient>
         <radialGradient id="hall_glow" cx="50%" cy="20%" r="70%">
           <stop offset="0" stopColor="#FFE8A3" stopOpacity="0.55" />
@@ -496,12 +501,12 @@ function renderEventHall(isNight: boolean) {
       <rect width="600" height="450" fill={wall} />
       {/* draped gold ceiling swags */}
       {[0, 1, 2, 3, 4, 5].map((k) => (
-        <path key={`swag_${k}`} d={`M ${k * 100} 0 Q ${k * 100 + 50} 70 ${k * 100 + 100} 0 Z`} fill="url(#hall_drape)" opacity="0.95" />
+        <path key={`swag_${k}`} d={`M ${k * 100} 0 Q ${k * 100 + 50} 70 ${k * 100 + 100} 0 Z`} fill={`url(#${drapeId})`} opacity="0.95" />
       ))}
       {/* side curtains with folds */}
       {[0, 1].map((side) => (
         <g key={`curtain_${side}`} transform={side ? 'translate(600 0) scale(-1 1)' : undefined}>
-          <path d="M 0 0 L 70 0 C 60 120, 80 260, 50 340 L 0 340 Z" fill="url(#hall_drape)" />
+          <path d="M 0 0 L 70 0 C 60 120, 80 260, 50 340 L 0 340 Z" fill={`url(#${drapeId})`} />
           {[12, 26, 40, 54].map((x) => (
             <path key={x} d={`M ${x} 0 C ${x - 4} 120, ${x + 6} 240, ${x - 6} 340`} stroke="#7A5208" strokeWidth="2" fill="none" opacity="0.45" />
           ))}
@@ -510,8 +515,8 @@ function renderEventHall(isNight: boolean) {
       {/* LED screen behind the high table */}
       <rect x="190" y="70" width="220" height="124" rx="4" fill="#0B0B12" stroke="#F5C24A" strokeWidth="3" />
       <rect x="198" y="78" width="204" height="108" fill={isNight ? '#3B0A1E' : '#4A0E28'} />
-      <text x="300" y="122" textAnchor="middle" fontSize="20" fontWeight="800" fill="#F5C24A" fontFamily="Georgia, serif">BELLO @ 60</text>
-      <text x="300" y="146" textAnchor="middle" fontSize="10" fill="#FDE7A8" letterSpacing="3">CELEBRATING A QUEEN</text>
+      <text x="300" y="122" textAnchor="middle" fontSize="20" fontWeight="800" fill={gala ? '#F4F6FA' : '#F5C24A'} fontFamily="Georgia, serif">{gala ? 'GUILD GALA' : 'BELLO @ 60'}</text>
+      <text x="300" y="146" textAnchor="middle" fontSize="10" fill={gala ? '#C9D3E6' : '#FDE7A8'} letterSpacing="3">{gala ? 'LAGOS INFLUENCERS GUILD' : 'CELEBRATING A QUEEN'}</text>
       <path d="M 270 160 Q 300 172 330 160" stroke="#F5C24A" strokeWidth="1.5" fill="none" />
       {/* chandeliers */}
       {[110, 490].map((x) => (
@@ -526,7 +531,7 @@ function renderEventHall(isNight: boolean) {
       ))}
       {/* high table with gold skirt and flowers */}
       <rect x="150" y="214" width="300" height="30" fill="#F8F3E6" />
-      <path d="M 150 244 L 450 244 L 446 300 L 154 300 Z" fill="url(#hall_drape)" />
+      <path d="M 150 244 L 450 244 L 446 300 L 154 300 Z" fill={`url(#${drapeId})`} />
       {[175, 225, 275, 325, 375, 425].map((x) => (
         <path key={`pleat_${x}`} d={`M ${x} 244 L ${x - 3} 300`} stroke="#7A5208" strokeWidth="2" opacity="0.5" />
       ))}

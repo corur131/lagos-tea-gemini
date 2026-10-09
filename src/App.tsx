@@ -92,6 +92,7 @@ const DEFAULT_HEROINE: HeroineCustomization = {
 const EXTRA_SPEAKERS: Record<string, string> = {
   dayo_voice: 'Dayo (voice note)',
   dayo_call: 'Dayo (on the phone)',
+  mama: 'Mama',
   rider: 'Okada Rider',
   security: 'Musa, Gate Security',
   locker_attendant: 'Locker Attendant',
@@ -505,10 +506,10 @@ export default function App() {
   // Dynamic Background Music adaptation based on scene, dialog, twists, or endings
   useEffect(() => {
     if (gameState.ending) {
-      if (gameState.ending === 'chidi') {
-        bgmManager.setMood('ending_romance');
-      } else if (gameState.ending === 'bad') {
+      if (gameState.ending === 'bad' || gameState.ending.endsWith('_bad')) {
         bgmManager.setMood('ending_bad');
+      } else if (gameState.ending !== 'independent') {
+        bgmManager.setMood('ending_romance');
       } else {
         bgmManager.setMood('ending_triumph');
       }
@@ -817,6 +818,18 @@ export default function App() {
         playSound.suspenseSting();
         bgmManager.playStingThenMood('reveal', 'mystery_climax');
       }
+    }
+
+    // The season finale: the final choice picks who Ada goes to; unmasking the culprit decides good or bad
+    if (choice.ending) {
+      const ending: EndingType = base.flags.unmasked_culprit ? choice.ending : (`${choice.ending}_bad` as EndingType);
+      setGameState((prev) => ({
+        ...prev,
+        ...base,
+        historyLog: [...prev.historyLog, opts.historyEntry],
+        ending,
+      }));
+      return;
     }
 
     const dest = resolveDestination(fromScene, choice);
@@ -1610,6 +1623,7 @@ export default function App() {
           ending={gameState.ending}
           heroine={gameState.heroine}
           meters={gameState.meters}
+          cluesFound={gameState.inventory.length}
           onRestart={handleRestart}
         />
       )}
