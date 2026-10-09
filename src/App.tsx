@@ -37,6 +37,8 @@ import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges, hasReached } 
 import { DM_THREADS } from './data/dmData';
 import { countUnreadDms, getVisibleBeats, resolveThreadIdentity } from './components/social/DmInbox';
 import { DmToast, DmToastItem, describeBeat } from './components/social/DmToast';
+import { ViralToast } from './components/social/ViralToast';
+import { getViralMoments, ViralMoment } from './data/viralMoments';
 import { playSound, bgmManager } from './utils/audio';
 import {
   Sparkles,
@@ -289,6 +291,42 @@ export default function App() {
   useEffect(() => {
     if (gameState.isSocialFeedOpen) setDmToastQueue([]);
   }, [gameState.isSocialFeedOpen]);
+
+  /* ---------------- Viral moment banners ---------------- */
+  const [viralQueue, setViralQueue] = useState<ViralMoment[]>([]);
+  const announcedViralRef = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    const unlocked = getViralMoments({ episode: gameState.currentEpisode, sceneIndex: socialSceneIndex, flags: gameState.flags });
+    if (!announcedViralRef.current) {
+      let stored: string[] | null = null;
+      try {
+        stored = JSON.parse(localStorage.getItem('lagos_tea_announced_viral') || 'null');
+      } catch {}
+      const isFreshStart =
+        gameState.currentEpisode === 1 && gameState.currentSceneIndex === 0 && gameState.currentLineIndex === 0;
+      announcedViralRef.current = new Set(stored ?? (isFreshStart ? [] : unlocked.map((m) => m.id)));
+    }
+    const announced = announcedViralRef.current;
+    const fresh = unlocked.filter((m) => !announced.has(m.id));
+    if (fresh.length === 0) return;
+    fresh.forEach((m) => announced.add(m.id));
+    try {
+      localStorage.setItem('lagos_tea_announced_viral', JSON.stringify([...announced]));
+    } catch {}
+    setViralQueue((q) => [...q, ...fresh]);
+    if (gameState.soundEnabled) playSound.phoneChime();
+  }, [gameState.currentEpisode, socialSceneIndex, gameState.flags]);
+
+  const activeViral = viralQueue[0];
+  const dismissViral = useCallback(() => setViralQueue((q) => q.slice(1)), []);
+  const openProfileFromViral = () => {
+    if (gameState.soundEnabled) playSound.click();
+    setViralQueue([]);
+    setSocialFeedInitialTab('profile');
+    setSocialFeedInitialThread(null);
+    setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
+  };
 
   const activeDmToast = dmToastQueue[0];
   const dismissDmToast = useCallback(() => setDmToastQueue((q) => q.slice(1)), []);
@@ -860,6 +898,12 @@ export default function App() {
     bgmManager.setMood('heartbreak_melancholy');
     localStorage.removeItem('lagos_tea_last_choice');
     localStorage.removeItem('lagos_tea_dynamic_scenes');
+    localStorage.removeItem('lagos_tea_announced_dms');
+    localStorage.removeItem('lagos_tea_announced_viral');
+    announcedDmBeatsRef.current = new Set();
+    announcedViralRef.current = new Set();
+    setDmToastQueue([]);
+    setViralQueue([]);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(freshState));
   };
 
@@ -1271,6 +1315,11 @@ export default function App() {
       )}
 
       {/* 7. FIRST LAUNCH WELCOME & CUSTOMIZER */}
+      {/* VIRAL MOMENT BANNER (waits while the phone is open or during character creation) */}
+      {activeViral && !gameState.isSocialFeedOpen && !isFirstLaunch && (
+        <ViralToast moment={activeViral} onOpen={openProfileFromViral} onDismiss={dismissViral} />
+      )}
+
       {/* NEW DM POP-UP (hidden while the phone/feed is open or during character creation) */}
       {activeDmToast && !gameState.isSocialFeedOpen && !isFirstLaunch && (
         <DmToast

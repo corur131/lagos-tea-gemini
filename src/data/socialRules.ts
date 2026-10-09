@@ -418,7 +418,9 @@ export function computeFollowers(
   episode: number,
   sceneIndex: number,
   social: SocialState,
-  followedCount = 9
+  followedCount = 9,
+  /** Followers from story viral moments (see viralMoments.ts) */
+  viralFollowers = 0
 ) {
   const baseFollowers = calculateAdaFollowers(
     meters.popularity,
@@ -426,9 +428,7 @@ export function computeFollowers(
     followedCount,
     social.followerBonus
   );
-  // The midnight leak brings a sudden surge of curious onlookers
-  const infamy = hasReached(episode, sceneIndex, 1, 6) ? 220 : 0;
-  return baseFollowers + infamy;
+  return baseFollowers + viralFollowers;
 }
 
 export function formatCount(n: number): string {

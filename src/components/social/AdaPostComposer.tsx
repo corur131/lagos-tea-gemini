@@ -229,6 +229,11 @@ export const AdaPostComposer: React.FC<AdaPostComposerProps> = ({
               </span>
             ))}
           </div>
+          {outcome.viralPotential && (
+            <div className="px-2 py-1 rounded-lg bg-gradient-to-r from-rose-600/30 to-amber-500/30 border border-amber-400/40 text-amber-200 font-bold text-[11px]">
+              🔥 Viral potential: everything lines up. This could blow up by thousands.
+            </div>
+          )}
           <div className="text-neutral-400 pt-0.5">{describeEffect({ meterChanges: outcome.meterChanges })}</div>
         </div>
       )}

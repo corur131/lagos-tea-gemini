@@ -257,6 +257,8 @@ function getArchiveGridPostsForCharacter(
 interface InstagramProfileViewProps {
   userId: CharacterId | 'lagos_tea' | 'heroine';
   allPosts: SocialPost[];
+  /** Ada's real follower count (posts + viral moments), shared with her profile tab */
+  adaFollowers?: number;
   heroine: HeroineCustomization;
   meters: Meters;
   inventory: InventoryItem[];
@@ -274,6 +276,7 @@ interface InstagramProfileViewProps {
 export const InstagramProfileView: React.FC<InstagramProfileViewProps> = ({
   userId,
   allPosts,
+  adaFollowers,
   heroine,
   meters,
   inventory,
@@ -294,7 +297,7 @@ export const InstagramProfileView: React.FC<InstagramProfileViewProps> = ({
   const isAda = userId === 'heroine';
 
   // Ada's dynamic meta - starting as an underdog scholar grinding to the top!
-  const calculatedFollowers = calculateAdaFollowers(meters.popularity, meters.reputation, 9);
+  const calculatedFollowers = adaFollowers ?? calculateAdaFollowers(meters.popularity, meters.reputation, 9);
   const formattedAdaFollowers = formatCount(calculatedFollowers);
 
   const profileMeta: CharacterProfileMeta = useMemo(() => {

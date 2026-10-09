@@ -24,6 +24,7 @@ import {
   getUpdatedAdaPostForScene,
 } from '../../data/adaPosts';
 import { CaptionOption, finalizePost } from '../../data/postEngine';
+import { viralFollowerTotal } from '../../data/viralMoments';
 import {
   CAST_PROFILES,
   getFollowToggleEffect,
@@ -637,7 +638,9 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
       setShowPostComposerModal(false);
       if (soundEnabled) playSound.phoneChime();
       showToast(
-        `Post published! +${formatCount(outcome.followerGain)} followers · ${formatCount(outcome.likesCount)} likes · ${comments.length} comments 📸✨`
+        outcome.viral
+          ? `🔥 YOUR POST WENT VIRAL! +${formatCount(outcome.followerGain)} followers · ${formatCount(outcome.likesCount)} likes`
+          : `Post published! +${formatCount(outcome.followerGain)} followers · ${formatCount(outcome.likesCount)} likes · ${comments.length} comments 📸✨`
       );
     }, 450);
   };
@@ -646,6 +649,20 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
   const followedNpcCount = useMemo(() => {
     return CAST_DIRECTORY.filter((c) => !unfollowed[c.id]).length;
   }, [unfollowed]);
+
+  // Ada's follower count: one number for every screen (posts + story viral moments)
+  const adaFollowers = useMemo(
+    () =>
+      computeFollowers(
+        meters,
+        currentEpisode,
+        currentSceneIndex,
+        social || DEFAULT_SOCIAL_STATE,
+        followedNpcCount,
+        viralFollowerTotal({ episode: currentEpisode, sceneIndex: currentSceneIndex, flags })
+      ),
+    [meters, currentEpisode, currentSceneIndex, social, followedNpcCount, flags]
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
@@ -910,6 +927,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
           <InstagramProfileView
             userId={viewingProfileUserId}
             allPosts={unlockedPosts}
+            adaFollowers={adaFollowers}
             heroine={heroineCustomization}
             meters={meters}
             inventory={inventory}
@@ -1111,13 +1129,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             {activeTab === 'profile' && (
               <AdaProfileView
                 heroine={heroineCustomization}
-                followers={computeFollowers(
-                  meters,
-                  currentEpisode,
-                  currentSceneIndex,
-                  social || DEFAULT_SOCIAL_STATE,
-                  followedNpcCount
-                )}
+                followers={adaFollowers}
                 followingCount={18 + followedNpcCount}
                 adaPosts={visiblePosts.filter((p) => p.authorId === 'heroine')}
                 taggedPosts={visiblePosts.filter((p) => p.authorId !== 'heroine')}

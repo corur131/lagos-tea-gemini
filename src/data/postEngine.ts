@@ -237,6 +237,13 @@ export interface PostOutcome {
   meterChanges: Partial<Meters>;
   factors: PostFactor[];
   mood: AudienceMood;
+  /** Combined photo × caption × mood × freshness score */
+  quality: number;
+  /** Strong enough to blow up (see VIRAL_QUALITY) */
+  viralPotential: boolean;
+  /** Set on the real result when the post actually went viral */
+  viral?: boolean;
+  viralFollowers?: number;
 }
 
 export interface PostInput {
@@ -251,6 +258,8 @@ export interface PostInput {
 
 const VARIANCE: [number, number] = [0.85, 1.2];
 const POST_EFFECT_SCALE = 0.6;
+/** Posts at or above this quality go viral */
+export const VIRAL_QUALITY = 2.1;
 const MAX_METER_CHANGE_PER_POST = 6;
 
 function addMeters(into: Partial<Meters>, add?: Partial<Meters>, scale = 1) {
@@ -341,6 +350,8 @@ export function estimatePost(input: PostInput): PostOutcome {
     meterChanges: changes,
     factors,
     mood,
+    quality,
+    viralPotential: quality >= VIRAL_QUALITY,
   };
 }
 
@@ -354,9 +365,17 @@ function hash01(s: string): number {
 export function finalizePost(input: PostInput, postId: string): PostOutcome {
   const est = estimatePost(input);
   const swing = VARIANCE[0] + hash01(postId) * (VARIANCE[1] - VARIANCE[0]);
-  return {
-    ...est,
-    followerGain: Math.max(10, Math.round(est.followerGain * swing)),
-    likesCount: Math.max(8, Math.round(est.likesCount * swing)),
-  };
+  let followerGain = Math.max(10, Math.round(est.followerGain * swing));
+  let likesCount = Math.max(8, Math.round(est.likesCount * swing));
+
+  // A post that hits everything at once blows up: thousands of new followers
+  if (est.viralPotential) {
+    const strength = Math.min(1, (est.quality - VIRAL_QUALITY) / 1.5);
+    const viralFollowers = Math.round((2000 + strength * 4000) * swing);
+    followerGain += viralFollowers;
+    likesCount += Math.round(viralFollowers * 2.4);
+    const meterChanges = { ...est.meterChanges, popularity: Math.min(MAX_METER_CHANGE_PER_POST, (est.meterChanges.popularity || 0) + 2) };
+    return { ...est, followerGain, likesCount, meterChanges, viral: true, viralFollowers };
+  }
+  return { ...est, followerGain, likesCount };
 }
