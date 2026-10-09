@@ -40,6 +40,7 @@ import { DmToast, DmToastItem, describeBeat } from './components/social/DmToast'
 import { ViralToast } from './components/social/ViralToast';
 import { RelationshipPing, RelationshipPingItem } from './components/vn/RelationshipPing';
 import { RELATIONSHIP_IMPACTS, scaledTrust } from './data/choiceRelationships';
+import { getIntroducedCharacters } from './data/introductions';
 import { getViralMoments, ViralMoment } from './data/viralMoments';
 import { playSound, bgmManager } from './utils/audio';
 import {
@@ -61,6 +62,7 @@ import {
   Coffee,
   CheckCircle2,
   MessageSquare,
+  Users,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'lagos_tea_vn_save_v1';
@@ -450,6 +452,25 @@ export default function App() {
   }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId, gameState.flags]);
 
   const isFollowUpScene = !!currentScene.afterChoice;
+
+  // Characters Ada has actually met (relationship screen only lists these)
+  const introducedCharacters = useMemo(() => {
+    const progress = {
+      episode: gameState.currentEpisode,
+      sceneIndex: socialSceneIndex,
+      flags: gameState.flags,
+      social: gameState.social,
+    };
+    return getIntroducedCharacters({
+      story: CANONICAL_STORY,
+      episode: gameState.currentEpisode,
+      sceneIndex: gameState.currentSceneIndex,
+      currentScene,
+      lineIndex: gameState.currentLineIndex,
+      threadsWithMessages: DM_THREADS.filter((t) => getVisibleBeats(t, progress).length > 0),
+    });
+  }, [currentScene, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentLineIndex, socialSceneIndex, gameState.flags, gameState.social]);
+  const [cluesInitialTab, setCluesInitialTab] = useState<'clues' | 'relationships'>('clues');
   const visibleChoices = currentScene.choices.filter((c) => !c.conditionFlag || gameState.flags[c.conditionFlag]);
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
@@ -1071,9 +1092,29 @@ export default function App() {
             <span className="hidden sm:inline">Look</span>
           </button>
 
+          {/* Relationships */}
+          <button
+            onClick={() => {
+              setCluesInitialTab('relationships');
+              setGameState((prev) => ({ ...prev, isCluesOpen: true }));
+              if (gameState.soundEnabled) playSound.click();
+            }}
+            className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1 transition-all relative"
+            title="Relationships"
+          >
+            <Users className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">People</span>
+            {relationshipPing && (
+              <span className="w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+            )}
+          </button>
+
           {/* Clue Board */}
           <button
-            onClick={() => setGameState((prev) => ({ ...prev, isCluesOpen: true }))}
+            onClick={() => {
+              setCluesInitialTab('clues');
+              setGameState((prev) => ({ ...prev, isCluesOpen: true }));
+            }}
             className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg bg-neutral-900/80 hover:bg-neutral-800 text-neutral-200 border border-neutral-700/60 text-xs flex items-center gap-1 transition-all relative"
             title="Clue Board & Dossier"
           >
@@ -1410,6 +1451,8 @@ export default function App() {
           flags={gameState.flags}
           heroine={gameState.heroine}
           soundEnabled={gameState.soundEnabled}
+          initialTab={cluesInitialTab}
+          introducedIds={[...introducedCharacters]}
           onClose={() => setGameState((prev) => ({ ...prev, isCluesOpen: false }))}
         />
       )}

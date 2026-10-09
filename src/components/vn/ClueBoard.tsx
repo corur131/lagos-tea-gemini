@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InventoryItem, Meters, HeroineCustomization } from '../../types/vn';
+import { InventoryItem, Meters, HeroineCustomization, CharacterId } from '../../types/vn';
 import { RelationshipProfile } from './RelationshipProfile';
 import {
   Camera,
@@ -21,6 +21,8 @@ interface ClueBoardProps {
   soundEnabled?: boolean;
   onClose: () => void;
   initialTab?: 'clues' | 'relationships';
+  /** Characters Ada has met; only these appear in Relationships */
+  introducedIds?: CharacterId[];
 }
 
 export const ClueBoard: React.FC<ClueBoardProps> = ({
@@ -31,6 +33,7 @@ export const ClueBoard: React.FC<ClueBoardProps> = ({
   soundEnabled = true,
   onClose,
   initialTab = 'clues',
+  introducedIds,
 }) => {
   const [activeTab, setActiveTab] = useState<'clues' | 'relationships'>(initialTab);
 
@@ -111,6 +114,7 @@ export const ClueBoard: React.FC<ClueBoardProps> = ({
         {activeTab === 'relationships' ? (
           <div className="flex-1 overflow-hidden">
             <RelationshipProfile
+              introducedIds={introducedIds}
               meters={meters}
               flags={flags}
               heroine={heroine}

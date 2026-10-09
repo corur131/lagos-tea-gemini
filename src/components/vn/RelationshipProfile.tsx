@@ -27,6 +27,8 @@ interface RelationshipProfileProps {
   onBackToClues?: () => void;
   onClose: () => void;
   soundEnabled?: boolean;
+  /** Characters Ada has met in the story. Anyone else stays hidden. */
+  introducedIds?: CharacterId[];
 }
 
 export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
@@ -35,14 +37,42 @@ export const RelationshipProfile: React.FC<RelationshipProfileProps> = ({
   heroine,
   onBackToClues,
   onClose,
+  introducedIds,
 }) => {
-  const [selectedCharId, setSelectedCharId] = useState<CharacterId>('chidi');
+  // Only people Ada has actually met, in the order she met them
+  const metCharacters = introducedIds
+    ? RELATIONSHIP_CHARACTERS.filter((c) => introducedIds.includes(c.id))
+    : RELATIONSHIP_CHARACTERS;
+
+  const [selectedCharId, setSelectedCharId] = useState<CharacterId>(metCharacters[0]?.id || 'chidi');
   const [filterMode, setFilterMode] = useState<'all' | 'romance' | 'squad'>('all');
 
-  const selectedChar = RELATIONSHIP_CHARACTERS.find((c) => c.id === selectedCharId) || RELATIONSHIP_CHARACTERS[0];
+  if (metCharacters.length === 0) {
+    return (
+      <div className="flex flex-col h-full bg-neutral-950 text-neutral-100 select-none">
+        <div className="px-4 py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/90">
+          <h3 className="text-sm font-serif font-bold flex items-center gap-2">
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500/30" /> Relationships
+          </h3>
+          <button onClick={onClose} className="px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs">
+            Close
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-2">
+          <div className="text-3xl">🤝</div>
+          <p className="text-sm font-bold text-neutral-200">You haven’t met anyone yet</p>
+          <p className="text-xs text-neutral-400 max-w-xs">
+            People appear here once you meet them in the story. Every choice you make shapes how they feel about you.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const selectedChar = metCharacters.find((c) => c.id === selectedCharId) || metCharacters[0];
   const assessment = calculateRelationship(selectedChar.id, meters, flags, heroine);
 
-  const filteredList = RELATIONSHIP_CHARACTERS.filter((c) => {
+  const filteredList = metCharacters.filter((c) => {
     if (filterMode === 'romance') return c.hasRomance;
     if (filterMode === 'squad') return !c.hasRomance;
     return true;
