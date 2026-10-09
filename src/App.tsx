@@ -265,23 +265,36 @@ export default function App() {
     dynamicScenes[`${gameState.currentEpisode}_${gameState.currentSceneIndex}`] ||
     CANONICAL_STORY[0];
 
-  // Open the scene with a short narration of what the player's last choice led to
+  // Open scenes with the previous choice's consequence and any earned follow-through.
   const currentScene: SceneData = useMemo(() => {
     const sceneKey = gameState.currentSceneId || `${gameState.currentEpisode}_${gameState.currentSceneIndex}`;
-    if (!lastChoice || lastChoice.sceneKey !== sceneKey || !lastChoice.consequenceText) {
-      return rawBaseScene;
+    const openingLines: DialogueLine[] = [];
+
+    if (lastChoice && lastChoice.sceneKey === sceneKey && lastChoice.consequenceText) {
+      openingLines.push({
+        speaker: 'narrator',
+        text: lastChoice.consequenceText,
+      });
     }
 
-    const consequenceLine: DialogueLine = {
-      speaker: 'narrator',
-      text: lastChoice.consequenceText,
-    };
+    // If Ada asked Chidi to check his camera archives, pay that choice off when they meet
+    // in the studio. Other routes still get the shared investigation scene without this line.
+    if (rawBaseScene.id === 'ep2_sc2' && gameState.flags.chidi_archive_alliance) {
+      openingLines.push({
+        speaker: 'chidi',
+        speakerDisplayName: 'Chidi Nwosu',
+        expression: 'serious',
+        text: '“I went through the party archive like you asked. I still can’t identify the person who sent the photo, but the original wide shot confirms it came from the second-floor mezzanine. We have a narrower list of suspects now.”',
+      });
+    }
+
+    if (openingLines.length === 0) return rawBaseScene;
 
     return {
       ...rawBaseScene,
-      lines: [consequenceLine, ...rawBaseScene.lines],
+      lines: [...openingLines, ...rawBaseScene.lines],
     };
-  }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId]);
+  }, [rawBaseScene, lastChoice, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentSceneId, gameState.flags]);
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
