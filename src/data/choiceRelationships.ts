@@ -1,4 +1,5 @@
 import { CharacterId } from '../types/vn';
+import { COMMENT_IMPACTS } from './commentChoices';
 
 /* =========================================================================
    HOW CHOICES CHANGE RELATIONSHIPS
@@ -237,4 +238,45 @@ export const RELATIONSHIP_IMPACTS: Record<string, RelationshipImpact> = {
     trust: { hauwa: -8 },
     memory: { hauwa: 'You implied she knows which doors are being opened.' },
   },
+
+  /* ---------------- Episode 4 ---------------- */
+  took_burner: { trust: { bisola: -6 }, memory: { bisola: 'You snatched the burner phone out of her hand in the archive.' } },
+  photographed_instructions: { trust: { bisola: -2 }, memory: { bisola: 'You photographed the blackmail message on her screen.' } },
+  followed_bisola: { trust: { bisola: 4 }, memory: { bisola: 'You let her walk out with the phone, then came to find her.' } },
+  returned_burner_after_copy: { trust: { bisola: 10 }, memory: { bisola: 'You gave the phone back so she could make the drop and keep her secret.' } },
+  kept_burner: { trust: { bisola: -12 }, memory: { bisola: 'You kept the phone, knowing they would come for her.' } },
+  bisola_deal: { trust: { bisola: 10 }, memory: { bisola: 'You promised to keep her secret if she brings you every message.' } },
+  threatened_bisola: { trust: { bisola: -14, zee: 3 }, memory: { bisola: 'You gave her until breakfast to confess to Zee.' } },
+  comforted_bisola: { trust: { bisola: 14, hauwa: 2 }, memory: { bisola: 'You hugged her on the laundry room floor and said nobody should own her.' } },
+  admitted_archive: { trust: { zee: 4, chi: 4, tamara: 2 }, memory: { zee: 'You told the whole kitchen you found the Lagos Tea phone in her archive.', chi: 'You told the truth at breakfast, under pressure.' } },
+  lied_archive: { trust: { zee: -8 }, memory: { zee: 'You lied about fetching her brand decks. She knows her own calendar.' } },
+  exposed_second_key: { trust: { zee: -3, hauwa: 4, chi: 3 }, memory: { hauwa: 'You asked about MASTER-2 when everyone else was staring at you.', zee: 'You turned her accusation back onto her master keys.' } },
+  zee_alliance_ep4: { trust: { zee: 12 }, memory: { zee: 'You agreed to catch the blackmailer with her before her mother’s 60th.' } },
+  pressed_zee_father: { trust: { zee: -10, kelvin: -4 }, memory: { zee: 'You asked what her father signed in 2019.', kelvin: 'Zee told him you asked about their father.' } },
+  screenshotted_zee_dms: { trust: {}, memory: {} },
+  chidi_darkroom_moment: { trust: { chidi: 10 }, memory: { chidi: 'You stood close in the red light of his darkroom and told him to keep your photo safe.' } },
+  pushed_chidi_entrance: { trust: { chidi: -6 }, memory: { chidi: 'You pushed him about a camera flash at the party entrance.' } },
+  showed_chidi_burner: { trust: { chidi: 6 }, memory: { chidi: 'You trusted him with the burner phone.' } },
+  kelvin_bridge_flirt: { trust: { kelvin: 10 }, memory: { kelvin: 'You asked if he wanted you to stand out, or stand next to him.' } },
+  caught_kelvin_log: { trust: { kelvin: -8 }, memory: { kelvin: 'You caught him knowing about the lock log Zee swore she told nobody about.' } },
+  asked_kelvin_logs: { trust: { kelvin: 6 }, memory: { kelvin: 'You asked him to pull the lock logs for MASTER-2.' } },
+  defended_bisola_meeting: { trust: { bisola: 10, chi: -4, zee: -3 }, memory: { bisola: 'You defended her at the house meeting when Chioma came for her.', chi: 'You defended Bisola against her at the house meeting.' } },
+  pressed_chi_meeting: { trust: { chi: -10, zee: 6 }, memory: { chi: 'You sided with Zee and told her to put her phone down.', zee: 'You backed her at the house meeting.' } },
+  grabbed_in_dark: { trust: { hauwa: -2, tamara: -2, zee: -2, chi: -2, bisola: -2 }, memory: { hauwa: 'You reached for the tray in the dark.' } },
+  dayo_owambe_date: { trust: { dayo: 10 }, memory: { dayo: 'You promised to find him at the Owambe booth.' } },
+  asked_dayo_m: { trust: { dayo: -4 }, memory: { dayo: 'You asked him if he knew anyone called M.' } },
+  dayo_truth_call: { trust: { dayo: 12 }, memory: { dayo: 'You fell asleep on the rooftop listening to him talk about his mum’s piano.' } },
+  accepted_tamara_money: { trust: { tamara: 10 }, memory: { tamara: 'You let her pay your fees.' } },
+  refused_tamara_money: { trust: { tamara: 4, hauwa: 3 }, memory: { tamara: 'You refused her money. Stubborn since primary school.' } },
+  asked_tamara_brand: { trust: { tamara: -3 }, memory: { tamara: 'You asked which brand was paying her.' } },
+  took_master2: { trust: { hauwa: 10 }, memory: { hauwa: 'You took the MASTER-2 key and promised not to stop looking.' } },
+  refused_master2: { trust: { hauwa: 4 }, memory: { hauwa: 'You asked why she was really helping you.' } },
+  accused_hauwa_hiding: { trust: { hauwa: -10 }, memory: { hauwa: 'You said watching the planter for three weeks was hiding, not watching.' } },
+  signed_lawsuit: { trust: { chi: 14 }, memory: { chi: 'You signed as plaintiff against @TheLagosTea.' } },
+  delayed_lawsuit: { trust: { chi: 4 }, memory: { chi: 'You held off signing to keep the page comfortable. She respects it.' } },
+  doubted_chi_whisper: { trust: { chi: -12 }, memory: { chi: 'You doubted her when she told you about the whisper on the mezzanine.' } },
+  called_mama: { trust: {}, memory: {} },
 };
+
+// Ada's Gidigram comments move trust too (see commentChoices.ts)
+Object.assign(RELATIONSHIP_IMPACTS, COMMENT_IMPACTS);

@@ -10,10 +10,19 @@ export const MOTIVE_CANDIDATES: CulpritMotive[] = [
   'undercover_expose',
 ];
 
+/*
+ * Season 1 tells one fixed story: the same person is behind @TheLagosTea in
+ * every playthrough, so Episodes 4–9 can plant real clues and a real twist.
+ * Stored as positions in the lists above so a glance at this file doesn't
+ * spoil it for the player.
+ */
+const SEASON_KEY: [number, number] = [6, 5];
+
 export function generateNewSecret(): MysterySecret {
-  const culprit = CULPRIT_CANDIDATES[Math.floor(Math.random() * CULPRIT_CANDIDATES.length)];
-  const motive = MOTIVE_CANDIDATES[Math.floor(Math.random() * MOTIVE_CANDIDATES.length)];
-  return { culprit, motive };
+  return {
+    culprit: CULPRIT_CANDIDATES[SEASON_KEY[0] % CULPRIT_CANDIDATES.length],
+    motive: MOTIVE_CANDIDATES[SEASON_KEY[1] % MOTIVE_CANDIDATES.length],
+  };
 }
 
 // Each friend has a personal item the story has already tied to her. Clues show one of these.

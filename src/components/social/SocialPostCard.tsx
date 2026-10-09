@@ -3,6 +3,7 @@ import { SocialPost, SocialComment } from '../../types/socialFeed';
 import { HeroineCustomization } from '../../types/vn';
 import { QuickReply } from '../../data/socialRules';
 import { SocialAvatar } from './SocialAvatar';
+import { CommentChoicePanel, TypingRow, useAdaThread } from './CommentChoices';
 import { NpcSvg } from '../svg/NpcSvg';
 import { HeroineSvg } from '../svg/HeroineSvg';
 import {
@@ -139,10 +140,14 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
     if (soundEnabled) playSound.click();
   };
 
+  // Ada's chosen comment (and the replies it pulled) sits on top of the thread list
+  const ada = useAdaThread(post, heroineCustomization.name);
+  const allComments = React.useMemo(() => [...ada.visible, ...post.comments], [ada.visible, post.comments]);
+
   // Group comments into a parent-children map
   const commentMap = React.useMemo(() => {
     const map = new Map<string, SocialComment[]>();
-    post.comments.forEach((c) => {
+    allComments.forEach((c) => {
       if (c.parentCommentId) {
         const list = map.get(c.parentCommentId) || [];
         list.push(c);
@@ -150,13 +155,13 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
       }
     });
     return map;
-  }, [post.comments]);
+  }, [allComments]);
 
   // Top level comments are those without parentCommentId or whose parent is outside the post
   const topLevelComments = React.useMemo(() => {
-    const allIds = new Set(post.comments.map((c) => c.id));
-    return post.comments.filter((c) => !c.parentCommentId || !allIds.has(c.parentCommentId));
-  }, [post.comments]);
+    const allIds = new Set(allComments.map((c) => c.id));
+    return allComments.filter((c) => !c.parentCommentId || !allIds.has(c.parentCommentId));
+  }, [allComments]);
 
   const displayedTopLevel = showAllComments ? topLevelComments : topLevelComments.slice(0, 2);
 
@@ -515,7 +520,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
               title="Comments"
             >
               <MessageCircle className="w-5 h-5" />
-              <span className="text-xs font-bold font-mono">{post.commentsCount.toLocaleString()}</span>
+              <span className="text-xs font-bold font-mono">{(post.commentsCount + ada.visible.length).toLocaleString()}</span>
             </button>
 
             <button
@@ -622,9 +627,10 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
         )}
 
         {/* 6. Comments */}
-        {post.comments.length > 0 && (
+        {allComments.length > 0 && (
           <div className="pt-2 border-t border-neutral-800/80 space-y-2.5">
             {displayedTopLevel.map((comment) => renderCommentThread(comment))}
+            {ada.typing && <TypingRow comment={ada.typing} />}
             {topLevelComments.length > 2 && (
               <button
                 onClick={() => setShowAllComments((prev) => !prev)}
@@ -632,14 +638,26 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
               >
                 {showAllComments
                   ? 'Hide extra comments'
-                  : `View all ${post.comments.length} comments (${topLevelComments.length} threads)`}
+                  : `View all ${allComments.length} comments (${topLevelComments.length} threads)`}
               </button>
             )}
           </div>
         )}
 
-        {/* 7. Quick replies & comment box */}
+        {/* 7. Ada's comment: pick one of the story-aware options */}
         <div className="mt-3 pt-3 border-t border-neutral-800/60">
+          {ada.ctx && !ada.picked && ada.choices.length > 0 && (
+            <CommentChoicePanel
+              post={post}
+              choices={ada.choices}
+              heroineCustomization={heroineCustomization}
+              onPicked={() => setShowAllComments(true)}
+            />
+          )}
+          {ada.ctx && ada.picked && (
+            <p className="text-[11px] text-neutral-500 italic">You’ve had your say on this post.</p>
+          )}
+          {!ada.ctx && (<>
           {quickReplies.length > 0 && (
             <div className="flex items-center gap-1.5 mb-2 overflow-x-auto pb-1 scrollbar-none">
               {quickReplies.map((reply) => (
@@ -677,6 +695,7 @@ export const SocialPostCard: React.FC<SocialPostCardProps> = ({
               <Send className="w-3.5 h-3.5" />
             </button>
           </form>
+          </>)}
         </div>
       </div>
     </article>

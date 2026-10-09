@@ -11,6 +11,8 @@ import {
   DmThread,
 } from '../types/socialFeed';
 import { createLightweightComment } from './gidiUsers';
+import { CANONICAL_STORY } from './storyScript';
+import { INITIAL_POSTS } from './socialFeedData';
 
 export const DEFAULT_SOCIAL_STATE: SocialState = {
   likedPosts: {},
@@ -36,6 +38,7 @@ export const DEFAULT_SOCIAL_STATE: SocialState = {
   deletedPostStatus: {},
   deletedPostSeenAt: {},
   commentWarPicks: {},
+  commentPicks: {},
   appliedEffects: {},
   followerBonus: 0,
   milestones: {},
@@ -438,6 +441,33 @@ export function formatCount(n: number): string {
   return n.toString();
 }
 
+
+/* ------------------------- Story reactions on posts ------------------------ */
+// When each story choice happens (first scene that can set the flag)
+const FLAG_MOMENT: Record<string, [number, number]> = {};
+CANONICAL_STORY.forEach((sc) =>
+  sc.choices.forEach((c) => {
+    if (c.flagToSet && !FLAG_MOMENT[c.flagToSet]) FLAG_MOMENT[c.flagToSet] = [sc.episode, sc.sceneIndex];
+  })
+);
+
+/**
+ * People react to a story choice once, under the first post that person makes
+ * after it happened (or their latest post if they haven't posted since), not
+ * under every post they have ever made.
+ */
+function isReactionHost(post: SocialPost, flag: string): boolean {
+  const byAuthor = INITIAL_POSTS.filter((p) => p.authorId === post.authorId).sort(
+    (a, b) => a.unlockEpisode - b.unlockEpisode || (a.unlockSceneIndex ?? 0) - (b.unlockSceneIndex ?? 0)
+  );
+  if (!byAuthor.length) return true;
+  const m = FLAG_MOMENT[flag];
+  const after = m
+    ? byAuthor.find((p) => p.unlockEpisode > m[0] || (p.unlockEpisode === m[0] && (p.unlockSceneIndex ?? 0) >= m[1]))
+    : undefined;
+  return (after ?? byAuthor[byAuthor.length - 1]).id === post.id;
+}
+
 /* ------------------------------ Post display ------------------------------ */
 
 // Applies choice-based variants, narrative memory, and threaded comment unlocking to a post
@@ -457,7 +487,7 @@ export function resolvePost(
 
   // 1. Bisola's posts: comments regarding outfit, party entrance, or Porsche ride
   if (post.authorId === 'bisola') {
-    if (flags.borrowed_emerald_dress && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('emerald silk'))) {
+    if (flags.borrowed_emerald_dress && isReactionHost(post, 'borrowed_emerald_dress') && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('emerald silk'))) {
       narrativeComments.push({
         id: `mem_bis_${post.id}_emerald`,
         authorId: 'tamara',
@@ -470,7 +500,7 @@ export function resolvePost(
         timestamp: '1h ago',
         memoryBadge: 'Recalls: Emerald Dress',
       });
-    } else if (flags.vintage_style_dress && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('thrifted'))) {
+    } else if (flags.vintage_style_dress && isReactionHost(post, 'vintage_style_dress') && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('thrifted'))) {
       narrativeComments.push({
         id: `mem_bis_${post.id}_thrift`,
         authorId: 'bisola',
@@ -485,7 +515,7 @@ export function resolvePost(
       });
     }
 
-    if (flags.drove_with_kelvin && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('GT3'))) {
+    if (flags.drove_with_kelvin && isReactionHost(post, 'drove_with_kelvin') && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('GT3'))) {
       narrativeComments.push({
         id: `mem_bis_${post.id}_kelvin_car`,
         authorId: 'bisola',
@@ -498,7 +528,7 @@ export function resolvePost(
         timestamp: '20m ago',
         memoryBadge: 'Recalls: Porsche Ride',
       });
-    } else if (flags.refused_kelvin_ride && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('shuttle'))) {
+    } else if (flags.refused_kelvin_ride && isReactionHost(post, 'refused_kelvin_ride') && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('shuttle'))) {
       narrativeComments.push({
         id: `mem_bis_${post.id}_refused_kelvin`,
         authorId: 'bisola',
@@ -513,7 +543,7 @@ export function resolvePost(
       });
     }
 
-    if (flags.noted_bisola_motive && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('stressed'))) {
+    if (flags.noted_bisola_motive && isReactionHost(post, 'noted_bisola_motive') && !social.unfollowed?.bisola && !post.comments.some((c) => c.text.includes('stressed'))) {
       const c1 = createLightweightComment(`org_bis_${post.id}_mot_1`, 'folake_ade', 'Is Bisola okay? She looked really stressed on live yesterday.', {
         likes: 270,
         timestamp: '25m ago',
@@ -536,7 +566,7 @@ export function resolvePost(
 
   // 2. Chidi's posts: reflections on candid balcony moments & investigative alliance
   if (post.authorId === 'chidi') {
-    if (flags.chidi_romantic_moment && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('balcony'))) {
+    if (flags.chidi_romantic_moment && isReactionHost(post, 'chidi_romantic_moment') && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('balcony'))) {
       narrativeComments.push({
         id: `mem_chidi_${post.id}_moment`,
         authorId: 'chidi',
@@ -549,7 +579,7 @@ export function resolvePost(
         timestamp: '30m ago',
         memoryBadge: 'Recalls: Balcony Confession',
       });
-    } else if (flags.flirted_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('behind the lens'))) {
+    } else if (flags.flirted_with_chidi && isReactionHost(post, 'flirted_with_chidi') && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('behind the lens'))) {
       const mem = {
         id: `mem_chidi_${post.id}_flirt`,
         authorId: 'chidi',
@@ -581,7 +611,7 @@ export function resolvePost(
         replyToHandle: '@david_obi_',
       });
       narrativeComments.push(mem, c1, c2, c3);
-    } else if (flags.sided_with_chidi && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('alliance'))) {
+    } else if (flags.sided_with_chidi && isReactionHost(post, 'sided_with_chidi') && !social.unfollowed?.chidi && !post.comments.some((c) => c.text.includes('alliance'))) {
       narrativeComments.push({
         id: `mem_chidi_${post.id}_alliance`,
         authorId: 'chidi',
@@ -599,7 +629,7 @@ export function resolvePost(
 
   // 3. Zee's posts: comments regarding assistant role, pact, or party impression
   if (post.authorId === 'zee') {
-    if (flags.accepted_pa_job && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('assistant'))) {
+    if (flags.accepted_pa_job && isReactionHost(post, 'accepted_pa_job') && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('assistant'))) {
       const mem = {
         id: `mem_zee_${post.id}_pa`,
         authorId: 'zee',
@@ -631,7 +661,7 @@ export function resolvePost(
         replyToHandle: '@kene_okoli_',
       });
       narrativeComments.push(mem, c1, c2, c3);
-    } else if (flags.negotiated_pa_terms && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('editorial clause'))) {
+    } else if (flags.negotiated_pa_terms && isReactionHost(post, 'negotiated_pa_terms') && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('editorial clause'))) {
       const mem = {
         id: `mem_zee_${post.id}_negotiated`,
         authorId: 'zee',
@@ -663,7 +693,7 @@ export function resolvePost(
         replyToHandle: '@daniel_okafor',
       });
       narrativeComments.push(mem, c1, c2, c3);
-    } else if (flags.pact_with_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('loyalty'))) {
+    } else if (flags.pact_with_zee && isReactionHost(post, 'pact_with_zee') && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('loyalty'))) {
       const mem = {
         id: `mem_zee_${post.id}_pact`,
         authorId: 'zee',
@@ -695,7 +725,7 @@ export function resolvePost(
         replyToHandle: '@miriam_chukwu',
       });
       narrativeComments.push(mem, c1, c2, c3);
-    } else if (flags.warned_zee && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('eyes wide open'))) {
+    } else if (flags.warned_zee && isReactionHost(post, 'warned_zee') && !social.unfollowed?.zee && !post.comments.some((c) => c.text.includes('eyes wide open'))) {
       const mem = {
         id: `mem_zee_${post.id}_warned`,
         authorId: 'zee',
@@ -732,7 +762,7 @@ export function resolvePost(
 
   // 4. Kelvin's posts: remarks on the Porsche GT3 ride or refused ride
   if (post.authorId === 'kelvin') {
-    if (flags.drove_with_kelvin && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('coastal'))) {
+    if (flags.drove_with_kelvin && isReactionHost(post, 'drove_with_kelvin') && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('coastal'))) {
       narrativeComments.push({
         id: `mem_kelvin_${post.id}_ride`,
         authorId: 'kelvin',
@@ -745,7 +775,7 @@ export function resolvePost(
         timestamp: '18m ago',
         memoryBadge: 'Recalls: Porsche Ride',
       });
-    } else if (flags.refused_kelvin_ride && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('shuttle'))) {
+    } else if (flags.refused_kelvin_ride && isReactionHost(post, 'refused_kelvin_ride') && !social.unfollowed?.kelvin && !post.comments.some((c) => c.text.includes('shuttle'))) {
       const mem = {
         id: `mem_kelvin_${post.id}_bus`,
         authorId: 'kelvin',
@@ -782,7 +812,7 @@ export function resolvePost(
 
   // 5. Tamara's posts: reminiscing about getting ready or the scholarship struggle
   if (post.authorId === 'tamara') {
-    if (flags.borrowed_emerald_dress && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('fitting'))) {
+    if (flags.borrowed_emerald_dress && isReactionHost(post, 'borrowed_emerald_dress') && !social.unfollowed?.tamara && !post.comments.some((c) => c.text.includes('fitting'))) {
       narrativeComments.push({
         id: `mem_tamara_${post.id}_fit`,
         authorId: 'tamara',
@@ -800,7 +830,7 @@ export function resolvePost(
 
   // 6. Lagos Tea leak posts: reacting to public confrontations or archive snooping
   if (post.authorId === 'lagos_tea') {
-    if (flags.demanded_leak_answers && !post.comments.some((c) => c.text.includes('kettle'))) {
+    if (flags.demanded_leak_answers && isReactionHost(post, 'demanded_leak_answers') && !post.comments.some((c) => c.text.includes('kettle'))) {
       narrativeComments.push({
         id: `mem_tea_${post.id}_demand`,
         authorId: 'lagos_tea',
@@ -813,7 +843,7 @@ export function resolvePost(
         timestamp: '10m ago',
         memoryBadge: 'Recalls: Public Demand',
       });
-    } else if (flags.photographed_tea_phone && !post.comments.some((c) => c.text.includes('camera'))) {
+    } else if (flags.photographed_tea_phone && isReactionHost(post, 'photographed_tea_phone') && !post.comments.some((c) => c.text.includes('camera'))) {
       const mem = {
         id: `mem_tea_${post.id}_photo`,
         authorId: 'lagos_tea',
@@ -847,7 +877,7 @@ export function resolvePost(
       narrativeComments.push(mem, c1, c2, c3);
     }
 
-    if (flags.held_breath_stealth && !post.comments.some((c) => c.text.includes('creeping'))) {
+    if (flags.held_breath_stealth && isReactionHost(post, 'held_breath_stealth') && !post.comments.some((c) => c.text.includes('creeping'))) {
       const c1 = createLightweightComment(`org_tea_${post.id}_stl_1`, 'demola_shonowo', 'Security was moving around the house at 2 AM.', {
         likes: 350,
         timestamp: '14m ago',
@@ -865,7 +895,7 @@ export function resolvePost(
         replyToHandle: '@keji_balogun',
       });
       narrativeComments.push(c1, c2, c3);
-    } else if (flags.confronted_intruder && !post.comments.some((c) => c.text.includes('back door'))) {
+    } else if (flags.confronted_intruder && isReactionHost(post, 'confronted_intruder') && !post.comments.some((c) => c.text.includes('back door'))) {
       const c1 = createLightweightComment(`org_tea_${post.id}_int_1`, 'demola_shonowo', 'Did you hear that noise near the stairs last night?', {
         likes: 380,
         timestamp: '14m ago',

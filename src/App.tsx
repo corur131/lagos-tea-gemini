@@ -1,3 +1,4 @@
+import { generateNewSecret } from './data/mystery';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   GameState,
@@ -86,6 +87,15 @@ const DEFAULT_HEROINE: HeroineCustomization = {
   necklace: 'none',
 };
 
+/** Voices that aren't on stage: phone calls, voice notes, strangers */
+const EXTRA_SPEAKERS: Record<string, string> = {
+  dayo_voice: 'Dayo (voice note)',
+  dayo_call: 'Dayo (on the phone)',
+  rider: 'Okada Rider',
+  security: 'Musa, Gate Security',
+  locker_attendant: 'Locker Attendant',
+};
+
 const SHORT_NAMES: Record<string, string> = {
   zee: 'Zee',
   tamara: 'Tamara',
@@ -97,20 +107,6 @@ const SHORT_NAMES: Record<string, string> = {
   dayo: 'Dayo',
 };
 
-const CULPRIT_CANDIDATES: CulpritId[] = ['zee', 'tamara', 'chi', 'bisola', 'hauwa'];
-const MOTIVE_CANDIDATES: CulpritMotive[] = [
-  'blackmail_debt',
-  'stolen_credit_revenge',
-  'algorithm_obsession',
-  'romantic_jealousy',
-  'undercover_expose',
-];
-
-function generateNewSecret(): MysterySecret {
-  const culprit = CULPRIT_CANDIDATES[Math.floor(Math.random() * CULPRIT_CANDIDATES.length)];
-  const motive = MOTIVE_CANDIDATES[Math.floor(Math.random() * MOTIVE_CANDIDATES.length)];
-  return { culprit, motive };
-}
 
 const INITIAL_INVENTORY: InventoryItem[] = [];
 
@@ -157,7 +153,8 @@ export default function App() {
             name: DEFAULT_HEROINE.name,
           },
           meters: calibratedMeters,
-          mysterySecret: parsed.mysterySecret || generateNewSecret(),
+          // One fixed season story, also for saves made while it was random
+          mysterySecret: generateNewSecret(),
           social: parsed.social ? normalizeSocial(parsed.social) : DEFAULT_SOCIAL_STATE,
           isTyping: false,
           isWardrobeOpen: false,
@@ -420,7 +417,7 @@ export default function App() {
       if (speakerId === 'kelvin') return 'Kelvin Adebayo-Wright';
       if (speakerId === 'dayo') return 'Dayo Martins';
       if (speakerId === 'narrator') return '';
-      return speakerId;
+      return EXTRA_SPEAKERS[speakerId] ?? speakerId;
     },
     [gameState.heroine.name]
   );
@@ -473,7 +470,9 @@ export default function App() {
     });
   }, [currentScene, gameState.currentEpisode, gameState.currentSceneIndex, gameState.currentLineIndex, socialSceneIndex, gameState.flags, gameState.social]);
   const [cluesInitialTab, setCluesInitialTab] = useState<'clues' | 'relationships'>('clues');
-  const visibleChoices = currentScene.choices.filter((c) => !c.conditionFlag || gameState.flags[c.conditionFlag]);
+  const visibleChoices = currentScene.choices.filter(
+    (c) => (!c.conditionFlag || gameState.flags[c.conditionFlag]) && (!c.hiddenIfFlag || !gameState.flags[c.hiddenIfFlag])
+  );
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
@@ -689,6 +688,10 @@ export default function App() {
         episodeAcquired: 3,
         tag: 'Chat',
       });
+    }
+    // Evidence written into the choice itself
+    if (choice.addsClue && !updatedInventory.some((i) => i.id === choice.addsClue!.id)) {
+      updatedInventory.push({ ...choice.addsClue, episodeAcquired: gameState.currentEpisode });
     }
 
     // Apply choice-specific music mood if defined

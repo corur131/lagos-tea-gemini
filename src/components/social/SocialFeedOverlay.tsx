@@ -59,6 +59,8 @@ import { playSound } from '../../utils/audio';
 import { DmInbox, countUnreadDms } from './DmInbox';
 import { DM_THREADS } from '../../data/dmData';
 import { DmThread, DmBeat, DmReplyOption } from '../../types/socialFeed';
+import { CommentChoiceContext, CommentChoiceContextValue } from './CommentChoices';
+import { CommentChoice, commentFlag } from '../../data/commentChoices';
 
 interface SocialFeedOverlayProps {
   currentEpisode: number;
@@ -664,7 +666,28 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
     [meters, currentEpisode, currentSceneIndex, social, followedNpcCount, flags]
   );
 
+  // Ada's written comment on a post: saved once, moves meters, and sets a flag that relationships read
+  const handleCommentPick = useCallback(
+    (post: SocialPost, choice: CommentChoice) => {
+      onUpdateSocial?.((prev) => ({
+        ...prev,
+        commentPicks: { ...(prev.commentPicks || {}), [post.id]: choice.id },
+      }));
+      if (choice.meters && onUpdateMeters) onUpdateMeters(choice.meters);
+      onUpdateFlags?.(commentFlag(post.id, choice.id));
+      const desc = choice.meters ? describeEffect({ meterChanges: choice.meters }) : '';
+      showToast(desc ? `Comment posted · ${desc}` : 'Comment posted 💬');
+    },
+    [onUpdateSocial, onUpdateMeters, onUpdateFlags, showToast]
+  );
+
+  const commentCtx = useMemo<CommentChoiceContextValue>(
+    () => ({ flags, picks: social?.commentPicks || {}, onPick: handleCommentPick, soundEnabled }),
+    [flags, social?.commentPicks, handleCommentPick, soundEnabled]
+  );
+
   return (
+    <CommentChoiceContext.Provider value={commentCtx}>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
       {/* Backdrop tap to close */}
       <div className="absolute inset-0" onClick={onClose} />
@@ -1340,5 +1363,6 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         </div>
       )}
     </div>
+    </CommentChoiceContext.Provider>
   );
 };

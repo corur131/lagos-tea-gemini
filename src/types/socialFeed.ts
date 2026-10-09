@@ -293,6 +293,8 @@ export interface SocialState {
   deletedPostStatus: Record<string, 'captured' | 'missed'>;
   deletedPostSeenAt: Record<string, number>;
   commentWarPicks: Record<string, string>;
+  /** postId -> id of the comment Ada chose to post there */
+  commentPicks?: Record<string, string>;
   appliedEffects: Record<string, boolean>;
   followerBonus: number;
   milestones: Record<string, boolean>;

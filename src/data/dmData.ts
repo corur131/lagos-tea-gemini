@@ -1,3 +1,4 @@
+import { EP4_DM_BEATS } from './dmEpisode4';
 import { DmThread } from '../types/socialFeed';
 
 /*
@@ -1990,3 +1991,8 @@ export const DM_THREADS: DmThread[] = [
     ],
   },
 ];
+
+// Episode 4 messages, added to their existing chats
+Object.entries(EP4_DM_BEATS).forEach(([threadId, beats]) => {
+  DM_THREADS.find((t) => t.id === threadId)?.beats.push(...beats);
+});

@@ -1,3 +1,4 @@
+import { buildArchivePosts } from '../../data/commentChoices';
 import React, { useState, useMemo } from 'react';
 import { SocialPost, SocialAuthorId } from '../../types/socialFeed';
 import { CharacterId, Meters, HeroineCustomization, InventoryItem } from '../../types/vn';
@@ -195,63 +196,12 @@ const PROFILE_REGISTRY: Record<string, CharacterProfileMeta> = {
   },
 };
 
-// Generates fallback archived posts for any character so the 3-column Instagram grid looks authentic and rich!
+// Older posts for each profile, written per character (see data/archivePosts.ts)
 function getArchiveGridPostsForCharacter(
   charId: string,
   charMeta: CharacterProfileMeta
 ): SocialPost[] {
-  const titles = [
-    { title: 'Velvet Horizon at Sundown', likes: 41200, comments: 840, gradient: 'from-rose-700 via-purple-800 to-neutral-950', badge: 'SUNSET LUXE' },
-    { title: 'Private Tasting in Victoria Island', likes: 32900, comments: 620, gradient: 'from-amber-600 via-rose-700 to-neutral-900', badge: 'VIP SALON' },
-    { title: 'Behind the Scenes: Campaign Shoot', likes: 58400, comments: 1200, gradient: 'from-indigo-600 via-purple-700 to-black', badge: 'EXCLUSIVE' },
-    { title: 'Lekki Coastal Drive in Monogram', likes: 27800, comments: 490, gradient: 'from-teal-600 via-emerald-800 to-neutral-950', badge: 'ON THE MOVE' },
-    { title: 'The Guestlist Afterparty', likes: 64200, comments: 1530, gradient: 'from-fuchsia-600 via-pink-700 to-neutral-900', badge: 'MIDNIGHT' },
-    { title: 'Signature Statement Look', likes: 49100, comments: 910, gradient: 'from-yellow-600 via-amber-700 to-stone-900', badge: 'RUNWAY' },
-  ];
-
-  return titles.map((t, idx) => ({
-    id: `archive_${charId}_${idx}`,
-    authorId: charId as SocialAuthorId,
-    authorName: charMeta.name,
-    authorHandle: charMeta.handle,
-    isVerified: true,
-    avatarType: (['heroine', 'zee', 'tamara', 'chi', 'bisola', 'hauwa', 'chidi', 'kelvin', 'dayo', 'lagos_tea'].includes(charId)
-      ? charId
-      : 'zee') as any,
-    unlockEpisode: 1,
-    timestamp: `${idx + 1}w ago`,
-    locationTag: 'Lagos, Nigeria',
-    caption: `${t.title}. When the energy is pure, the moments speak for themselves ✨ #LagosLiving #${charMeta.handle.replace('@', '')}`,
-    hashtags: ['#LagosLiving', `#${charMeta.handle.replace('@', '')}`, '#LuxuryLifestyle'],
-    graphic: {
-      type: 'luxe_portrait',
-      characterId: charId as CharacterId,
-      bgGradient: t.gradient,
-      badgeLabel: t.badge,
-      headline: t.title.toUpperCase(),
-      subheadline: `${charMeta.name} Archive`,
-      accentColor: '#f43f5e',
-      tagLocation: 'VICTORIA ISLAND, LAGOS',
-    },
-    likesCount: t.likes,
-    commentsCount: t.comments,
-    sharesCount: Math.round(t.likes * 0.08),
-    isLikedByPlayer: false,
-    isArchive: true,
-    comments: [
-      {
-        id: `c_arch_${charId}_${idx}`,
-        authorId: 'tamara' as const,
-        authorName: 'Tamara Reid',
-        authorHandle: '@tamara_reid',
-        isVerified: true,
-        avatarType: 'tamara' as const,
-        text: 'Absolute perfection! Still obsessed with this fit! 🔥😍',
-        likes: 120,
-        timestamp: '3d ago',
-      },
-    ],
-  }));
+  return buildArchivePosts(charId, charMeta.name, charMeta.handle);
 }
 
 interface InstagramProfileViewProps {

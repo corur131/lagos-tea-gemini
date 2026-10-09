@@ -1,6 +1,7 @@
 import { SocialPost, SocialStory } from '../types/socialFeed';
 import type { StaticNotification } from './socialRules';
 import { createLightweightComment } from './gidiUsers';
+import { STORY_POSTS } from './storyPosts';
 
 export const INITIAL_STORIES: SocialStory[] = [
   {
@@ -2490,6 +2491,8 @@ export const INITIAL_POSTS: SocialPost[] = [
     sharesCount: 90,
     comments: [],
   },
+  // The cast keeps posting through the story (storyPosts.ts)
+  ...STORY_POSTS,
 ];
 
 /* =========================================================================

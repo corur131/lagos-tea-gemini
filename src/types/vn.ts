@@ -242,6 +242,10 @@ export interface ChoiceOption {
   nextEpisode?: number;
   /** Lines that play right after this choice, in the same scene, before the story moves on */
   followUp?: DialogueLine[];
+  /** Hidden when this story flag has been set by an earlier choice */
+  hiddenIfFlag?: string;
+  /** Evidence this choice adds to the Clues board */
+  addsClue?: { id: string; name: string; description: string; tag: InventoryItem['tag'] };
 }
 
 export interface SceneData {

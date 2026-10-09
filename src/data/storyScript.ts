@@ -1,4 +1,5 @@
 import { SceneData, EpisodeMeta } from '../types/vn';
+import { EPISODE_4_META, EPISODE_4_SCENES } from './episode4';
 
 export const EPISODE_METAS: EpisodeMeta[] = [
   {
@@ -25,6 +26,7 @@ export const EPISODE_METAS: EpisodeMeta[] = [
     recap: 'Previously on Lagos Tea... In the wake of the viral drama, Zee Bello hired Ada as her personal assistant inside the elite Banana Island Content House. But living behind the ring lights reveals secrets darker than any comment section.',
     twistTitle: 'The Locked Drawer',
   },
+  EPISODE_4_META,
 ];
 
 /* =========================================================================
@@ -1577,4 +1579,5 @@ export const CANONICAL_STORY: SceneData[] = [
   ...EPISODE_1_SCENES,
   ...EPISODE_2_SCENES,
   ...EPISODE_3_SCENES,
+  ...EPISODE_4_SCENES,
 ];
