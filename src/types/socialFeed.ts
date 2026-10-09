@@ -192,6 +192,12 @@ export interface DmBeat extends Unlockable {
   id: string;
   messages: DmMessage[];
   replies?: DmReplyOption[];
+  /** Renames the chat once this beat unlocks (e.g. a group rename) */
+  renameTo?: string;
+  /** New chat icon once this beat unlocks */
+  newAvatarEmoji?: string;
+  /** New member list / subtitle once this beat unlocks */
+  newHandle?: string;
 }
 
 export interface DmThread {

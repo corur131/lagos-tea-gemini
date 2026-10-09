@@ -35,7 +35,7 @@ import {
 } from './data/choiceFollowUps';
 import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges, hasReached } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
-import { countUnreadDms, getVisibleBeats } from './components/social/DmInbox';
+import { countUnreadDms, getVisibleBeats, resolveThreadIdentity } from './components/social/DmInbox';
 import { DmToast, DmToastItem, describeBeat } from './components/social/DmToast';
 import { playSound, bgmManager } from './utils/audio';
 import {
@@ -240,14 +240,16 @@ export default function App() {
   const announcedDmBeatsRef = useRef<Set<string> | null>(null);
 
   useEffect(() => {
-    const visible = DM_THREADS.flatMap((thread) =>
-      getVisibleBeats(thread, {
-        episode: gameState.currentEpisode,
-        sceneIndex: socialSceneIndex,
-        flags: gameState.flags,
-        social: gameState.social,
-      }).map((beat) => ({ thread, beat }))
-    );
+    const progress = {
+      episode: gameState.currentEpisode,
+      sceneIndex: socialSceneIndex,
+      flags: gameState.flags,
+      social: gameState.social,
+    };
+    const visible = DM_THREADS.flatMap((rawThread) => {
+      const thread = resolveThreadIdentity(rawThread, progress);
+      return getVisibleBeats(thread, progress).map((beat) => ({ thread, beat }));
+    });
 
     // First run: remember what's already in the inbox so a reload or an old save doesn't replay pop-ups.
     // A brand-new game (very first line) starts empty, so its first messages do pop up.

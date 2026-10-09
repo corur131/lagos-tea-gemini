@@ -24,6 +24,22 @@ export function getVisibleBeats(thread: DmThread, p: Progress): DmBeat[] {
   return out;
 }
 
+/**
+ * The chat's current name/icon. Renames apply as soon as the story reaches them, even if an
+ * earlier message in the chat is still waiting for the player's reply.
+ */
+export function resolveThreadIdentity(thread: DmThread, p: Progress): DmThread {
+  let { title, avatarEmoji, handle } = thread;
+  for (const beat of thread.beats) {
+    if (!isUnlocked(beat, p.episode, p.sceneIndex, p.flags)) continue;
+    if (beat.renameTo) title = beat.renameTo;
+    if (beat.newAvatarEmoji) avatarEmoji = beat.newAvatarEmoji;
+    if (beat.newHandle) handle = beat.newHandle;
+  }
+  if (title === thread.title && avatarEmoji === thread.avatarEmoji && handle === thread.handle) return thread;
+  return { ...thread, title, avatarEmoji, handle };
+}
+
 export function countUnreadDms(threads: DmThread[], p: Progress): number {
   return threads.reduce(
     (sum, t) => sum + getVisibleBeats(t, p).filter((b) => !p.social.seenDmBeats[b.id]).length,
@@ -105,7 +121,8 @@ export const DmInbox: React.FC<DmInboxProps> = (props) => {
 
   const inbox = useMemo(() => {
     return threads
-      .map((thread) => {
+      .map((rawThread) => {
+        const thread = resolveThreadIdentity(rawThread, props);
         const beats = getVisibleBeats(thread, props);
         const flat = flatten(beats, props.social.dmReplies, heroine.name);
         const last = beats[beats.length - 1];
@@ -179,6 +196,7 @@ const ThreadView: React.FC<DmInboxProps & { thread: DmThread }> = ({
 }) => {
   const beats = getVisibleBeats(thread, progress);
   const flat = flatten(beats, progress.social.dmReplies, heroine.name);
+  const shown = resolveThreadIdentity(thread, progress);
 
   // Messages the player already read appear instantly; new ones arrive one by one
   const [revealed, setRevealed] = useState(() => {
@@ -239,10 +257,10 @@ const ThreadView: React.FC<DmInboxProps & { thread: DmThread }> = ({
           onClick={() => thread.profileId && onViewProfile(thread.profileId)}
           className="flex items-center gap-2.5 min-w-0 text-left"
         >
-          <ThreadAvatar thread={thread} heroine={heroine} size="sm" />
+          <ThreadAvatar thread={shown} heroine={heroine} size="sm" />
           <div className="min-w-0">
-            <div className="text-sm font-bold text-neutral-100 truncate">{thread.title}</div>
-            <div className="text-[10px] text-neutral-500 truncate">{thread.handle}</div>
+            <div className="text-sm font-bold text-neutral-100 truncate">{shown.title}</div>
+            <div className="text-[10px] text-neutral-500 truncate">{shown.handle}</div>
           </div>
         </button>
       </div>

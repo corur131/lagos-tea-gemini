@@ -1069,6 +1069,9 @@ export const DM_THREADS: DmThread[] = [
         id: 'group_4',
         unlockEpisode: 3,
         unlockSceneIndex: 0,
+        renameTo: 'Content House 🏡',
+        newAvatarEmoji: '🏡',
+        newHandle: 'Zee, Tamara, Chi, Bisola, Hauwa, You',
         messages: [
           { from: 'system', text: 'Zee renamed the group “Content House 🏡”' },
           { from: 'zee', text: 'House rules. 1. Ring lights off at 2am. 2. No guests upstairs. 3. The archive room is OFF LIMITS.' },
