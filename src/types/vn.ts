@@ -125,7 +125,10 @@ export type OutfitId =
   | 'tube_top'
   | 'jersey_top'
   | 'halter_top'
-  | 'cardigan_set';
+  | 'cardigan_set'
+  | 'thrift_dress'
+  | 'silk_pajamas'
+  | 'aso_ebi';
 
 export type EarringsId = 'none' | 'studs' | 'hoops' | 'drops';
 

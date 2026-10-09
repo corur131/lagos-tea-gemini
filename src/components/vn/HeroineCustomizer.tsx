@@ -16,6 +16,7 @@ import {
   NecklaceId,
   HeroineCustomization,
 } from '../../types/vn';
+import type { DressCode } from '../../data/storyOutfits';
 import { HeroineSvg } from '../svg/HeroineSvg';
 import {
   SKIN_TONES,
@@ -42,6 +43,8 @@ interface HeroineCustomizerProps {
   onSave: (updated: HeroineCustomization) => void;
   onClose?: () => void;
   isInitialSetup?: boolean;
+  /** The current scene's dress code, if it has one */
+  dressCode?: DressCode;
 }
 
 export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
@@ -49,6 +52,7 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
   onSave,
   onClose,
   isInitialSetup = false,
+  dressCode,
 }) => {
   const [draft, setDraft] = useState<HeroineCustomization>({ ...customization });
   const [activeTab, setActiveTab] = useState<
@@ -120,6 +124,9 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
     { id: 'jersey_top', label: 'Naija Jersey', desc: 'Oversized green football jersey' },
     { id: 'halter_top', label: 'Crochet Halter', desc: 'Granny-square halter & mini skirt' },
     { id: 'cardigan_set', label: 'Knit Cardigan Set', desc: 'Cropped cable cardigan & mini' },
+    { id: 'thrift_dress', label: 'Yaba Thrift Dress', desc: '₦4,500 black shift, styled like Paris' },
+    { id: 'silk_pajamas', label: 'Silk Pyjamas', desc: 'Blush satin, for 2 AM detective work' },
+    { id: 'aso_ebi', label: 'Gold Aso-Ebi', desc: 'Owambe lace, wrapper & gele' },
   ];
 
   const earringsList: { id: EarringsId; label: string }[] = [
@@ -603,11 +610,19 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
             =================================================================== */}
         {activeTab === 'wardrobe' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Outfits (6) */}
+            {/* Outfits */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2">
-                Campus Outfits
+                Outfits
               </label>
+              {dressCode && (
+                <div className="mb-2.5 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/40 text-[11px] text-amber-100 leading-snug">
+                  👗 <span className="font-semibold">This scene: {dressCode.label}.</span>{' '}
+                  {dressCode.allowed.length > 1
+                    ? 'Outfits marked ✓ work here; anything else changes back after the scene.'
+                    : 'Ada wears this for the scene. Your pick comes back right after.'}
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 {outfitsList.map((outfit) => (
                   <button
@@ -620,7 +635,12 @@ export const HeroineCustomizer: React.FC<HeroineCustomizerProps> = ({
                         : 'bg-neutral-900/60 border-neutral-800 text-neutral-300 hover:border-neutral-700'
                     }`}
                   >
-                    <div className="font-semibold">{outfit.label}</div>
+                    <div className="font-semibold">
+                      {outfit.label}
+                      {dressCode && dressCode.allowed.length > 1 && dressCode.allowed.includes(outfit.id) && (
+                        <span className="ml-1 text-emerald-400">✓</span>
+                      )}
+                    </div>
                     <div className="text-[10px] text-neutral-400 mt-0.5">{outfit.desc}</div>
                   </button>
                 ))}

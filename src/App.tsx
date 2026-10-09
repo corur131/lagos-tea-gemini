@@ -1,4 +1,5 @@
 import { generateNewSecret } from './data/mystery';
+import { getDressCode, sceneOutfit } from './data/storyOutfits';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   GameState,
@@ -474,6 +475,22 @@ export default function App() {
     (c) => (!c.conditionFlag || gameState.flags[c.conditionFlag]) && (!c.hiddenIfFlag || !gameState.flags[c.hiddenIfFlag])
   );
 
+  // Scenes that need a particular look dress Ada for the moment; her own outfit is kept for later
+  const dressCode = useMemo(() => getDressCode(currentScene, gameState.flags), [currentScene, gameState.flags]);
+  const sceneHeroine = useMemo(
+    () => ({ ...gameState.heroine, outfit: sceneOutfit(gameState.heroine.outfit, dressCode) }),
+    [gameState.heroine, dressCode]
+  );
+  const dressedForScene = sceneHeroine.outfit !== gameState.heroine.outfit;
+  const [dressBanner, setDressBanner] = useState<string | null>(null);
+  const dressBannerKey = dressedForScene && dressCode ? `${currentScene.afterChoice?.sceneId ?? currentScene.id}|${sceneHeroine.outfit}` : '';
+  useEffect(() => {
+    if (!dressBannerKey || !dressCode) return;
+    setDressBanner(dressCode.label);
+    const t = setTimeout(() => setDressBanner(null), 3200);
+    return () => clearTimeout(t);
+  }, [dressBannerKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
 
@@ -523,7 +540,12 @@ export default function App() {
 
   // Typewriter effect state
   const [displayedText, setDisplayedText] = useState('');
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  // "Finished typing" belongs to one specific line. Keying it to the line means a new line can never
+  // inherit the previous line's finished state (which used to flash the choices for a frame).
+  const lineKey = `${currentScene.id}|${gameState.currentLineIndex}|${currentLine?.text ?? ''}`;
+  const [completedLineKey, setCompletedLineKey] = useState<string | null>(null);
+  const isTypingComplete = completedLineKey === lineKey;
+  const setIsTypingComplete = (done: boolean) => setCompletedLineKey(done ? lineKey : null);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Gemini Live Generation state & error handling
@@ -568,9 +590,10 @@ export default function App() {
     }
 
     const fullText = currentLine.text;
+    const typingKey = lineKey;
     let charIndex = 0;
     setDisplayedText('');
-    setIsTypingComplete(false);
+    setCompletedLineKey(null);
 
     // Play line SFX if present
     if (gameState.soundEnabled && currentLine.sfx) {
@@ -595,7 +618,7 @@ export default function App() {
 
       if (charIndex >= fullText.length) {
         if (typingTimerRef.current) clearInterval(typingTimerRef.current);
-        setIsTypingComplete(true);
+        setCompletedLineKey(typingKey);
       }
     }, 20);
 
@@ -605,6 +628,7 @@ export default function App() {
   }, [
     gameState.currentEpisode,
     gameState.currentSceneIndex,
+    currentScene.id,
     gameState.currentLineIndex,
     currentLine?.text,
     currentLine?.sfx,
@@ -1207,7 +1231,7 @@ export default function App() {
           }`}
         >
           <HeroineSvg
-            customization={gameState.heroine}
+            customization={sceneHeroine}
             expression={isHeroineSpeaking ? currentLine.expression || 'neutral' : 'neutral'}
             isTalking={isHeroineSpeaking && !isTypingComplete}
             lookDirection={stageNpcs.length > 0 ? 'right' : 'center'}
@@ -1410,6 +1434,16 @@ export default function App() {
       )}
 
       {/* 7. FIRST LAUNCH WELCOME & CUSTOMIZER */}
+      {/* DRESSED FOR THE SCENE */}
+      {dressBanner && !gameState.isSocialFeedOpen && !gameState.isWardrobeOpen && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-40 px-3.5 py-2 rounded-full bg-neutral-950/90 border border-amber-500/50 text-amber-100 text-xs shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <span>👗</span>
+          <span>
+            Dressed for the scene: <span className="font-semibold text-amber-300">{dressBanner}</span>
+          </span>
+        </div>
+      )}
+
       {/* WHO LIKED THAT CHOICE */}
       {relationshipPing && !gameState.isSocialFeedOpen && (
         <RelationshipPing pingId={relationshipPing.id} items={relationshipPing.items} onDone={clearRelationshipPing} />
@@ -1449,6 +1483,7 @@ export default function App() {
       {gameState.isWardrobeOpen && (
         <HeroineCustomizer
           customization={gameState.heroine}
+          dressCode={dressCode}
           onSave={(updated) => {
             setGameState((prev) => ({
               ...prev,
@@ -1489,7 +1524,7 @@ export default function App() {
           currentEpisode={gameState.currentEpisode}
           currentSceneIndex={socialSceneIndex}
           currentLocation={currentScene.location}
-          heroineCustomization={gameState.heroine}
+          heroineCustomization={sceneHeroine}
           meters={gameState.meters}
           inventory={gameState.inventory}
           flags={gameState.flags}

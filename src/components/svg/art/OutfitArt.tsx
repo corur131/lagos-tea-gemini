@@ -868,6 +868,84 @@ export function OutfitArt({ outfit, id, skin }: { outfit: OutfitId; id: string; 
       );
     }
 
+    case 'thrift_dress': {
+      // ₦4,500 thrifted black shift dress: square neck, cap sleeves, crochet collar trim
+      const c = '#18161B';
+      const neck = 'C 136 268, 146 272, 160 272';
+      const half = `M 160 420 L 99 420 C 100 380, 101 346, 103 324 L 92 322 C 88 314, 88 304, 92 296 C 100 280, 112 266, 124 260 L 128 272 ${neck}`;
+      return (
+        <g>
+          <ArmLines skin={skin} />
+          <Garment id={id} d={sym(half)} fabric={c} base={c} edge="#000">
+            {/* matte crepe: soft grey sheen down the front, darts at the bust */}
+            <path d={both('M 118 330 C 120 360, 122 392, 122 420')} stroke="#5B5763" strokeWidth="9" fill="none" opacity="0.22" />
+            <Folds c="#3A3640" ds={['M 120 318 C 124 330, 126 342, 126 352', 'M 106 392 C 116 400, 126 406, 134 420']} />
+            <Seam c="#3A3640" d="M 104 404 L 160 404" o={0.5} />
+          </Garment>
+          {/* cream crochet trim on the square neckline */}
+          <path d={both(`M 124 260 L 128 272 ${neck}`)} stroke="#EFE6D2" strokeWidth="3" fill="none" strokeDasharray="2.2 1.2" />
+          <path d={both('M 92 322 L 103 324')} stroke="#EFE6D2" strokeWidth="2" strokeDasharray="2 1.2" fill="none" />
+        </g>
+      );
+    }
+
+    case 'silk_pajamas': {
+      // Satin pyjama shirt with piping and a notched collar
+      const c = '#E8B9C8';
+      const pipe = '#FFFFFF';
+      const neck = 'C 144 270, 152 288, 160 300';
+      const d = sym(sleevedHalf([130, 254], neck, 300));
+      return (
+        <g>
+          <path d="M 134 254 L 186 254 L 160 302 Z" fill={skin.baseColor} />
+          <Garment id={id} d={d} fabric={c} base={c}>
+            {/* satin sheen */}
+            <path d={both('M 112 312 C 116 344, 118 380, 118 420')} stroke="#FFF1F5" strokeWidth="10" fill="none" opacity="0.35" />
+            <BodyFolds c={c} o={1.1} />
+            <path d={both('M 132 300 L 132 420')} stroke={pipe} strokeWidth="1.4" fill="none" opacity="0.8" />
+            {/* chest pocket with piping */}
+            <path d="M 112 318 L 136 318 L 136 340 L 112 340 Z" fill="none" stroke={pipe} strokeWidth="1.2" />
+          </Garment>
+          <path d={both('M 130 254 C 124 262, 120 274, 122 286 L 144 290 C 144 278, 140 266, 134 252 Z')} fill={c} stroke={pipe} strokeWidth="1.3" />
+          {[322, 352, 382].map((y) => (
+            <Button key={y} x={160} y={y} r={2.2} c="#FFFFFF" />
+          ))}
+        </g>
+      );
+    }
+
+    case 'aso_ebi': {
+      // Gold aso-ebi: lace blouse with a wrapper tied high, for the Owambe (the gele is drawn with the hair)
+      const base = '#C9971F';
+      const cord = '#FFE9A8';
+      const pid = `${id}_gl`;
+      const neck = 'C 130 264, 146 268, 160 268';
+      const d = sym(sleevedHalf([110, 262], neck, 268));
+      return (
+        <g>
+          <defs>
+            <LacePattern id={pid} base={base} cord={cord} />
+          </defs>
+          <Garment id={id} d={d} fabric={`url(#${pid})`} base={base} edge="#7A5A10">
+            <BodyFolds c={base} o={1.2} />
+            {/* wrapper (iro) tied at the waist with a knot */}
+            <path d="M 60 384 C 110 378, 210 378, 262 384 L 264 420 L 58 420 Z" fill="#B07D10" />
+            <path d="M 60 384 C 110 378, 210 378, 262 384" stroke="#FFE9A8" strokeWidth="2" fill="none" />
+            <path d="M 66 396 C 112 390, 208 390, 256 396 M 70 408 C 114 402, 206 402, 252 408" stroke="#7A5A10" strokeWidth="1.4" fill="none" opacity="0.6" />
+            <path d="M 186 380 C 196 372, 206 376, 204 386 C 214 392, 206 402, 196 396 C 192 404, 182 398, 186 390 Z" fill="#B07D10" stroke="#FFE9A8" strokeWidth="1" />
+          </Garment>
+          {/* beaded neckline */}
+          <path d={both('M 110 262 ' + neck)} stroke="#FFE9A8" strokeWidth="2" fill="none" />
+          {[116, 126, 136, 146, 156].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy={x < 140 ? 266 : 268} r="1.5" fill="#FFF8E1" />
+              <circle cx={320 - x} cy={x < 140 ? 266 : 268} r="1.5" fill="#FFF8E1" />
+            </g>
+          ))}
+        </g>
+      );
+    }
+
     case 'cardigan_set': {
       // Cropped cable-knit cardigan, buttoned, with a matching mini skirt
       const c = '#A7C7A1';

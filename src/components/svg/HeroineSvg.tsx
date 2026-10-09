@@ -674,6 +674,27 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       <HairFront style={customization.hairstyle} ink={hairInk} id={hairId} />
 
       {/* Silk headwrap (turban) over the hair */}
+      {/* Gele (head-tie) with aso-ebi: a tall pleated fan over the hair */}
+      {customization.outfit === 'aso_ebi' && !face?.headwrap && (
+        <g id="gele">
+          {/* fan of stiff pleats rising from the back of the head and sweeping to one side */}
+          {[-58, -40, -22, -4, 14, 32, 50].map((deg, k) => (
+            <g key={k} transform={`rotate(${deg} 168 74)`}>
+              <path d="M 168 74 C 152 52, 153 18, 168 -2 C 183 18, 184 52, 168 74 Z" fill={k % 2 ? '#C9971F' : '#B8860F'} stroke="#7A5A10" strokeWidth="1.2" />
+              <path d="M 168 68 C 161 46, 162 20, 168 6" stroke="#FFE9A8" strokeWidth="1.2" fill="none" opacity="0.6" />
+            </g>
+          ))}
+          {/* the wrapped band across the forehead, folds slanting the same way */}
+          <path d="M 84 126 C 78 86, 104 52, 160 48 C 216 52, 242 86, 236 126 C 220 110, 196 100, 160 100 C 124 100, 100 110, 84 126 Z" fill="#C9971F" stroke="#7A5A10" strokeWidth="1.4" />
+          {[0, 1, 2, 3, 4].map((k) => (
+            <path key={k} d={`M ${92 + k * 6} ${116 - k * 12} C ${130 + k * 4} ${100 - k * 12}, ${190 - k * 2} ${92 - k * 12}, ${226 - k * 4} ${108 - k * 12}`} stroke="#7A5A10" strokeWidth="1.6" fill="none" opacity="0.55" />
+          ))}
+          <path d="M 96 112 C 124 96, 196 96, 224 112" stroke="#FFE9A8" strokeWidth="2.4" fill="none" opacity="0.75" />
+          {/* tucked knot at the side */}
+          <path d="M 214 82 C 232 72, 246 84, 236 98 C 228 106, 216 100, 214 92 Z" fill="#B8860F" stroke="#7A5A10" strokeWidth="1.2" />
+        </g>
+      )}
+
       {face?.headwrap && (
         <g id="headwrap">
           <defs>

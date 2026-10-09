@@ -71,6 +71,9 @@ const OUTFIT_LABELS: Record<OutfitId, string> = {
   jersey_top: 'jersey',
   halter_top: 'crochet halter',
   cardigan_set: 'cardigan set',
+  thrift_dress: 'thrift dress',
+  silk_pajamas: 'pyjama',
+  aso_ebi: 'aso-ebi',
 };
 
 const LOCATION_TAGS: Record<LocationType, PhotoTag[]> = {
