@@ -391,6 +391,13 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
     [unfollowed, onUpdateSocial, onUpdateMeters, onUpdateFlags, soundEnabled]
   );
 
+  // Every post the player is allowed to see right now (story progress + choice flags), before tab filters.
+  // Profile pages use this so they can't show posts the story hasn't reached yet.
+  const unlockedPosts = useMemo(
+    () => posts.filter((post) => isUnlocked(post, currentEpisode, currentSceneIndex, flags)),
+    [posts, currentEpisode, currentSceneIndex, flags]
+  );
+
   // Filter posts based on story progression and user filters
   const visiblePosts = useMemo(() => {
     return posts.filter((post) => {
@@ -883,7 +890,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
         {viewingProfileUserId ? (
           <InstagramProfileView
             userId={viewingProfileUserId}
-            allPosts={posts}
+            allPosts={unlockedPosts}
             heroine={heroineCustomization}
             meters={meters}
             inventory={inventory}
@@ -1112,7 +1119,7 @@ export const SocialFeedOverlay: React.FC<SocialFeedOverlayProps> = ({
             {activeTab === 'trending' && (
               <TrendingView
                 trends={visibleTrends}
-                allPosts={posts}
+                allPosts={unlockedPosts}
                 heroineCustomization={heroineCustomization}
                 soundEnabled={soundEnabled}
                 unfollowed={unfollowed}
