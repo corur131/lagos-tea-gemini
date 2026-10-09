@@ -11,6 +11,7 @@ import {
   EYESHADOW_COLORS,
   BLUSH_COLORS,
 } from './palettes';
+import type { FaceProfile, HeadShape } from './npcLooks';
 
 interface HeroineSvgProps {
   customization: HeroineCustomization;
@@ -20,7 +21,21 @@ interface HeroineSvgProps {
   lookDirection?: 'left' | 'right' | 'center' | 'away';
   reduceMotion?: boolean;
   className?: string;
+  /** Face shape/features for NPCs drawn with this body (Ada uses the default) */
+  face?: FaceProfile;
 }
+
+const HEAD_PATHS: Record<HeadShape, string> = {
+  oval: 'M 106 120 C 106 75, 126 58, 160 58 C 194 58, 214 75, 214 120 C 214 165, 208 194, 186 218 C 174 231, 166 235, 160 235 C 154 235, 146 231, 134 218 C 112 194, 106 165, 106 120 Z',
+  round: 'M 104 125 C 104 74, 126 58, 160 58 C 194 58, 216 74, 216 125 C 216 172, 206 200, 188 218 C 176 229, 168 232, 160 232 C 152 232, 144 229, 132 218 C 114 200, 104 172, 104 125 Z',
+  heart: 'M 104 118 C 104 72, 126 56, 160 56 C 194 56, 216 72, 216 118 C 216 160, 206 186, 182 214 C 172 228, 165 237, 160 237 C 155 237, 148 228, 138 214 C 114 186, 104 160, 104 118 Z',
+  long: 'M 108 116 C 108 70, 128 54, 160 54 C 192 54, 212 70, 212 116 C 212 168, 207 200, 188 224 C 176 237, 167 241, 160 241 C 153 241, 144 237, 132 224 C 113 200, 108 168, 108 116 Z',
+  square: 'M 106 120 C 106 74, 126 58, 160 58 C 194 58, 214 74, 214 120 C 214 170, 212 198, 196 216 C 184 228, 172 232, 160 232 C 148 232, 136 228, 124 216 C 108 198, 106 170, 106 120 Z',
+};
+
+/** Scale around a point, as an SVG transform */
+const scaleAround = (cx: number, cy: number, sx: number, sy = sx) =>
+  sx === 1 && sy === 1 ? undefined : `translate(${cx} ${cy}) scale(${sx} ${sy}) translate(${-cx} ${-cy})`;
 
 export const HeroineSvg: React.FC<HeroineSvgProps> = ({
   customization,
@@ -30,7 +45,11 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
   lookDirection = 'center',
   reduceMotion = false,
   className = 'w-full h-full object-contain',
+  face,
 }) => {
+  const headShape: HeadShape = face?.headShape ?? 'oval';
+  const faceW = face?.faceWidth ?? 1;
+  const marks = face?.marks ?? [];
   // Palettes
   const skin = SKIN_TONES[customization.skinTone] || SKIN_TONES.rich_honey;
   const eye = EYE_COLORS[customization.eyeColor] || EYE_COLORS.dark_brown;
@@ -1029,15 +1048,13 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       />
       <path d="M 140 196 Q 160 212 180 196" stroke={skin.shadowColor} strokeWidth="2.8" fill="none" opacity="0.45" />
 
+      <g transform={scaleAround(160, 150, faceW, 1)}>
       {/* Ears */}
       <ellipse cx="102" cy="168" rx="7.5" ry="12.5" fill={skin.baseColor} />
       <ellipse cx="218" cy="168" rx="7.5" ry="12.5" fill={skin.baseColor} />
 
-      {/* Enlarged Head (20% larger): soft oval, sculpted cheekbones, pointed chin */}
-      <path
-        d="M 106 120 C 106 75, 126 58, 160 58 C 194 58, 214 75, 214 120 C 214 165, 208 194, 186 218 C 174 231, 166 235, 160 235 C 154 235, 146 231, 134 218 C 112 194, 106 165, 106 120 Z"
-        fill={`url(#${uniqueId}_skin)`}
-      />
+      {/* Head: shape varies per character (Ada: soft oval) */}
+      <path d={HEAD_PATHS[headShape]} fill={`url(#${uniqueId}_skin)`} />
 
       {/* Soft Cheek Blush (smooth fade-in when blushing) */}
       {(blush.opacity > 0 || isBlushing) && (
@@ -1056,9 +1073,10 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
           <circle cx="160" cy="192" r="2.4" fill="#FFFFFF" opacity="0.8" />
         </g>
       )}
+      </g>
 
       {/* Small refined nose with soft highlight */}
-      <g id="nose">
+      <g id="nose" transform={scaleAround(160, 192, face?.noseWidth ?? 1, 1)}>
         <path d="M 158 155 Q 156 178 152 191" stroke={skin.shadowColor} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.4" />
         <path d="M 148 196 Q 160 200 172 196" stroke={skin.shadowColor} strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.75" />
         <circle cx="152" cy="195" r="1.5" fill={skin.shadowColor} opacity="0.55" />
@@ -1067,17 +1085,70 @@ export const HeroineSvg: React.FC<HeroineSvgProps> = ({
       </g>
 
       {/* Eyes & Eyebrows */}
-      {renderEyes()}
-      {renderEyebrows()}
+      <g transform={scaleAround(160, 158, face?.eyeScale ?? 1)}>{renderEyes()}</g>
+      <g transform={face?.browLift ? `translate(0 ${-face.browLift})` : undefined}>
+        <g transform={scaleAround(160, 150, face?.eyeScale ?? 1, 1)}>{renderEyebrows()}</g>
+      </g>
 
       {/* Plump Glossy Lips (animated on speech) */}
-      {renderLips()}
+      <g transform={scaleAround(160, 215, face?.lipScale ?? 1)}>{renderLips()}</g>
+
+      {/* Signature face details */}
+      {marks.includes('mole') && <circle cx="183" cy="202" r="2.2" fill="#1A0F0A" opacity="0.85" />}
+      {marks.includes('dimples') && (
+        <g stroke={skin.shadowColor} strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.55">
+          <path d="M 135 214 Q 133 219 136 223" />
+          <path d="M 185 214 Q 187 219 184 223" />
+        </g>
+      )}
+      {marks.includes('freckles') && (
+        <g fill={skin.shadowColor} opacity="0.7">
+          {[
+            [128, 180], [134, 186], [140, 181], [124, 188], [146, 186], [131, 193],
+            [192, 180], [186, 186], [180, 181], [196, 188], [174, 186], [189, 193],
+            [154, 176], [166, 176], [160, 182],
+          ].map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r={1.1} />
+          ))}
+        </g>
+      )}
+      {face?.glasses && (
+        <g transform={scaleAround(160, 158, face?.eyeScale ?? 1)} fill="#FFFFFF" fillOpacity="0.08" stroke="#141014" strokeWidth="2.4">
+          {face.glasses === 'cat' ? (
+            <>
+              <path d="M 100 152 Q 104 145 124 146 Q 142 147 146 152 Q 146 168 124 171 Q 102 168 100 152 Z" />
+              <path d="M 220 152 Q 216 145 196 146 Q 178 147 174 152 Q 174 168 196 171 Q 218 168 220 152 Z" />
+            </>
+          ) : (
+            <>
+              <circle cx="123" cy="158" r="17" />
+              <circle cx="197" cy="158" r="17" />
+            </>
+          )}
+          <path d="M 146 154 Q 160 149 174 154" fill="none" />
+          <path d="M 100 152 L 92 150" fill="none" />
+          <path d="M 220 152 L 228 150" fill="none" />
+        </g>
+      )}
 
       {/* Earrings */}
       {renderEarrings()}
 
       {/* Front Hairstyle (Natural seamless hairline, no bands) */}
       {renderHairstyle()}
+
+      {/* Silk headwrap (turban) over the hair */}
+      {face?.headwrap && (
+        <g>
+          <path
+            d="M 90 116 C 80 64, 108 22, 160 20 C 212 22, 240 64, 230 116 C 216 98, 196 90, 160 90 C 124 90, 104 98, 90 116 Z"
+            fill={face.headwrap}
+          />
+          <path d="M 104 92 C 124 70, 196 70, 216 92" stroke="#FFFFFF" strokeOpacity="0.18" strokeWidth="5" fill="none" />
+          <path d="M 98 74 C 126 46, 194 46, 222 74" stroke="#000000" strokeOpacity="0.18" strokeWidth="4" fill="none" />
+          <path d="M 140 24 C 150 44, 170 44, 180 24 C 176 50, 144 50, 140 24 Z" fill={face.headwrap} stroke="#000000" strokeOpacity="0.2" strokeWidth="1.5" />
+        </g>
+      )}
     </svg>
   );
 };

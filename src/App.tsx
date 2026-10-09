@@ -975,6 +975,16 @@ export default function App() {
   // Characters on stage to display
   const stageNpcs = currentScene.charactersOnStage?.filter((c) => c !== 'heroine') || [];
 
+  // Show whoever is talking. During narration or Ada's lines, keep the last character who spoke.
+  const focusNpc: CharacterId | undefined = (() => {
+    for (let i = gameState.currentLineIndex; i >= 0; i--) {
+      const sp = currentScene.lines[i]?.speaker;
+      if (sp && sp !== 'heroine' && sp !== 'narrator' && SHORT_NAMES[sp]) return sp as CharacterId;
+    }
+    return stageNpcs[0];
+  })();
+  const focusNpcSpeaking = !!focusNpc && currentLine.speaker === focusNpc;
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-neutral-950 font-sans flex flex-col justify-between select-none">
       
@@ -1200,24 +1210,27 @@ export default function App() {
         </div>
 
         {/* Right Character: NPC (Zee, Tamara, Chi, Bisola, Hauwa, Chidi, Kelvin) */}
-        {stageNpcs.length > 0 && (
+        {focusNpc && (
           <div
-            className={`relative w-44 sm:w-64 md:w-80 h-full max-h-[52vh] sm:max-h-[60vh] transition-all duration-300 origin-bottom ${
-              !isHeroineSpeaking && !isNarrator
+            key={focusNpc}
+            className={`relative w-44 sm:w-64 md:w-80 h-full max-h-[52vh] sm:max-h-[60vh] transition-all duration-300 origin-bottom animate-in fade-in slide-in-from-right-4 ${
+              focusNpcSpeaking
                 ? 'scale-105 brightness-105 z-20 drop-shadow-2xl'
                 : 'scale-95 brightness-90 opacity-95 z-10'
             }`}
           >
             <NpcSvg
-              characterId={stageNpcs[0]}
-              expression={
-                currentLine.speaker === stageNpcs[0]
-                  ? currentLine.expression || 'neutral'
-                  : 'neutral'
-              }
-              isTalking={currentLine.speaker === stageNpcs[0] && !isTypingComplete}
+              characterId={focusNpc}
+              expression={focusNpcSpeaking ? currentLine.expression || 'neutral' : 'neutral'}
+              isTalking={focusNpcSpeaking && !isTypingComplete}
               lookDirection="left"
+              episode={gameState.currentEpisode}
+              location={currentScene.location}
             />
+            {/* Name tag so it's always clear who this is */}
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-neutral-950/85 border border-white/15 text-[10px] sm:text-xs font-bold text-neutral-100 shadow-lg whitespace-nowrap">
+              {SHORT_NAMES[focusNpc]}
+            </span>
           </div>
         )}
       </main>

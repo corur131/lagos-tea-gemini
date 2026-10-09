@@ -1,99 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterId, Expression, HeroineCustomization } from '../../types/vn';
+import { CharacterId, Expression, HeroineCustomization, LocationType } from '../../types/vn';
+import { getNpcLook, NPC_BASE_LOOKS } from './npcLooks';
 import { HeroineSvg } from './HeroineSvg';
 
-export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'hauwa', HeroineCustomization> = {
-  zee: {
-    name: 'Zainab "Zee" Bello',
-    department: 'Fashion & Luxury Branding',
-    skinTone: 'rich_honey',
-    eyeColor: 'amber',
-    hairstyle: 'body_wave_wig',
-    hairColor: 'jet_black',
-    lipColor: 'classic_red',
-    lipFinish: 'gloss',
-    eyeshadow: 'gold',
-    lashes: 'dramatic',
-    blush: 'rose',
-    highlighter: true,
-    brows: 'arched',
-    outfit: 'party_dress',
-    earrings: 'drops',
-    necklace: 'pendant',
-  },
-  tamara: {
-    name: 'Tamara Okonkwo-Reid',
-    department: 'Business Administration & Finance',
-    skinTone: 'caramel',
-    eyeColor: 'hazel',
-    hairstyle: 'knotless_braids',
-    hairColor: 'honey_blonde',
-    lipColor: 'coral',
-    lipFinish: 'gloss',
-    eyeshadow: 'bronze',
-    lashes: 'volume',
-    blush: 'soft_peach',
-    highlighter: true,
-    brows: 'soft',
-    outfit: 'ankara',
-    earrings: 'hoops',
-    necklace: 'thin_chain',
-  },
-  chi: {
-    name: 'Chioma "Chi" Eze',
-    department: 'Law & International Governance',
-    skinTone: 'deep_chestnut',
-    eyeColor: 'dark_brown',
-    hairstyle: 'bob_wig',
-    hairColor: 'jet_black',
-    lipColor: 'plum',
-    lipFinish: 'matte',
-    eyeshadow: 'smoky_black',
-    lashes: 'classic',
-    blush: 'bold_berry',
-    highlighter: true,
-    brows: 'bold',
-    outfit: 'corporate',
-    earrings: 'studs',
-    necklace: 'thin_chain',
-  },
-  bisola: {
-    name: 'Bisola Adeyemi',
-    department: 'Media & Digital Communications',
-    skinTone: 'dark_cocoa',
-    eyeColor: 'dark_brown',
-    hairstyle: 'curly_wig',
-    hairColor: 'burgundy',
-    lipColor: 'soft_pink',
-    lipFinish: 'gloss',
-    eyeshadow: 'rose',
-    lashes: 'volume',
-    blush: 'bold_berry',
-    highlighter: true,
-    brows: 'arched',
-    outfit: 'casual',
-    earrings: 'hoops',
-    necklace: 'thin_chain',
-  },
-  hauwa: {
-    name: 'Hauwa Musa',
-    department: 'Interior & Architectural Design',
-    skinTone: 'radiant_ebony',
-    eyeColor: 'dark_brown',
-    hairstyle: 'cornrows',
-    hairColor: 'jet_black',
-    lipColor: 'nude',
-    lipFinish: 'matte',
-    eyeshadow: 'bronze',
-    lashes: 'natural',
-    blush: 'none',
-    highlighter: true,
-    brows: 'soft',
-    outfit: 'native_lace',
-    earrings: 'studs',
-    necklace: 'thin_chain',
-  },
-};
+/** Episode 1 base looks (kept for older imports); faces & story outfits live in npcLooks.ts */
+export const FEMALE_NPC_PRESETS: Record<'zee' | 'tamara' | 'chi' | 'bisola' | 'hauwa', HeroineCustomization> = NPC_BASE_LOOKS;
 
 interface NpcSvgProps {
   characterId: CharacterId;
@@ -103,6 +14,9 @@ interface NpcSvgProps {
   lookDirection?: 'left' | 'right' | 'center' | 'away';
   reduceMotion?: boolean;
   className?: string;
+  /** Story moment, so outfits/hair change with place and episode */
+  episode?: number;
+  location?: LocationType;
 }
 
 export const NpcSvg: React.FC<NpcSvgProps> = ({
@@ -113,6 +27,8 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
   lookDirection = 'center',
   reduceMotion = false,
   className = 'w-full h-full object-contain',
+  episode,
+  location,
 }) => {
   // Blinking hook for NPC (random 3.2s to 5.2s interval)
   const [isBlinking, setIsBlinking] = useState(false);
@@ -162,10 +78,11 @@ export const NpcSvg: React.FC<NpcSvgProps> = ({
 
   // Female NPCs rendered via parametric HeroineSvg with fixed presets
   if (characterId in FEMALE_NPC_PRESETS) {
-    const preset = FEMALE_NPC_PRESETS[characterId as keyof typeof FEMALE_NPC_PRESETS];
+    const { look, face } = getNpcLook(characterId as keyof typeof FEMALE_NPC_PRESETS, { episode, location });
     return (
       <HeroineSvg
-        customization={preset}
+        customization={look}
+        face={face}
         expression={expression}
         isTalking={isTalking}
         isBlushing={isBlushing}
