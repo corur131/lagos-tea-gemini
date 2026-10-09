@@ -94,8 +94,25 @@ export function castComment(
 
 /* ------------------------------ Progression ------------------------------ */
 
-export function hasReached(episode: number, sceneIndex: number, targetEpisode: number, targetScene = 0) {
-  return episode > targetEpisode || (episode === targetEpisode && sceneIndex >= targetScene);
+/**
+ * Story progress check for social content (posts, stories, DMs, comments, trends, notifications).
+ *
+ * `sceneIndex` here is the player's SOCIAL progress: the current scene index, plus 1 once that
+ * scene's choice has been made (see getSocialProgress in App). Content tagged with scene N reacts
+ * to something that happens IN scene N, so it unlocks only after scene N is finished. That stops
+ * posts and DMs from spoiling an event before the player has seen it.
+ * Scene 0 of an episode is "between episodes" news and is visible as soon as the episode opens.
+ */
+export function hasReached(
+  episode: number,
+  sceneIndex: number,
+  targetEpisode: number,
+  targetScene = 0,
+  atSceneStart = false
+) {
+  if (episode !== targetEpisode) return episode > targetEpisode;
+  if (targetScene === 0 || atSceneStart) return sceneIndex >= targetScene;
+  return sceneIndex > targetScene;
 }
 
 export function isUnlocked(
@@ -104,7 +121,7 @@ export function isUnlocked(
   sceneIndex: number,
   flags: Record<string, boolean> = {}
 ) {
-  if (!hasReached(episode, sceneIndex, item.unlockEpisode, item.unlockSceneIndex ?? 0)) return false;
+  if (!hasReached(episode, sceneIndex, item.unlockEpisode, item.unlockSceneIndex ?? 0, item.unlockAtSceneStart)) return false;
   if (item.requiredFlag && !flags[item.requiredFlag]) return false;
   if (item.requiredAnyFlags && !item.requiredAnyFlags.some((f) => flags[f])) return false;
   if (item.hiddenIfFlag && flags[item.hiddenIfFlag]) return false;
@@ -409,7 +426,7 @@ export function computeFollowers(
     social.followerBonus
   );
   // The midnight leak brings a sudden surge of curious onlookers
-  const infamy = (episode > 1 || sceneIndex >= 6) ? 220 : 0;
+  const infamy = hasReached(episode, sceneIndex, 1, 6) ? 220 : 0;
   return baseFollowers + infamy;
 }
 

@@ -31,8 +31,9 @@ import {
   findFollowUpScene,
   followUpSceneId,
   applyFlagLines,
+  FOLLOW_UP_SEPARATOR,
 } from './data/choiceFollowUps';
-import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges } from './data/socialRules';
+import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges, hasReached } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
 import { countUnreadDms } from './components/social/DmInbox';
 import { playSound, bgmManager } from './utils/audio';
@@ -216,15 +217,21 @@ export default function App() {
   // Target tab when opening GidiGram (e.g. 'for_you' vs 'dms')
   const [socialFeedInitialTab, setSocialFeedInitialTab] = useState<'for_you' | 'dms' | 'trending' | 'tea_leaks' | 'cast' | 'profile'>('for_you');
 
+  // Social progress: posts/DMs about a scene only unlock once that scene's choice has been made.
+  // A scene counts as finished while its follow-up beat plays, or once the written story has run out.
+  const socialSceneIndex =
+    gameState.currentSceneIndex +
+    ((gameState.currentSceneId || '').includes(FOLLOW_UP_SEPARATOR) || gameState.reachedEndOfContent ? 1 : 0);
+
   // Total unread DMs count
   const unreadDmCount = useMemo(() => {
     return countUnreadDms(DM_THREADS, {
       episode: gameState.currentEpisode,
-      sceneIndex: gameState.currentSceneIndex,
+      sceneIndex: socialSceneIndex,
       flags: gameState.flags,
       social: gameState.social,
     });
-  }, [gameState.currentEpisode, gameState.currentSceneIndex, gameState.flags, gameState.social]);
+  }, [gameState.currentEpisode, socialSceneIndex, gameState.flags, gameState.social]);
 
   // Dynamic Background Music state & modal
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
@@ -865,7 +872,7 @@ export default function App() {
             <Sparkles className="w-3.5 h-3.5 text-pink-400" />
             <span className="hidden sm:inline font-bold text-pink-200">Feed</span>
             {/* Live notification badge for viral leaks / updates */}
-            {(gameState.currentSceneIndex >= 6 || gameState.currentEpisode > 1) && (
+            {hasReached(gameState.currentEpisode, socialSceneIndex, 1, 6) && (
               <span className="w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-0.5 animate-pulse" />
             )}
           </button>
@@ -1234,7 +1241,7 @@ export default function App() {
       {gameState.isSocialFeedOpen && (
         <SocialFeedOverlay
           currentEpisode={gameState.currentEpisode}
-          currentSceneIndex={gameState.currentSceneIndex}
+          currentSceneIndex={socialSceneIndex}
           heroineCustomization={gameState.heroine}
           meters={gameState.meters}
           inventory={gameState.inventory}

@@ -18,6 +18,8 @@ export interface Unlockable {
   requiredAnyFlags?: string[];
   hiddenIfFlag?: string;
   hiddenIfAnyFlags?: string[];
+  /** Show as soon as the scene starts (used for Ada's own posts). Default: only after the scene's choice is made. */
+  unlockAtSceneStart?: boolean;
 }
 
 export interface SocialComment {

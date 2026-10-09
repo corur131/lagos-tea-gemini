@@ -106,7 +106,7 @@ export const GIDIGRAM_TRENDS: GidiGramTrend[] = [
     intensity: 'spicy',
     relatedCharacters: ['lagos_tea', 'chi', 'zee'],
     unlockEpisode: 2,
-    unlockSceneIndex: 0,
+    unlockSceneIndex: 2,
     relatedPostIds: ['post_zee_statement_ep2', 'post_tea_ep2_metadata'],
   },
   {
@@ -173,7 +173,7 @@ export const GIDIGRAM_TRENDS: GidiGramTrend[] = [
     intensity: 'spicy',
     relatedCharacters: ['kelvin', 'heroine'],
     unlockEpisode: 3,
-    unlockSceneIndex: 2,
+    unlockSceneIndex: 3,
     relatedPostIds: ['post_paparazzi_porsche', 'post_kelvin_wing'],
   },
   {

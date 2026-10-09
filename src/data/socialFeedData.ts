@@ -11,7 +11,7 @@ export const INITIAL_STORIES: SocialStory[] = [
     avatarType: 'lagos_tea',
     hasUnseen: true,
     unlockEpisode: 1,
-    unlockSceneIndex: 0,
+    unlockSceneIndex: 2,
     slides: [
       {
         id: 'tea_slide_1',

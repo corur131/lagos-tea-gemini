@@ -733,6 +733,7 @@ export function adaPostToSocialPost(post: AdaPost, heroineName: string, isVerifi
     avatarType: 'heroine',
     unlockEpisode: post.episode,
     unlockSceneIndex: post.sceneIndex,
+    unlockAtSceneStart: true,
     timestamp: 'Your post',
     caption: post.caption,
     hashtags: [],
