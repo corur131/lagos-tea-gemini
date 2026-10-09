@@ -197,6 +197,8 @@ export interface DialogueLine {
   ifFlag?: string;
   /** Hidden when this story flag has been set by an earlier choice */
   ifNotFlag?: string;
+  /** Sets this story flag the moment the line appears (e.g. to unlock a post at the exact moment it is revealed) */
+  setsFlag?: string;
 }
 
 export interface Meters {

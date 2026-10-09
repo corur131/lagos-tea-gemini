@@ -24,6 +24,7 @@ export interface GidiGramTrend {
   requiredFlag?: string;
   requiredAnyFlags?: string[];
   hiddenIfFlag?: string;
+  unlockedByFlag?: string;
   relatedPostIds?: string[];
 }
 
@@ -79,6 +80,7 @@ export const GIDIGRAM_TRENDS: GidiGramTrend[] = [
     relatedCharacters: ['lagos_tea', 'heroine', 'zee'],
     unlockEpisode: 1,
     unlockSceneIndex: 6,
+    unlockedByFlag: 'reveal_ep1_leak',
     relatedPostIds: ['post_lagos_tea_leak_ep1'],
   },
   {
@@ -92,6 +94,7 @@ export const GIDIGRAM_TRENDS: GidiGramTrend[] = [
     relatedCharacters: ['lagos_tea'],
     unlockEpisode: 1,
     unlockSceneIndex: 6,
+    unlockedByFlag: 'reveal_ep1_leak',
     relatedPostIds: ['post_lagos_tea_leak_ep1', 'post_tea_ep2_metadata'],
   },
 

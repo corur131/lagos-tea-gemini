@@ -6,7 +6,7 @@ import { SocialAvatar } from './SocialAvatar';
 import { ArrowLeft, Send } from 'lucide-react';
 import { playSound } from '../../utils/audio';
 
-interface Progress {
+export interface Progress {
   episode: number;
   sceneIndex: number;
   flags: Record<string, boolean>;
@@ -66,7 +66,7 @@ function flatten(beats: DmBeat[], dmReplies: Record<string, string>, name: strin
   return out;
 }
 
-const ThreadAvatar: React.FC<{ thread: DmThread; heroine: HeroineCustomization; size?: 'sm' | 'md' | 'lg' }> = ({
+export const ThreadAvatar: React.FC<{ thread: DmThread; heroine: HeroineCustomization; size?: 'sm' | 'md' | 'lg' }> = ({
   thread,
   heroine,
   size = 'md',

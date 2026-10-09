@@ -835,6 +835,7 @@ export const INITIAL_POSTS: SocialPost[] = [
     avatarType: 'lagos_tea',
     unlockEpisode: 1,
     unlockSceneIndex: 6,
+    unlockedByFlag: 'reveal_ep1_leak',
     isTeaLeak: true,
     timestamp: 'Just now',
     locationTag: 'Banana Island • LEAKED GPS',

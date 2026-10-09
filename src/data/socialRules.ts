@@ -121,7 +121,8 @@ export function isUnlocked(
   sceneIndex: number,
   flags: Record<string, boolean> = {}
 ) {
-  if (!hasReached(episode, sceneIndex, item.unlockEpisode, item.unlockSceneIndex ?? 0, item.unlockAtSceneStart)) return false;
+  const revealedNow = !!(item.unlockedByFlag && flags[item.unlockedByFlag]);
+  if (!revealedNow && !hasReached(episode, sceneIndex, item.unlockEpisode, item.unlockSceneIndex ?? 0, item.unlockAtSceneStart)) return false;
   if (item.requiredFlag && !flags[item.requiredFlag]) return false;
   if (item.requiredAnyFlags && !item.requiredAnyFlags.some((f) => flags[f])) return false;
   if (item.hiddenIfFlag && flags[item.hiddenIfFlag]) return false;

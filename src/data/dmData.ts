@@ -1010,6 +1010,7 @@ export const DM_THREADS: DmThread[] = [
         id: 'group_2',
         unlockEpisode: 1,
         unlockSceneIndex: 6,
+    unlockedByFlag: 'reveal_ep1_leak',
         messages: [
           { from: 'bisola', text: 'GUYS. GUYS. CHECK TEA’S PAGE' },
           { from: 'zee', text: 'Who took photos upstairs. I’m asking ONCE.' },
@@ -1358,6 +1359,7 @@ export const DM_THREADS: DmThread[] = [
         id: 'tea_1',
         unlockEpisode: 1,
         unlockSceneIndex: 6,
+    unlockedByFlag: 'reveal_ep1_leak',
         messages: [
           { from: 'lagos_tea', text: 'Hi Cinderella 🫖' },
           { from: 'lagos_tea', text: 'Did you enjoy your debut? 168K likes in twenty minutes. You’re welcome.' },

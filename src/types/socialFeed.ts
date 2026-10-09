@@ -20,6 +20,8 @@ export interface Unlockable {
   hiddenIfAnyFlags?: string[];
   /** Show as soon as the scene starts (used for Ada's own posts). Default: only after the scene's choice is made. */
   unlockAtSceneStart?: boolean;
+  /** Unlocks the instant this flag is set (by a dialogue line's setsFlag), even mid-scene */
+  unlockedByFlag?: string;
 }
 
 export interface SocialComment {

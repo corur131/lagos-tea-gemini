@@ -35,7 +35,8 @@ import {
 } from './data/choiceFollowUps';
 import { DEFAULT_SOCIAL_STATE, normalizeSocial, applyMeterChanges, hasReached } from './data/socialRules';
 import { DM_THREADS } from './data/dmData';
-import { countUnreadDms } from './components/social/DmInbox';
+import { countUnreadDms, getVisibleBeats } from './components/social/DmInbox';
+import { DmToast, DmToastItem, describeBeat } from './components/social/DmToast';
 import { playSound, bgmManager } from './utils/audio';
 import {
   Sparkles,
@@ -233,6 +234,78 @@ export default function App() {
     });
   }, [gameState.currentEpisode, socialSceneIndex, gameState.flags, gameState.social]);
 
+  /* ---------------- New-DM pop-up notifications ---------------- */
+  const [dmToastQueue, setDmToastQueue] = useState<DmToastItem[]>([]);
+  const [socialFeedInitialThread, setSocialFeedInitialThread] = useState<string | null>(null);
+  const announcedDmBeatsRef = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    const visible = DM_THREADS.flatMap((thread) =>
+      getVisibleBeats(thread, {
+        episode: gameState.currentEpisode,
+        sceneIndex: socialSceneIndex,
+        flags: gameState.flags,
+        social: gameState.social,
+      }).map((beat) => ({ thread, beat }))
+    );
+
+    // First run: remember what's already in the inbox so a reload or an old save doesn't replay pop-ups.
+    // A brand-new game (very first line) starts empty, so its first messages do pop up.
+    if (!announcedDmBeatsRef.current) {
+      let stored: string[] | null = null;
+      try {
+        stored = JSON.parse(localStorage.getItem('lagos_tea_announced_dms') || 'null');
+      } catch {}
+      const isFreshStart =
+        gameState.currentEpisode === 1 && gameState.currentSceneIndex === 0 && gameState.currentLineIndex === 0;
+      announcedDmBeatsRef.current = new Set(stored ?? (isFreshStart ? [] : visible.map((v) => v.beat.id)));
+    }
+    const announced = announcedDmBeatsRef.current;
+
+    const fresh = visible.filter(({ beat }) => !announced.has(beat.id) && !gameState.social.seenDmBeats[beat.id]);
+    if (fresh.length === 0) return;
+    fresh.forEach(({ beat }) => announced.add(beat.id));
+    try {
+      localStorage.setItem('lagos_tea_announced_dms', JSON.stringify([...announced]));
+    } catch {}
+
+    // Already looking at the phone: the inbox badge covers it, no pop-up needed
+    if (gameState.isSocialFeedOpen) return;
+
+    const items: DmToastItem[] = [];
+    for (const { thread, beat } of fresh) {
+      const info = describeBeat(thread, beat.messages, gameState.heroine.name);
+      if (info) items.push({ id: beat.id, thread, ...info });
+    }
+    if (items.length === 0) return;
+    // Several at once: show the first two, fold the rest into the second banner
+    const batch = items.length <= 2 ? items : [items[0], { ...items[1], moreCount: items.length - 2 }];
+    setDmToastQueue((q) => [...q, ...batch]);
+  }, [gameState.currentEpisode, socialSceneIndex, gameState.flags, gameState.social, gameState.heroine.name, gameState.isSocialFeedOpen]);
+
+  // Opening the phone clears any waiting pop-ups
+  useEffect(() => {
+    if (gameState.isSocialFeedOpen) setDmToastQueue([]);
+  }, [gameState.isSocialFeedOpen]);
+
+  const activeDmToast = dmToastQueue[0];
+  const dismissDmToast = useCallback(() => setDmToastQueue((q) => q.slice(1)), []);
+
+  // Chime when a pop-up appears
+  useEffect(() => {
+    if (activeDmToast && gameState.soundEnabled && !gameState.isSocialFeedOpen && !isFirstLaunch) {
+      playSound.phoneChime();
+    }
+  }, [activeDmToast?.id]);
+
+  const openDmFromToast = (threadId: string) => {
+    if (gameState.soundEnabled) playSound.click();
+    setSocialFeedInitialTab('dms');
+    setSocialFeedInitialThread(threadId);
+    setDmToastQueue([]);
+    setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
+  };
+
   // Dynamic Background Music state & modal
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false);
   const [musicState, setMusicState] = useState(() => ({
@@ -306,6 +379,14 @@ export default function App() {
 
   const currentLine = currentScene.lines[gameState.currentLineIndex] || currentScene.lines[0];
   const isLastLineOfScene = gameState.currentLineIndex >= currentScene.lines.length - 1;
+
+  // A line can mark a moment as revealed (e.g. the leak post goes live exactly when Bisola shouts about it)
+  useEffect(() => {
+    const flag = currentLine?.setsFlag;
+    if (flag && !gameState.flags[flag]) {
+      setGameState((prev) => ({ ...prev, flags: { ...prev.flags, [flag]: true } }));
+    }
+  }, [currentLine?.setsFlag, gameState.flags]);
 
   // Dynamic Background Music adaptation based on scene, dialog, twists, or endings
   useEffect(() => {
@@ -863,6 +944,7 @@ export default function App() {
           <button
             onClick={() => {
               setSocialFeedInitialTab('for_you');
+              setSocialFeedInitialThread(null);
               setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
               if (gameState.soundEnabled) playSound.click();
             }}
@@ -881,6 +963,7 @@ export default function App() {
           <button
             onClick={() => {
               setSocialFeedInitialTab('dms');
+              setSocialFeedInitialThread(null);
               setGameState((prev) => ({ ...prev, isSocialFeedOpen: true }));
               if (gameState.soundEnabled) playSound.click();
             }}
@@ -1186,6 +1269,16 @@ export default function App() {
       )}
 
       {/* 7. FIRST LAUNCH WELCOME & CUSTOMIZER */}
+      {/* NEW DM POP-UP (hidden while the phone/feed is open or during character creation) */}
+      {activeDmToast && !gameState.isSocialFeedOpen && !isFirstLaunch && (
+        <DmToast
+          toast={activeDmToast}
+          heroine={gameState.heroine}
+          onOpen={openDmFromToast}
+          onDismiss={dismissDmToast}
+        />
+      )}
+
       {isFirstLaunch && (
         <HeroineCustomizer
           customization={gameState.heroine}
@@ -1249,6 +1342,7 @@ export default function App() {
           soundEnabled={gameState.soundEnabled}
           social={gameState.social}
           initialTab={socialFeedInitialTab}
+          initialThreadId={socialFeedInitialThread}
           onUpdateSocial={(updater) =>
             setGameState((prev) => ({
               ...prev,

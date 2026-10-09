@@ -462,6 +462,7 @@ export const EPISODE_1_SCENES: SceneData[] = [
         speakerDisplayName: 'Bisola Adeyemi',
         expression: 'shocked',
         text: '“OMG! @TheLagosTea just posted! Guys, look at your feeds right now!” Bisola’s voice cracked in genuine panic.',
+        setsFlag: 'reveal_ep1_leak',
       },
       {
         speaker: 'narrator',
