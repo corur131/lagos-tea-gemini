@@ -232,7 +232,7 @@ export function buildFallbackComments(
   // 2. TONE-BASED AND RELATIONSHIP COMMENTS:
   if (!comments.some((c) => c.authorId === 'tamara') && !unfollowed?.tamara) {
     if (flags.questioned_tamara_dm) add('tamara', '😐');
-    else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑' }[tone]);
+    else add('tamara', { humble: 'My girl 🥹💚', shady: 'LMAOOO who hurt you 😭💚', flex: 'THAT’S MY SISTER 💚👑', flirty: 'Okay bestie I see you 👀💚', mysterious: 'Wait tell me everything right now 🫖💚' }[tone]);
   }
 
   if (!comments.some((c) => c.authorId === 'chidi') && !unfollowed?.chidi && meters.romanceChidi >= 25) {
@@ -240,6 +240,8 @@ export function buildFallbackComments(
       humble: '📸👏',
       shady: 'Remind me never to get on your bad side 😅',
       flex: 'Better than any shot I took tonight 🔥',
+      flirty: 'Looking like a muse as always 😉',
+      mysterious: 'A picture says a thousand words... what are you hiding? 📸🔍',
     }[tone]);
   }
 
@@ -248,6 +250,8 @@ export function buildFallbackComments(
       humble: 'Humble looks good on you.',
       shady: 'Dangerous. I like it 🥃',
       flex: 'Told you. Main character. 🥃',
+      flirty: 'Drop the location. I’ll send a car 🥃',
+      mysterious: 'Playing games now? I’ll play along 🥃',
     }[tone]);
   }
 
